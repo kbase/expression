@@ -1,0 +1,10 @@
+#!/bin/sh
+echo trying to stop ExpressionServices service.
+pid_file=/kb/deployment/services/ExpressionServices/service.pid
+if [ ! -f $pid_file ] ; then 
+	echo "No pid file: $pid_file found for service ExpressionServices."
+	exit 1
+fi
+pid=$(cat $pid_file)
+kill $pid
+

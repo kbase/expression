@@ -1,0 +1,12 @@
+#!/bin/sh
+echo starting ExpressionServices service.
+export PERL5LIB=$PERL5LIB:/kb/deployment/lib
+export KB_DEPLOYMENT_CONFIG=/homes/oakland/jkbaumohl/expression_instance/test.cfg
+export KB_SERVICE_NAME=expressionServices
+#uncomment to debug: export STARMAN_DEBUG=1
+/kb/runtime/bin/starman --listen :9999 --pid /kb/deployment/services/ExpressionServices/service.pid --daemonize \
+  --access-log /kb/deployment/services/ExpressionServices/log/access.log \
+  --error-log /kb/deployment/services/ExpressionServices/log/error.log \
+  /kb/deployment/lib/
+echo ExpressionServices service is listening on port 9999.
+
