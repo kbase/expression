@@ -1,0 +1,17 @@
+OVERVIEW
+------------------------------------------
+This service provides users methods for accessing the expression data.
+This expression schema is set up to contain a fair amount of metadata, hook ins to the experiment schema and being a data repository for
+different types of expression technologies (microarrays (all platforms), RNA-Seq, proteomics).
+
+
+Version 0.01 (GIT commit on 3/12/2013)
+-------------------------------------------
+NEW FEATURES:
+-The first internal release.  All methods are new.
+
+UPDATED FEATURES / MAJOR BUG FIXES:
+-none.
+
+ANTICIPATED FUTURE DEVELOPMENTS:
+-public release of the service
