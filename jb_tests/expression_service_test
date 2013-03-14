@@ -1,6 +1,6 @@
 use strict;
 use Data::Dumper;
-use lib "../expressionServices";
+use lib "../lib/Bio/KBase/expressionServices"; 
 use ExpressionServicesClient;
 my $client = ExpressionServicesClient->new("http://localhost:9999");
 
