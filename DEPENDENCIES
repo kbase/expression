@@ -1,0 +1,15 @@
+dev_container
+typecomp
+	cd typecomp
+	git checkout dev-pyserver
+kb_seed
+kbapi_common
+auth
+dev_container_tools.git
+exchange_format_support
+	cd exchange_format_support/
+	git checkout 336524e
+experiment
+	cd experiment
+	git checkout a588dba
+idserver
