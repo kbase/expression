@@ -15,9 +15,13 @@ use warnings;
 use Data::Dumper; 
 use Test::More;
 use lib "../lib/Bio/KBase/expressionServices"; 
+#--
 use lib "../lib/"; 
+use lib "t/client-tests";
+
 use ExpressionServicesClient;
- 
+
+#-- 
 #my $client = ExpressionServicesClient->new("http://localhost:9999"); 
 #############################################################################
 # HERE IS A LIST OF METHODS AND PARAMETERS THAT WE WANT TO TEST
@@ -41,6 +45,7 @@ my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of func
 #use_ok("Bio::KBase::ExpressionServices::Client");
  
 #NEW VERSION WITH AUTO START / STOP SERVICE
+#--
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
@@ -67,5 +72,7 @@ for $method_name (keys %$func_calls) {
     }
     ok($result,"looking for a response from \"$method_name\"");
 }
+
+Server::stop($pid);
 
 done_testing($n_tests);
