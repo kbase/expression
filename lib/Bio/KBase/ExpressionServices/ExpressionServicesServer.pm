@@ -1,4 +1,4 @@
-package Bio::KBase::ExpressionServices::Service;
+package ExpressionServicesServer;
 
 use Data::Dumper;
 use Moose;
@@ -46,7 +46,7 @@ sub call_method {
 
     my ($module, $method) = @$method_info{qw(module method)};
     
-    my $ctx = Bio::KBase::ExpressionServices::ServiceContext->new(client_ip => $self->_plack_req->address);
+    my $ctx = ExpressionServicesServerContext->new(client_ip => $self->_plack_req->address);
     
     my $args = $data->{arguments};
 
@@ -136,13 +136,13 @@ sub get_method
     return { module => $module, method => $method };
 }
 
-package Bio::KBase::ExpressionServices::ServiceContext;
+package ExpressionServicesServerContext;
 
 use strict;
 
 =head1 NAME
 
-Bio::KBase::ExpressionServices::ServiceContext
+ExpressionServicesServerContext
 
 head1 DESCRIPTION
 

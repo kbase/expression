@@ -1,40 +1,46 @@
-package Bio::KBase::ExpressionServices::ExpressionServicesImpl;
+package ExpressionServicesClient;
+
+use JSON::RPC::Client;
 use strict;
+use Data::Dumper;
+use URI;
 use Bio::KBase::Exceptions;
-# Use Semantic Versioning (2.0.0-rc.1)
-# http://semver.org 
+
+# Client version should match Impl version
+# This is a Semantic Version number,
+# http://semver.org
 our $VERSION = "0.1.0";
 
 =head1 NAME
 
-ExpressionServices
+ExpressionServicesClient
 
 =head1 DESCRIPTION
 
 
 
-=cut
 
-#BEGIN_HEADER
-#END_HEADER
+
+=cut
 
 sub new
 {
-    my($class, @args) = @_;
-    my $self = {
-    };
-    bless $self, $class;
-    #BEGIN_CONSTRUCTOR
-    #END_CONSTRUCTOR
+    my($class, $url, @args) = @_;
 
-    if ($self->can('_init_instance'))
-    {
-	$self->_init_instance();
-    }
+    my $self = {
+	client => ExpressionServicesClient::RpcClient->new,
+	url => $url,
+    };
+
+
+    my $ua = $self->{client}->ua;	 
+    my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
+    $ua->timeout($timeout);
+    bless $self, $class;
+    #    $self->_validate_version();
     return $self;
 }
 
-=head1 METHODS
 
 
 
@@ -168,8 +174,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure
@@ -180,31 +184,47 @@ core function used by many others.  Given a list of SampleIds returns mapping of
 
 sub get_expression_samples_data
 {
-    my $self = shift;
-    my($sampleIds) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($sampleIds) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIds\" (value was \"$sampleIds\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_samples_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data');
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_samples_data (received $n, expecting 1)");
+    }
+    {
+	my($sampleIds) = @args;
+
+	my @_bad_arguments;
+        (ref($sampleIds) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"sampleIds\" (value was \"$sampleIds\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_samples_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_samples_data');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($expressionDataSamplesMap);
-    #BEGIN get_expression_samples_data
-    #END get_expression_samples_data
-    my @_bad_returns;
-    (ref($expressionDataSamplesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"expressionDataSamplesMap\" (value was \"$expressionDataSamplesMap\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_samples_data:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_samples_data",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_samples_data',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_samples_data",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_samples_data',
+				       );
     }
-    return($expressionDataSamplesMap);
 }
-
 
 
 
@@ -338,8 +358,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 given a list of SeriesIds returns mapping of SeriesId to expressionDataSamples
@@ -350,31 +368,47 @@ given a list of SeriesIds returns mapping of SeriesId to expressionDataSamples
 
 sub get_expression_samples_data_by_series_ids
 {
-    my $self = shift;
-    my($seriesIds) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($seriesIds) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIds\" (value was \"$seriesIds\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_samples_data_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_series_ids');
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_samples_data_by_series_ids (received $n, expecting 1)");
+    }
+    {
+	my($seriesIds) = @args;
+
+	my @_bad_arguments;
+        (ref($seriesIds) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"seriesIds\" (value was \"$seriesIds\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_samples_data_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_samples_data_by_series_ids');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesExpressionDataSamplesMapping);
-    #BEGIN get_expression_samples_data_by_series_ids
-    #END get_expression_samples_data_by_series_ids
-    my @_bad_returns;
-    (ref($seriesExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesExpressionDataSamplesMapping\" (value was \"$seriesExpressionDataSamplesMapping\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_samples_data_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_series_ids');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_samples_data_by_series_ids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_samples_data_by_series_ids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_samples_data_by_series_ids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_samples_data_by_series_ids',
+				       );
     }
-    return($seriesExpressionDataSamplesMapping);
 }
-
 
 
 
@@ -510,8 +544,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 given a list of ExperimentalUnitIds returns mapping of ExperimentalUnitId to expressionDataSamples
@@ -522,31 +554,47 @@ given a list of ExperimentalUnitIds returns mapping of ExperimentalUnitId to exp
 
 sub get_expression_samples_data_by_experimental_unit_ids
 {
-    my $self = shift;
-    my($experimentalUnitIDs) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($experimentalUnitIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentalUnitIDs\" (value was \"$experimentalUnitIDs\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_samples_data_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_samples_data_by_experimental_unit_ids (received $n, expecting 1)");
+    }
+    {
+	my($experimentalUnitIDs) = @args;
+
+	my @_bad_arguments;
+        (ref($experimentalUnitIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"experimentalUnitIDs\" (value was \"$experimentalUnitIDs\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_samples_data_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_samples_data_by_experimental_unit_ids');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($experimentalUnitExpressionDataSamplesMapping);
-    #BEGIN get_expression_samples_data_by_experimental_unit_ids
-    #END get_expression_samples_data_by_experimental_unit_ids
-    my @_bad_returns;
-    (ref($experimentalUnitExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"experimentalUnitExpressionDataSamplesMapping\" (value was \"$experimentalUnitExpressionDataSamplesMapping\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_samples_data_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_samples_data_by_experimental_unit_ids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_samples_data_by_experimental_unit_ids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_samples_data_by_experimental_unit_ids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_samples_data_by_experimental_unit_ids',
+				       );
     }
-    return($experimentalUnitExpressionDataSamplesMapping);
 }
-
 
 
 
@@ -684,8 +732,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 given a list of ExperimentMetaIds returns mapping of ExperimentId to experimentalUnitExpressionDataSamplesMapping
@@ -696,31 +742,47 @@ given a list of ExperimentMetaIds returns mapping of ExperimentId to experimenta
 
 sub get_expression_experimental_unit_samples_data_by_experiment_meta_ids
 {
-    my $self = shift;
-    my($experimentMetaIDs) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($experimentMetaIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentMetaIDs\" (value was \"$experimentMetaIDs\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_experimental_unit_samples_data_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids');
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_experimental_unit_samples_data_by_experiment_meta_ids (received $n, expecting 1)");
+    }
+    {
+	my($experimentMetaIDs) = @args;
+
+	my @_bad_arguments;
+        (ref($experimentMetaIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"experimentMetaIDs\" (value was \"$experimentMetaIDs\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_experimental_unit_samples_data_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($experimentMetaExpressionDataSamplesMapping);
-    #BEGIN get_expression_experimental_unit_samples_data_by_experiment_meta_ids
-    #END get_expression_experimental_unit_samples_data_by_experiment_meta_ids
-    my @_bad_returns;
-    (ref($experimentMetaExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"experimentMetaExpressionDataSamplesMapping\" (value was \"$experimentMetaExpressionDataSamplesMapping\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_experimental_unit_samples_data_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_experimental_unit_samples_data_by_experiment_meta_ids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_experimental_unit_samples_data_by_experiment_meta_ids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids',
+				       );
     }
-    return($experimentMetaExpressionDataSamplesMapping);
 }
-
 
 
 
@@ -858,8 +920,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 given a list of Strains, and a SampleType, it returns a StrainExpressionDataSamplesMapping,  StrainId -> ExpressionDataSample
@@ -870,32 +930,48 @@ given a list of Strains, and a SampleType, it returns a StrainExpressionDataSamp
 
 sub get_expression_samples_data_by_strain_ids
 {
-    my $self = shift;
-    my($strainIDs, $sampleType) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($strainIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"strainIDs\" (value was \"$strainIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_samples_data_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_strain_ids');
+# Authentication: none
+
+    if ((my $n = @args) != 2)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_samples_data_by_strain_ids (received $n, expecting 2)");
+    }
+    {
+	my($strainIDs, $sampleType) = @args;
+
+	my @_bad_arguments;
+        (ref($strainIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"strainIDs\" (value was \"$strainIDs\")");
+        (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument 2 \"sampleType\" (value was \"$sampleType\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_samples_data_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_samples_data_by_strain_ids');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($strainExpressionDataSamplesMapping);
-    #BEGIN get_expression_samples_data_by_strain_ids
-    #END get_expression_samples_data_by_strain_ids
-    my @_bad_returns;
-    (ref($strainExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"strainExpressionDataSamplesMapping\" (value was \"$strainExpressionDataSamplesMapping\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_samples_data_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_strain_ids');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_samples_data_by_strain_ids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_samples_data_by_strain_ids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_samples_data_by_strain_ids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_samples_data_by_strain_ids',
+				       );
     }
-    return($strainExpressionDataSamplesMapping);
 }
-
 
 
 
@@ -1039,8 +1115,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample
@@ -1051,33 +1125,49 @@ given a list of Genomes, a SampleType and a int indicating WildType Only (1 = tr
 
 sub get_expression_samples_data_by_genome_ids
 {
-    my $self = shift;
-    my($genomeIDs, $sampleType, $wildTypeOnly) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($genomeIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genomeIDs\" (value was \"$genomeIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_samples_data_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_genome_ids');
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_samples_data_by_genome_ids (received $n, expecting 3)");
+    }
+    {
+	my($genomeIDs, $sampleType, $wildTypeOnly) = @args;
+
+	my @_bad_arguments;
+        (ref($genomeIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"genomeIDs\" (value was \"$genomeIDs\")");
+        (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument 2 \"sampleType\" (value was \"$sampleType\")");
+        (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument 3 \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_samples_data_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_samples_data_by_genome_ids');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($genomeExpressionDataSamplesMapping);
-    #BEGIN get_expression_samples_data_by_genome_ids
-    #END get_expression_samples_data_by_genome_ids
-    my @_bad_returns;
-    (ref($genomeExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"genomeExpressionDataSamplesMapping\" (value was \"$genomeExpressionDataSamplesMapping\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_samples_data_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_samples_data_by_genome_ids');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_samples_data_by_genome_ids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_samples_data_by_genome_ids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_samples_data_by_genome_ids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_samples_data_by_genome_ids',
+				       );
     }
-    return($genomeExpressionDataSamplesMapping);
 }
-
 
 
 
@@ -1127,8 +1217,6 @@ Log2Level is a float
 
 =end text
 
-
-
 =item Description
 
 given a list of FeatureIds, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleLog2LevelMapping : featureId->{sample_id->log2Level}
@@ -1139,68 +1227,103 @@ given a list of FeatureIds, a SampleType and a int indicating WildType Only (1 =
 
 sub get_expression_data_by_feature_ids
 {
-    my $self = shift;
-    my($featureIds, $sampleType, $wildTypeOnly) = @_;
+    my($self, @args) = @_;
 
-    my @_bad_arguments;
-    (ref($featureIds) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"featureIds\" (value was \"$featureIds\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_expression_data_by_feature_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_data_by_feature_ids');
+# Authentication: none
+
+    if ((my $n = @args) != 3)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_expression_data_by_feature_ids (received $n, expecting 3)");
+    }
+    {
+	my($featureIds, $sampleType, $wildTypeOnly) = @args;
+
+	my @_bad_arguments;
+        (ref($featureIds) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"featureIds\" (value was \"$featureIds\")");
+        (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument 2 \"sampleType\" (value was \"$sampleType\")");
+        (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument 3 \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_expression_data_by_feature_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_expression_data_by_feature_ids');
+	}
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($featureSampleLog2LevelMapping);
-    #BEGIN get_expression_data_by_feature_ids
-    #END get_expression_data_by_feature_ids
-    my @_bad_returns;
-    (ref($featureSampleLog2LevelMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"featureSampleLog2LevelMapping\" (value was \"$featureSampleLog2LevelMapping\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_expression_data_by_feature_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_expression_data_by_feature_ids');
+    my $result = $self->{client}->call($self->{url}, {
+	method => "ExpressionServices.get_expression_data_by_feature_ids",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_expression_data_by_feature_ids',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_expression_data_by_feature_ids",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_expression_data_by_feature_ids',
+				       );
     }
-    return($featureSampleLog2LevelMapping);
 }
 
 
 
-
-=head2 version 
-
-  $return = $obj->version()
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$return is a string
-</pre>
-
-=end html
-
-=begin text
-
-$return is a string
-
-=end text
-
-=item Description
-
-Return the module version. This is a Semantic Versioning number.
-
-=back
-
-=cut
-
 sub version {
-    return $VERSION;
+    my ($self) = @_;
+    my $result = $self->{client}->call($self->{url}, {
+        method => "ExpressionServices.version",
+        params => [],
+    });
+    if ($result) {
+        if ($result->is_error) {
+            Bio::KBase::Exceptions::JSONRPC->throw(
+                error => $result->error_message,
+                code => $result->content->{code},
+                method_name => 'get_expression_data_by_feature_ids',
+            );
+        } else {
+            return wantarray ? @{$result->result} : $result->result->[0];
+        }
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(
+            error => "Error invoking method get_expression_data_by_feature_ids",
+            status_line => $self->{client}->status_line,
+            method_name => 'get_expression_data_by_feature_ids',
+        );
+    }
+}
+
+sub _validate_version {
+    my ($self) = @_;
+    my $svr_version = $self->version();
+    my $client_version = $VERSION;
+    my ($cMajor, $cMinor) = split(/\./, $client_version);
+    my ($sMajor, $sMinor) = split(/\./, $svr_version);
+    if ($sMajor != $cMajor) {
+        Bio::KBase::Exceptions::ClientServerIncompatible->throw(
+            error => "Major version numbers differ.",
+            server_version => $svr_version,
+            client_version => $client_version
+        );
+    }
+    if ($sMinor < $cMinor) {
+        Bio::KBase::Exceptions::ClientServerIncompatible->throw(
+            error => "Client minor version greater than Server minor version.",
+            server_version => $svr_version,
+            client_version => $client_version
+        );
+    }
+    if ($sMinor > $cMinor) {
+        warn "New client version available for ExpressionServicesClient\n";
+    }
+    if ($sMajor == 0) {
+        warn "ExpressionServicesClient version is $svr_version. API subject to change.\n";
+    }
 }
 
 =head1 TYPES
@@ -2239,5 +2362,82 @@ a reference to a hash where the key is a FeatureID and the value is a SampleLog2
 
 
 =cut
+
+package ExpressionServicesClient::RpcClient;
+use base 'JSON::RPC::Client';
+
+#
+# Override JSON::RPC::Client::call because it doesn't handle error returns properly.
+#
+
+sub call {
+    my ($self, $uri, $obj) = @_;
+    my $result;
+
+    if ($uri =~ /\?/) {
+       $result = $self->_get($uri);
+    }
+    else {
+        Carp::croak "not hashref." unless (ref $obj eq 'HASH');
+        $result = $self->_post($uri, $obj);
+    }
+
+    my $service = $obj->{method} =~ /^system\./ if ( $obj );
+
+    $self->status_line($result->status_line);
+
+    if ($result->is_success) {
+
+        return unless($result->content); # notification?
+
+        if ($service) {
+            return JSON::RPC::ServiceObject->new($result, $self->json);
+        }
+
+        return JSON::RPC::ReturnObject->new($result, $self->json);
+    }
+    elsif ($result->content_type eq 'application/json')
+    {
+        return JSON::RPC::ReturnObject->new($result, $self->json);
+    }
+    else {
+        return;
+    }
+}
+
+
+sub _post {
+    my ($self, $uri, $obj) = @_;
+    my $json = $self->json;
+
+    $obj->{version} ||= $self->{version} || '1.1';
+
+    if ($obj->{version} eq '1.0') {
+        delete $obj->{version};
+        if (exists $obj->{id}) {
+            $self->id($obj->{id}) if ($obj->{id}); # if undef, it is notification.
+        }
+        else {
+            $obj->{id} = $self->id || ($self->id('JSON::RPC::Client'));
+        }
+    }
+    else {
+        # $obj->{id} = $self->id if (defined $self->id);
+	# Assign a random number to the id if one hasn't been set
+	$obj->{id} = (defined $self->id) ? $self->id : substr(rand(),2);
+    }
+
+    my $content = $json->encode($obj);
+
+    $self->ua->post(
+        $uri,
+        Content_Type   => $self->{content_type},
+        Content        => $content,
+        Accept         => 'application/json',
+	($self->{token} ? (Authorization => $self->{token}) : ()),
+    );
+}
+
+
 
 1;
