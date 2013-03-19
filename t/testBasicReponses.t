@@ -16,7 +16,7 @@ use Data::Dumper;
 use Test::More;
 use lib "../lib/Bio/KBase/expressionServices"; 
 #--
-use lib "../lib/"; 
+use lib "lib"; 
 use lib "t/client-tests";
 
 use ExpressionServicesClient;
