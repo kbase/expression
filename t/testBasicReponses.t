@@ -18,7 +18,7 @@ use Test::More;
 #--
 use lib "lib"; 
 use lib "t/client-tests";
-
+#--
 #use ExpressionServicesClient;
 
 #-- 
@@ -43,7 +43,7 @@ my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of func
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
 #--
 use_ok("JSON::RPC::Client");
-use_ok("Bio::KBase::ExpressionServices::Client");
+use_ok("Bio::KBase::ExpressionServices::ExpressionServicesClient");
  
 #NEW VERSION WITH AUTO START / STOP SERVICE
 #--
