@@ -20,6 +20,7 @@ use lib "lib";
 use lib "../lib"; 
 #use lib "t/client-tests";
 #--
+use Bio::KBase::ExpressionServices::ExpressionServicesClient;
 #use ExpressionServicesClient;
 
 #-- 
