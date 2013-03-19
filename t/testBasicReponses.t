@@ -50,7 +50,7 @@ use_ok("Bio::KBase::ExpressionServices::ExpressionServicesClient");
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-my $client = Bio::KBase::ExpressionServices::Client->new($url);
+my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
 
 ok(defined($client),"instantiating tree client");
 
