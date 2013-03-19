@@ -13,6 +13,7 @@
 use strict; 
 use warnings;
 use Data::Dumper; 
+use Test::More;
 use lib "../lib/Bio/KBase/expressionServices"; 
 #use lib "../lib/"; 
 use ExpressionServicesClient;
