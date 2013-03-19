@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Data::Dumper; 
 use Test::More;
-use lib "../lib/Bio/KBase/expressionServices"; 
+#use lib "../lib/Bio/KBase/ExpressionServices"; 
 #--
 use lib "lib"; 
 use lib "t/client-tests";
@@ -41,8 +41,8 @@ my $func_calls = {
 my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of function calls + 3; 
 
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
-#use_ok("JSON::RPC::Client");
-#use_ok("Bio::KBase::ExpressionServices::Client");
+use_ok("JSON::RPC::Client");
+use_ok("Bio::KBase::ExpressionServices::Client");
  
 #NEW VERSION WITH AUTO START / STOP SERVICE
 #--
