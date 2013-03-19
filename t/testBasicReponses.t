@@ -17,7 +17,8 @@ use Test::More;
 #use lib "../lib/Bio/KBase/ExpressionServices"; 
 #--
 use lib "lib"; 
-use lib "t/client-tests";
+use lib "../lib"; 
+#use lib "t/client-tests";
 #--
 #use ExpressionServicesClient;
 
