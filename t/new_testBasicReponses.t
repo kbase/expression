@@ -16,8 +16,8 @@ use Data::Dumper;
 use Test::More;
 use lib "../lib/Bio/KBase/ExpressionServices"; 
 #--
-#use lib "lib"; 
-#use lib "../lib"; 
+use lib "lib"; 
+use lib "../lib"; 
 #use lib "t/client-tests";
 #--
 use ExpressionServicesClient;
@@ -51,8 +51,8 @@ use_ok("JSON::RPC::Client");
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
 my $client = ExpressionServicesClient->new($url); 
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
 ok(defined($client),"instantiating tree client");
 
 # LOOP THROUGH ALL THE REMOTE CALLS AND MAKE SURE WE GOT SOMETHING
