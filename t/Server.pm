@@ -26,12 +26,12 @@ sub start {
     my $child_pid = fork;
   if ($child_pid == 0)
   {
-      die "could not find ./lib/$service.psgi" unless -e "lib/$service.psgi";
+      die "could not find ./lib/$service.psgi" unless -e "../lib/$service.psgi";
       open STDOUT, "/dev/null";
       open STDERR, "/dev/null";
       my $runner = Plack::Runner->new();
       $runner->parse_options("--listen", "0:$port");
-      $runner->run("lib/$service.psgi");
+      $runner->run("../lib/$service.psgi");
       exit;
   }
 
