@@ -13,8 +13,8 @@
 use strict; 
 use warnings;
 use Data::Dumper; 
-#use lib "../lib/Bio/KBase/expressionServices"; 
-use lib "../lib/"; 
+use lib "../lib/Bio/KBase/expressionServices"; 
+#use lib "../lib/"; 
 #use ExpressionServicesClient;
  
 my $client = ExpressionServicesClient->new("http://localhost:9999"); 
