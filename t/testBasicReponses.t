@@ -18,7 +18,7 @@ use lib "../lib/Bio/KBase/expressionServices";
 #use lib "../lib/"; 
 use ExpressionServicesClient;
  
-my $client = ExpressionServicesClient->new("http://localhost:9999"); 
+#my $client = ExpressionServicesClient->new("http://localhost:9999"); 
 #############################################################################
 # HERE IS A LIST OF METHODS AND PARAMETERS THAT WE WANT TO TEST
 # NOTE THAT THE PARAMETERS ASSUME the initial load of Adam D's data is loaded.
@@ -41,10 +41,10 @@ my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of func
 #use_ok("Bio::KBase::ExpressionServices::Client");
  
 #NEW VERSION WITH AUTO START / STOP SERVICE
-#use Server;
-#my ($pid, $url) = Server::start('ExpressionServices');
-#print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-#my $client = Bio::KBase::ExpressionServices::Client->new($url);
+use Server;
+my ($pid, $url) = Server::start('ExpressionServices');
+print "-> attempting to connect to:'".$url."' with PID=$pid\n";
+my $client = Bio::KBase::ExpressionServices::Client->new($url);
 
 ok(defined($client),"instantiating tree client");
 
