@@ -51,7 +51,6 @@ use_ok("JSON::RPC::Client");
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-             Bio::KBase::ExpressionServices::ExpressionServicesClient
 #my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
 my $client = ExpressionServicesClient->new($url); 
 ok(defined($client),"instantiating tree client");
