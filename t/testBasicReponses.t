@@ -36,11 +36,9 @@ my $func_calls = {
 my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of function calls + 3; 
 
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
-use_ok("JSON::RPC::Client");
-use_ok("Bio::KBase::ExpressionServices::Client");
+#use_ok("JSON::RPC::Client");
+#use_ok("Bio::KBase::ExpressionServices::Client");
  
-my $client = ExpressionServicesClient->new("http://localhost:9999"); 
-
 #NEW VERSION WITH AUTO START / STOP SERVICE
 #use Server;
 #my ($pid, $url) = Server::start('ExpressionServices');
