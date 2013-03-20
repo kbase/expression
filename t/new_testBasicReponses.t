@@ -49,7 +49,7 @@ my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
 my $client = ExpressionServicesClient->new($url); 
 #my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
-ok(defined($client),"instantiating tree client");
+ok(defined($client),"instantiating ExpressionServices client");
 
 # LOOP THROUGH ALL THE REMOTE CALLS AND MAKE SURE WE GOT SOMETHING
 my $method_name;
