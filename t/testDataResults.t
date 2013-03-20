@@ -70,7 +70,6 @@ eval {
 }; 
 ok($result,"get_expression_samples_data(['kb|sample.2','kb|sample.3']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries");
-#my %sample_record_hash = %{$result->{'kb|sample_2'}};
 my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDesciption',
 		     'originalLog2Median','experimentMetaID','dataExpressionLevelsForSample','protocolId','wildtype',
 		     'platformTitle','platformId','referenceStrain','personIds','experimentTitle','externalSourceDate',
@@ -82,8 +81,7 @@ my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','
 foreach my $exp_key (@expected_keys)
 {
     print "$exp_key \n";
-#    ok(exists($sample_record_hash{$exp_key}), 'get_expression_samples_data() sample has the key : $exp_key');
-    ok(exists($result->{'kb|sample.2'}->{$exp_key}), 'get_expression_samples_data() sample has the key : $exp_key');
+    ok(exists($result->{'kb|sample.2'}->{$exp_key}), 'get_expression_samples_data() sample has the key : '.$exp_key);
 }
 #check that keys that point to a data structure are that data structure.
 ok(ref($result->{'kb|sample.2'}->{'dataExpressionLevelsForSample'}) eq 'HASH',
