@@ -46,14 +46,15 @@ use_ok("Bio::KBase::ExpressionServices::ExpressionServicesClient");
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-my $client = ExpressionServicesClient->new($url); 
-#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
+#my $client = ExpressionServicesClient->new($url); 
+my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
 ok(defined($client),"instantiating ExpressionServices client");
 
 my $result;
 
 #Test get_expression_samples_data
 #Test 4 - 48
+#most heavily tested since all but 1 other ExpressionServices method eventually calls this method
 eval {
     $result = $client->get_expression_samples_data([]);
 };
@@ -64,13 +65,13 @@ eval {
     $result = $client->get_expression_samples_data(['Not A real ID','kb|not Real']);
 }; 
 ok($result,"get_expression_samples_data(['Not A real ID','kb|not Real']) returned"); 
-ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entrie=s");
+ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entries");
 eval {
     $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); 
 }; 
 ok($result,"get_expression_samples_data(['kb|sample.2','kb|sample.3']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries");
-my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDesciption',
+my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDescription',
 		     'originalLog2Median','experimentMetaID','dataExpressionLevelsForSample','protocolId','wildtype',
 		     'platformTitle','platformId','referenceStrain','personIds','experimentTitle','externalSourceDate',
 		     'molecule','protocolName','platformTechnology','protocolDescription','environmentId','dataSource',
@@ -80,7 +81,6 @@ my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','
 #print Dumper($result);
 foreach my $exp_key (@expected_keys)
 {
-    print "$exp_key \n";
     ok(exists($result->{'kb|sample.2'}->{$exp_key}), 'get_expression_samples_data() sample has the key : '.$exp_key);
 }
 #check that keys that point to a data structure are that data structure.
@@ -95,7 +95,22 @@ ok(ref($result->{'kb|sample.2'}->{'seriesIds'}) eq 'ARRAY',
 ok(ref($result->{'kb|sample.2'}->{'sampleAnnotationIDs'}) eq 'ARRAY',
    'get_expression_samples_data has an array for sampleAnnotationIDs');
 
-
+#Test get_expression_samples_data_by_series_ids
+#Test 49
+eval { 
+    $result = $client->get_expression_samples_data_by_series_ids([]); 
+}; 
+ok($result,"get_expression_samples_data_by_series_ids([]) returned"); 
+ok(ref($result) eq 'HASH','get_expression_samples_data_by_series_ids returns a hash'); 
+ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_series_ids([]) appropriately has no entries'); 
+eval { 
+    $result = $client->get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']); 
+}; 
+ok($result,"get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']) returned"); 
+ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
+eval { 
+    $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); 
+}; 
 
 
 # LOOP THROUGH ALL THE REMOTE CALLS AND MAKE SURE WE GOT SOMETHING
