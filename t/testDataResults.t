@@ -57,20 +57,20 @@ my $result;
 #Test 4 - 49
 eval {
     $result = $client->get_expression_samples_data([]);
-}
+};
 ok($result,"get_expression_samples_data([]) returned");
 ok(ref($result) eq 'HASH','get_expression returns a hash');
 ok(scalar(keys(%{$result})) = 0, 'get_expression_samples_data([]) appropriately has no entries');
 eval { 
     $result = $client->get_expression_samples_data(['Not A real ID','kb|not Real']);
-} 
+}; 
 ok($result,"get_expression_samples_data(['Not A real ID','kb|not Real']) returned"); 
-ok(scalar(keys(%{$result})) = 0, 'get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entries');
+ok(scalar(keys(%{$result})) = 0, "get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entries");
 eval {
     $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); 
-} 
+}; 
 ok($result,"get_expression_samples_data(['kb|sample.2','kb|sample.3']) returned");
-ok(scalar(keys(%{$result})) = 2, 'get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries');
+ok(scalar(keys(%{$result})) = 2, "get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries");
 my %sample_record_hash = $results->{'kb|sample_2'};
 my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDesciption',
 		     'originalLog2Median','experimentMetaID','dataExpressionLevelsForSample','protocolId','wildtype',
