@@ -14,17 +14,12 @@ use strict;
 use warnings;
 use Data::Dumper; 
 use Test::More;
-#use lib "../lib/Bio/KBase/ExpressionServices"; 
-#--
+use lib "../lib/Bio/KBase/ExpressionServices"; 
 use lib "lib"; 
 use lib "../lib"; 
-#use lib "t/client-tests";
-#--
-use Bio::KBase::ExpressionServices::ExpressionServicesClient;
-#use ExpressionServicesClient;
+use ExpressionServicesClient;
 
-#-- 
-#my $client = ExpressionServicesClient->new("http://localhost:9999"); 
+
 #############################################################################
 # HERE IS A LIST OF METHODS AND PARAMETERS THAT WE WANT TO TEST
 # NOTE THAT THE PARAMETERS ASSUME the initial load of Adam D's data is loaded.
@@ -52,9 +47,9 @@ use_ok("Bio::KBase::ExpressionServices::ExpressionServicesClient");
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
-
-ok(defined($client),"instantiating tree client");
+my $client = ExpressionServicesClient->new($url); 
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
+ok(defined($client),"instantiating ExpressionServices client");
 
 # LOOP THROUGH ALL THE REMOTE CALLS AND MAKE SURE WE GOT SOMETHING
 my $method_name;
