@@ -133,6 +133,24 @@ eval {
 ok($result,"get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) appropriately has 2 entries");
 
+#Test get_expression_samples_data_by_series_ids 
+#Test 63 - 69      
+eval { 
+    $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]); 
+}; 
+ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) returned"); 
+ok(ref($result) eq 'HASH','get_expression_experimental_unit_samples_data_by_experiment_meta_ids returns a hash'); 
+ok(scalar(keys(%{$result})) == 0, 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) appropriately has no entries'); 
+eval { 
+    $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']); 
+}; 
+ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) returned"); 
+ok(scalar(keys(%{$result})) == 0, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
+eval { 
+    $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
+}; 
+ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) returned"); 
+ok(scalar(keys(%{$result})) == 2, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
 
 
 
