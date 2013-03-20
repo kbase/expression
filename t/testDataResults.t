@@ -64,7 +64,7 @@ eval {
     $result = $client->get_expression_samples_data(['Not A real ID','kb|not Real']);
 }; 
 ok($result,"get_expression_samples_data(['Not A real ID','kb|not Real']) returned"); 
-ok(scalar(keys(%{$result})) = 0, "get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entrie=s");
+ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entrie=s");
 eval {
     $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); 
 }; 
