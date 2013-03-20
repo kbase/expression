@@ -96,7 +96,7 @@ ok(ref($result->{'kb|sample.2'}->{'sampleAnnotationIDs'}) eq 'ARRAY',
    'get_expression_samples_data has an array for sampleAnnotationIDs');
 
 #Test get_expression_samples_data_by_series_ids
-#Test 49
+#Test 49 - 55
 eval { 
     $result = $client->get_expression_samples_data_by_series_ids([]); 
 }; 
@@ -109,8 +109,33 @@ eval {
 ok($result,"get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']) returned"); 
 ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
 eval { 
-    $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); 
+    $result = $client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); 
 }; 
+ok($result,"get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.1']) returned"); 
+ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_series_ids('kb|series.0','kb|series.1']) appropriately has 2 entries"); 
+
+#Test get_expression_samples_data_by_series_ids 
+#Test 56 - 62             
+eval { 
+    $result = $client->get_expression_samples_data_by_experimental_unit_ids([]); 
+};
+ok($result,"get_expression_samples_data_by_experimental_unit_ids([]) returned"); 
+ok(ref($result) eq 'HASH','get_expression_samples_data_by_experimental_unit_ids returns a hash'); 
+ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_experimental_unit_ids([]) appropriately has no entries'); 
+eval { 
+    $result = $client->get_expression_samples_data_by_experimental_unit_ids(['Not A real ID','kb|not Real']); 
+}; 
+ok($result,"get_expression_samples_data_by_experimental_unit_ids(['Not A real ID','kb|not Real']) returned"); 
+ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_experimental_unit_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
+eval { 
+    $result = $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); 
+}; 
+ok($result,"get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) returned");
+ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) appropriately has 2 entries");
+
+
+
+
 
 
 # LOOP THROUGH ALL THE REMOTE CALLS AND MAKE SURE WE GOT SOMETHING
