@@ -53,7 +53,7 @@ ok(defined($client),"instantiating ExpressionServices client");
 my $result;
 
 #Test get_expression_samples_data
-#Test 4 - 49
+#Test 4 - 48
 eval {
     $result = $client->get_expression_samples_data([]);
 };
@@ -70,17 +70,18 @@ eval {
 }; 
 ok($result,"get_expression_samples_data(['kb|sample.2','kb|sample.3']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries");
-my %sample_record_hash = $result->{'kb|sample_2'};
+my %sample_record_hash = %{$result->{'kb|sample_2'}};
 my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDesciption',
 		     'originalLog2Median','experimentMetaID','dataExpressionLevelsForSample','protocolId','wildtype',
 		     'platformTitle','platformId','referenceStrain','personIds','experimentTitle','externalSourceDate',
 		     'molecule','protocolName','platformTechnology','protocolDescription','environmentId','dataSource',
 		     'custom','experimentalUnitID','strainID','sourceId','strainDescription','seriesIds',
 		     'sampleAnnotationIDs','genomeScientificName','sampleId','externalSourceId','sampleType');
-#check that each Key exists  33 checks 12-44
+#check that each Key exists  33 checks 11-43
 #print Dumper($result);
 foreach my $exp_key (@expected_keys)
 {
+    print "$exp_key \n";
     ok(exists($sample_record_hash{$exp_key}), 'get_expression_samples_data() sample has the key : $exp_key');
 }
 #check that keys that point to a data structure are that data structure.
