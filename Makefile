@@ -6,7 +6,7 @@ SERVICE_NAME = ExpressionServices
 ROOT_DEV_MODULE_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 KB_DEPLOYMENT_CONFIG ?= $(ROOT_DEV_MODULE_DIR)/deploy.cfg
 SERVICE_CONFIG_NAME = expressionServices
-SERVICE_PORT = 9999
+SERVICE_PORT = 7075
 
 include $(TOP_DIR)/tools/Makefile.common
 
@@ -234,9 +234,9 @@ build-libs:
 		--psgi $(SERVICE_NAME).psgi \
 		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
 		--service Bio::KBase::$(SERVICE_NAME)::Service \
-		--client Bio::KBase::$(SERVICE_NAME)::Client \
-		--py biokbase/$(SERVICE_NAME)/Client \
-		--js javascript/$(SERVICE_NAME)/Client \
+		--client Bio::KBase::$(SERVICE_NAME)::ExpressionServicesClient \
+		--py biokbase/$(SERVICE_NAME)/ExpressionServicesClient \
+		--js javascript/$(SERVICE_NAME)/ExpressionServicesClient \
 		--scripts scripts \
 		$(SERVICE_SPEC) lib
 
