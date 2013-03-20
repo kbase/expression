@@ -15,15 +15,11 @@ use warnings;
 use Data::Dumper; 
 use Test::More;
 use lib "../lib/Bio/KBase/ExpressionServices"; 
-#--
 use lib "lib"; 
 use lib "../lib"; 
-#use lib "t/client-tests";
-#--
 use ExpressionServicesClient;
 
-#-- 
-#my $client = ExpressionServicesClient->new("http://localhost:9999"); 
+
 #############################################################################
 # HERE IS A LIST OF METHODS AND PARAMETERS THAT WE WANT TO TEST
 # NOTE THAT THE PARAMETERS ASSUME the initial load of Adam D's data is loaded.
@@ -44,15 +40,14 @@ my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of func
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
 #--
 use_ok("JSON::RPC::Client");
-#use_ok("Bio::KBase::ExpressionServices::ExpressionServicesClient");
+use_ok("Bio::KBase::ExpressionServices::ExpressionServicesClient");
  
 #NEW VERSION WITH AUTO START / STOP SERVICE
 #--
 use Server;
 my ($pid, $url) = Server::start('ExpressionServices');
 print "-> attempting to connect to:'".$url."' with PID=$pid\n";
-my $client = ExpressionServicesClient->new("http://localhost:9999"); 
-#my $client = ExpressionServicesClient->new($url); 
+my $client = ExpressionServicesClient->new($url); 
 #my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($url);
 ok(defined($client),"instantiating tree client");
 
