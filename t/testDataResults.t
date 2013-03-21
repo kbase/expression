@@ -154,6 +154,9 @@ ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids
 ok(scalar(keys(%{$result})) == 2, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
 #print Dumper($result);
 
+
+ok(defined($client),"Client still here:");
+
 #Test get_expression_samples_data_by_strain_ids            
 #Test 70 - 76 
 print "\n#get_expression_samples_data_by_strain_ids portion\n";
