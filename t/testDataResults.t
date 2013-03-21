@@ -99,6 +99,7 @@ eval {
 }; 
 ok($result,"get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.1']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_series_ids('kb|series.0','kb|series.1']) appropriately has 2 entries"); 
+#print Dumper($result);
 
 #Test get_expression_samples_data_by_experimental_unit_ids 
 #Test 56 - 62             
@@ -119,6 +120,7 @@ eval {
 }; 
 ok($result,"get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) appropriately has 2 entries");
+#print Dumper($result);
 
 #Test get_expression_experimental_unit_samples_data_by_experiment_meta_ids 
 #Test 63 - 69      
@@ -139,6 +141,7 @@ eval {
 }; 
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
+#print Dumper($result);
 
 #Test get_expression_samples_data_by_strain_ids            
 #Test 70 - 76 
@@ -159,6 +162,7 @@ eval {
 }; 
 ok($result,"get_expression_samples_data_by_strain_ids(['kb|str.7634']) returned"); 
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_strain_ids(['kb|str.7634']) appropriately has 1 entry");
+print Dumper($result);
  
 #Test get_expression_samples_data_by_genome_ids 
 #Test 77 - 83     
@@ -179,7 +183,7 @@ eval {
 }; 
 ok($result,"get_expression_samples_data_by_genome_ids(['kb|g.20848']) returned"); 
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_genome_ids(['kb|g.20848']) appropriately has 1 entry");
- 
+print Dumper($result);
 
 
 
