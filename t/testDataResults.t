@@ -137,6 +137,7 @@ $result = undef;
 eval { 
     $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]); 
 }; 
+ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) ". $@);
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) returned"); 
 ok(ref($result) eq 'HASH','get_expression_experimental_unit_samples_data_by_experiment_meta_ids returns a hash'); 
 ok(scalar(keys(%{$result})) == 0, 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) appropriately has no entries'); 
@@ -164,6 +165,7 @@ $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_strain_ids([]); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_strain_ids([]) ". $@);
 ok($result,"get_expression_samples_data_by_strain_ids([]) returned");
 ok(ref($result) eq 'HASH','get_expression_samples_data_by_strain_ids returns a hash');
 ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_strain_ids([]) appropriately has no entries');
