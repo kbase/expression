@@ -146,7 +146,6 @@ $result = undef;
 eval { 
     $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]); 
 }; 
-ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
 ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) ". $@);
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) returned"); 
 ok(ref($result) eq 'HASH','get_expression_experimental_unit_samples_data_by_experiment_meta_ids returns a hash'); 
@@ -225,6 +224,34 @@ ok($result,"get_expression_samples_data_by_genome_ids(['kb|g.20848']) returned")
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_genome_ids(['kb|g.20848']) appropriately has 1 entry");
 #print Dumper($result);
 
+#Test get_expression_data_by_feature_ids
+#Test 102-111
+print "\n#get_expression_expression_data_by_feature_ids portion\n"; 
+$result = undef; 
+eval { 
+    $result = $client->get_expression_data_by_feature_ids([],'microarray','N'); 
+}; 
+ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
+ok($result,"get_expression_data_by_feature_ids([]) returned"); 
+ok(ref($result) eq 'HASH','get_expression_data_by_feature_ids returns a hash'); 
+ok(scalar(keys(%{$result})) == 0, 'get_expression_data_by_feature_ids([]) appropriately has no entries'); 
+#print Dumper($result); 
+$result = undef; 
+eval { 
+    $result = $client->get_expression_data_by_feature_ids(['Not A real ID','kb|not Real'],'microarray','N'); 
+}; 
+ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
+ok($result,"get_expression_data_by_feature_ids(['Not A real ID','kb|not Real']) returned"); 
+ok(scalar(keys(%{$result})) == 0, "get_expression_data_by_feature_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
+#print Dumper($result);   
+$result = undef; 
+eval { 
+    $result = $client->get_expression_data_by_feature_ids(['kb|g.20848'],'microarray','N'); 
+}; 
+ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
+ok($result,"get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) returned"); 
+ok(scalar(keys(%{$result})) == 2, "get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) appropriately has 2 entries"); 
+#print Dumper($result);                                                  
 
 
 Server::stop($pid);
