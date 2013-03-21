@@ -37,12 +37,13 @@ ok(defined($client),"instantiating ExpressionServices client");
 my $result;
 
 #Test get_expression_samples_data
-#Test 4 - 48
+#Test 4 - 51
 #most heavily tested since all but 1 other ExpressionServices method eventually calls this method
 print "\n#get_expression_samples_data portion\n";
 eval {
     $result = $client->get_expression_samples_data([]);
 };
+ok($@ eq '',"get_expression_samples_data call ". $@);
 ok($result,"get_expression_samples_data([]) returned");
 ok(ref($result) eq 'HASH','get_expression returns a hash');
 ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data([]) appropriately has no entries');
@@ -50,12 +51,14 @@ $result = undef;
 eval { 
     $result = $client->get_expression_samples_data(['Not A real ID','kb|not Real']);
 }; 
+ok($@ eq '',"get_expression_samples_data call ". $@);
 ok($result,"get_expression_samples_data(['Not A real ID','kb|not Real']) returned"); 
 ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data(['Not A real ID','kb|not Real']) appropriately has no entries");
 $result = undef;
 eval {
     $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); 
 }; 
+ok($@ eq '',"get_expression_samples_data call ". $@);
 ok($result,"get_expression_samples_data(['kb|sample.2','kb|sample.3']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries");
 my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDescription',
@@ -83,12 +86,13 @@ ok(ref($result->{'kb|sample.2'}->{'sampleAnnotationIDs'}) eq 'ARRAY',
    'get_expression_samples_data has an array for sampleAnnotationIDs');
 
 #Test get_expression_samples_data_by_series_ids
-#Test 49 - 55
+#Test 52 - 61
 print "\n#get_expression_samples_data_by_series_ids portion\n";
 $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_series_ids([]); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_series_id call ". $@);
 ok($result,"get_expression_samples_data_by_series_ids([]) returned"); 
 ok(ref($result) eq 'HASH','get_expression_samples_data_by_series_ids returns a hash'); 
 ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_series_ids([]) appropriately has no entries'); 
@@ -96,23 +100,26 @@ $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_series_id call ". $@);
 ok($result,"get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']) returned"); 
 ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_series_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
 $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_series_id call ". $@);
 ok($result,"get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.1']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_series_ids('kb|series.0','kb|series.1']) appropriately has 2 entries"); 
 #print Dumper($result);
 
 #Test get_expression_samples_data_by_experimental_unit_ids 
-#Test 56 - 62             
+#Test 62 - 71             
 print "\n#get_expression_samples_data_by_experimental_unit_ids portion\n";
 $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_experimental_unit_ids([]); 
 };
+ok($@ eq '',"get_expression_samples_data_by_experimental_unit_ids call ". $@);
 ok($result,"get_expression_samples_data_by_experimental_unit_ids([]) returned"); 
 ok(ref($result) eq 'HASH','get_expression_samples_data_by_experimental_unit_ids returns a hash'); 
 ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_experimental_unit_ids([]) appropriately has no entries'); 
@@ -120,23 +127,26 @@ $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_experimental_unit_ids(['Not A real ID','kb|not Real']); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_experimental_unit_ids call ". $@);
 ok($result,"get_expression_samples_data_by_experimental_unit_ids(['Not A real ID','kb|not Real']) returned"); 
 ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_experimental_unit_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
 $result = undef;
 eval { 
     $result = $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_experimental_unit_ids call ". $@);
 ok($result,"get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) appropriately has 2 entries");
 #print Dumper($result);
 
 #Test get_expression_experimental_unit_samples_data_by_experiment_meta_ids 
-#Test 63 - 69      
+#Test 72 - 81      
 print "\n#get_expression_experimental_unit_samples_data_by_experiment_meta_ids portion\n";
 $result = undef;
 eval { 
     $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]); 
 }; 
+ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
 ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) ". $@);
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) returned"); 
 ok(ref($result) eq 'HASH','get_expression_experimental_unit_samples_data_by_experiment_meta_ids returns a hash'); 
@@ -145,68 +155,72 @@ $result = undef;
 eval { 
     $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']); 
 }; 
+ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) returned"); 
 ok(scalar(keys(%{$result})) == 0, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
 $result = undef;
 eval { 
     $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
 }; 
+ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
 #print Dumper($result);
 
-
-ok(defined($client),"Client still here:");
-
 #Test get_expression_samples_data_by_strain_ids            
-#Test 70 - 76 
+#Test 82 - 91 
 print "\n#get_expression_samples_data_by_strain_ids portion\n";
 $result = undef;
 eval { 
-    $result = $client->get_expression_samples_data_by_strain_ids([]); 
+    $result = $client->get_expression_samples_data_by_strain_ids([],'microarray'); 
 }; 
-ok($@ eq '',"get_expression_samples_data_by_strain_ids([]) ". $@);
+ok($@ eq '',"get_expression_samples_data_by_strain_ids call ". $@);
 ok($result,"get_expression_samples_data_by_strain_ids([]) returned");
 ok(ref($result) eq 'HASH','get_expression_samples_data_by_strain_ids returns a hash');
 ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_strain_ids([]) appropriately has no entries');
 print Dumper($result);
 $result = undef;
 eval { 
-    $result = $client->get_expression_samples_data_by_strain_ids(['Not A real ID','kb|not Real']);
+    $result = $client->get_expression_samples_data_by_strain_ids(['Not A real ID','kb|not Real'],'microarray');
 }; 
+ok($@ eq '',"get_expression_samples_data_by_strain_ids call ". $@);
 ok($result,"get_expression_samples_data_by_strain_ids(['Not A real ID','kb|not Real']) returned");
 ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_strain_ids(['Not A real ID','kb|not Real']) appropriately has no entries");
 print Dumper($result);
 $result = undef;
 eval { 
-    $result = $client->get_expression_samples_data_by_strain_ids(['kb|str.7634']);
+    $result = $client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray');
 }; 
+ok($@ eq '',"get_expression_samples_data_by_strain_ids call ". $@);
 ok($result,"get_expression_samples_data_by_strain_ids(['kb|str.7634']) returned"); 
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_strain_ids(['kb|str.7634']) appropriately has 1 entry");
 print Dumper($result);
  
 #Test get_expression_samples_data_by_genome_ids 
-#Test 77 - 83     
+#Test 92 - 101     
 print "\n#get_expression_samples_data_by_genome_ids portion\n";
 $result = undef;
 eval { 
-    $result = $client->get_expression_samples_data_by_genome_ids([]); 
+    $result = $client->get_expression_samples_data_by_genome_ids([],'microarray','N'); 
 }; 
+ok($@ eq '',"get_expression_samples_data_by_genome_ids call ". $@);
 ok($result,"get_expression_samples_data_by_genome_ids([]) returned");
 ok(ref($result) eq 'HASH','get_expression_samples_data_by_genome_ids returns a hash');
 ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_genome_ids([]) appropriately has no entries');
 print Dumper($result);
 $result = undef;
 eval { 
-    $result = $client->get_expression_samples_data_by_genome_ids(['Not A real ID','kb|not Real']);
+    $result = $client->get_expression_samples_data_by_genome_ids(['Not A real ID','kb|not Real'],'microarray','N');
 }; 
+ok($@ eq '',"get_expression_samples_data_by_genome_ids call ". $@);
 ok($result,"get_expression_samples_data_by_genome_ids(['Not A real ID','kb|not Real']) returned");
 ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_genome_ids(['Not A real ID','kb|not Real']) appropriately has no entries");
 print Dumper($result);
 $result = undef;
 eval { 
-    $result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848']);
+    $result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N');
 }; 
+ok($@ eq '',"get_expression_samples_data_by_genome_ids call ". $@);
 ok($result,"get_expression_samples_data_by_genome_ids(['kb|g.20848']) returned"); 
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_genome_ids(['kb|g.20848']) appropriately has 1 entry");
 print Dumper($result);
