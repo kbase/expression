@@ -18,7 +18,7 @@ use lib "../lib/Bio/KBase/ExpressionServices";
 use lib "lib"; 
 use lib "../lib"; 
 use ExpressionServicesClient;
-my $n_tests = 100; 
+my $n_tests = 111; 
 
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
 #--
@@ -246,7 +246,7 @@ ok(scalar(keys(%{$result})) == 0, "get_expression_data_by_feature_ids(['Not A re
 #print Dumper($result);   
 $result = undef; 
 eval { 
-    $result = $client->get_expression_data_by_feature_ids(['kb|g.20848'],'microarray','N'); 
+    $result = $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','N'); 
 }; 
 ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
 ok($result,"get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) returned"); 
