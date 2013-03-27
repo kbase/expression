@@ -31,13 +31,13 @@ if (scalar(@ARGV)>0)
 print "NOTE THIS TEST SCRIPT HAS AN OPTION TO PASS ADDITIONAL INTEGER ARGUMENTS TO IT\n".
 "The following integers being present will result in the Data Dumper of the returned results to be printed for the following calls:\n".
 "**********************************************************************************************************************************\n".
-"1 - $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); \n".
-"2 - $client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); \n".
-"3 - $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); \n".
-"4 - $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n".
-"5 - $client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray'); \n".
-"6 - $client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N'); \n".
-"7 - $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','N'); \n\n";
+"1 - client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); \n".
+"2 - client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); \n".
+"3 - client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); \n".
+"4 - client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n".
+"5 - client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray'); \n".
+"6 - client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N'); \n".
+"7 - client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','N'); \n\n";
 
 my $n_tests = 111; 
 
