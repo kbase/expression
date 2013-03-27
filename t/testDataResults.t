@@ -21,7 +21,7 @@ use ExpressionServicesClient;
 
 my $debug = 0;
 my $temp = shift;
-if (exists($temp))
+if ($temp == 1)
 {
     $debug = 1;
 }
