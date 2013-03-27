@@ -3,9 +3,10 @@ DEPLOY_RUNTIME ?= /kb/runtime
 TARGET ?= /kb/deployment
 SERVICE_SPEC = expressionServices.spec 
 SERVICE_NAME = ExpressionServices
+SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 ROOT_DEV_MODULE_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 KB_DEPLOYMENT_CONFIG ?= $(ROOT_DEV_MODULE_DIR)/deploy.cfg
-SERVICE_CONFIG_NAME = expressionServices
+SERVICE_CONFIG_NAME = ExpressionServices
 SERVICE_PORT = 7075
 
 include $(TOP_DIR)/tools/Makefile.common
