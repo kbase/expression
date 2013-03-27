@@ -25,7 +25,6 @@ if (scalar(@ARGV)>0)
     foreach my $arg (@ARGV)
     {
 	$print_hash{$arg} = 1;
-	print $arg . "\n";
     }
 }
 
