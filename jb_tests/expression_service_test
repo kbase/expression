@@ -1,8 +1,7 @@
 use strict;
 use Data::Dumper;
-use lib "../lib/Bio/KBase/expressionServices"; 
-use ExpressionServicesClient;
-my $client = ExpressionServicesClient->new("http://localhost:9999");
+use Bio::KBase::ExpressionServices::ExpressionServicesClient;
+my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
 
 my $result;
 print "get_expression_samples_data()\n";
