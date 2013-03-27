@@ -1,4 +1,4 @@
-package ExpressionServicesImpl;
+package Bio::KBase::ExpressionServices::ExpressionServicesImpl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
@@ -28,6 +28,10 @@ sub new
     };
     bless $self, $class;    
     #BEGIN_CONSTRUCTOR 
+#    foreach my $key (keys %ENV) { 
+#	print "$key = $ENV{$key}\n"; 
+#    } 
+
     #Copied from M. Sneddon's TreeImpl.pm from trees.git f63b672dc14f4600329424bc6b404b507e9c2503   
     my($deploy) = @args; 
     if (! $deploy) { 
@@ -35,19 +39,18 @@ sub new
         # the deployment settings   
 	my %params; 
         if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) { 
-	    print "IN CONFIG IF\n"; 
-	    print "CONFIG FILE $e \n\n";
+#print "IN CONFIG IF\n"; 
+#print "CONFIG FILE $e \n\n";
             my $EXPRESSION_SERVICE_NAME = $ENV{KB_SERVICE_NAME}; 
             my $c = Config::Simple->new(); 
             $c->read($e); 
-	    print "CONFIG FILE C: $c \n\n";
+#print "CONFIG FILE C: $c \n\n";
 	    my %temp_hash = $c->vars();
-	    foreach my $c_key (keys(%temp_hash))
-	    {
-		print "CKEY: $c_key : Val $temp_hash{$c_key} \n";
-	    }
+#	    foreach my $c_key (keys(%temp_hash))
+#	    {
+#		print "CKEY: $c_key : Val $temp_hash{$c_key} \n";
+#	    }
             my @param_list = qw(dbName dbUser dbhost); 
-#print "IN DEP CONF IF\n";
 #print "PAram list : ".join(":",@param_list)."\n";
             for my $p (@param_list) 
             { 
@@ -56,7 +59,7 @@ sub new
 #print "IN LOOP P: $p v $v \n";
                 if ($v) 
                 { 
-		    print "IN V IF\n"; 
+#		    print "IN V IF\n"; 
                     $params{$p} = $v; 
                     $self->{$p} = $v; 
                 } 
@@ -67,7 +70,7 @@ sub new
             $self->{dbName} = 'CS_expression'; 
             $self->{dbUser} = 'expressionSelect'; 
             $self->{dbhost} = 'localhost'; 
-            print "IN CONFIG ELSE\n"; 
+#            print "IN CONFIG ELSE\n"; 
         } 
         #Create a connection to the EXPRESSION (and print a logging debug mssg)              
 	if( 0 < scalar keys(%params) ) { 
@@ -81,11 +84,11 @@ sub new
         $self->{dbName} = 'CS_expression'; 
         $self->{dbUser} = 'expressionSelect'; 
         $self->{dbhost} = 'localhost'; 
-	print "IN ELSE\n"; 
+#	print "IN ELSE\n"; 
     } 
-    print "\nDBNAME : ".  $self->{dbName}; 
-    print "\nDBUSER : ".  $self->{dbUser}; 
-    print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
+#    print "\nDBNAME : ".  $self->{dbName}; 
+#    print "\nDBUSER : ".  $self->{dbUser}; 
+#    print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
     #END_CONSTRUCTOR     
 
     if ($self->can('_init_instance'))
@@ -252,7 +255,7 @@ sub get_expression_samples_data
 							       method_name => 'get_expression_samples_data');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($expressionDataSamplesMap);
     #BEGIN get_expression_samples_data
     $expressionDataSamplesMap = {};
@@ -567,7 +570,7 @@ sub get_expression_samples_data_by_series_ids
 							       method_name => 'get_expression_samples_data_by_series_ids');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($seriesExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_series_ids
     $seriesExpressionDataSamplesMapping = {};
@@ -781,7 +784,7 @@ sub get_expression_samples_data_by_experimental_unit_ids
 							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($experimentalUnitExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_experimental_unit_ids
     $experimentalUnitExpressionDataSamplesMapping = {};
@@ -1002,7 +1005,7 @@ sub get_expression_experimental_unit_samples_data_by_experiment_meta_ids
 							       method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($experimentMetaExpressionDataSamplesMapping);
     #BEGIN get_expression_experimental_unit_samples_data_by_experiment_meta_ids
     $experimentMetaExpressionDataSamplesMapping = {}; 
@@ -1218,7 +1221,7 @@ sub get_expression_samples_data_by_strain_ids
 							       method_name => 'get_expression_samples_data_by_strain_ids');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($strainExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_strain_ids
     $strainExpressionDataSamplesMapping = {};
@@ -1461,7 +1464,7 @@ sub get_expression_samples_data_by_genome_ids
 							       method_name => 'get_expression_samples_data_by_genome_ids');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($genomeExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_genome_ids
     $genomeExpressionDataSamplesMapping = {};
@@ -1627,7 +1630,7 @@ sub get_expression_data_by_feature_ids
 							       method_name => 'get_expression_data_by_feature_ids');
     }
 
-    my $ctx = $ExpressionServicesServer::CallContext;
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($featureSampleLog2LevelMapping);
     #BEGIN get_expression_data_by_feature_ids
     $featureSampleLog2LevelMapping = {};
