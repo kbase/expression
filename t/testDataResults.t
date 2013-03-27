@@ -18,6 +18,13 @@ use lib "../lib/Bio/KBase/ExpressionServices";
 use lib "lib"; 
 use lib "../lib"; 
 use ExpressionServicesClient;
+
+my $debug = 0;
+my $temp = shift;
+if (exists($temp))
+{
+    $debug = 1;
+}
 my $n_tests = 111; 
 
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
@@ -110,7 +117,10 @@ eval {
 ok($@ eq '',"get_expression_samples_data_by_series_id call ". $@);
 ok($result,"get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.1']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_series_ids('kb|series.0','kb|series.1']) appropriately has 2 entries"); 
-#print Dumper($result);
+if ($debug == 1)
+{
+    print Dumper($result);
+}
 
 #Test get_expression_samples_data_by_experimental_unit_ids 
 #Test 62 - 71             
@@ -251,8 +261,10 @@ eval {
 ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
 ok($result,"get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) appropriately has 2 entries"); 
-#print Dumper($result);                                                  
-
+if ($debug == 1)
+{
+    print Dumper($result);
+}
 
 Server::stop($pid);
 
