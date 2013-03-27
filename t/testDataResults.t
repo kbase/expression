@@ -89,7 +89,7 @@ my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','
 		     'custom','experimentalUnitID','strainID','sourceId','strainDescription','seriesIds',
 		     'sampleAnnotationIDs','genomeScientificName','sampleId','externalSourceId','sampleType');
 #check that each Key exists  33 checks 11-43
-if (exists($print_hash{1}) 
+if (exists($print_hash{1})) 
 { 
     print Dumper($result); 
 } 
@@ -134,7 +134,7 @@ eval {
 ok($@ eq '',"get_expression_samples_data_by_series_id call ". $@);
 ok($result,"get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.1']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_series_ids('kb|series.0','kb|series.1']) appropriately has 2 entries"); 
-if (exists($print_hash{2}) 
+if (exists($print_hash{2})) 
 { 
     print Dumper($result);
 } 
@@ -165,7 +165,7 @@ eval {
 ok($@ eq '',"get_expression_samples_data_by_experimental_unit_ids call ". $@);
 ok($result,"get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) appropriately has 2 entries");
-if (exists($print_hash{3}) 
+if (exists($print_hash{3})) 
 { 
     print Dumper($result);
 } 
@@ -196,7 +196,7 @@ eval {
 ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
 ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
-if (exists($print_hash{4}) 
+if (exists($print_hash{4})) 
 { 
     print Dumper($result);
 } 
@@ -229,7 +229,7 @@ eval {
 ok($@ eq '',"get_expression_samples_data_by_strain_ids call ". $@);
 ok($result,"get_expression_samples_data_by_strain_ids(['kb|str.7634']) returned"); 
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_strain_ids(['kb|str.7634']) appropriately has 1 entry");
-if (exists($print_hash{5}) 
+if (exists($print_hash{5}))
 { 
     print Dumper($result);
 } 
@@ -262,7 +262,7 @@ eval {
 ok($@ eq '',"get_expression_samples_data_by_genome_ids call ". $@);
 ok($result,"get_expression_samples_data_by_genome_ids(['kb|g.20848']) returned"); 
 ok(scalar(keys(%{$result})) == 1, "get_expression_samples_data_by_genome_ids(['kb|g.20848']) appropriately has 1 entry");
-if (exists($print_hash{6}) 
+if (exists($print_hash{6}))
 { 
     print Dumper($result);
 } 
@@ -295,7 +295,7 @@ eval {
 ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
 ok($result,"get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) appropriately has 2 entries"); 
-if (exists($print_hash{7}) 
+if (exists($print_hash{7}))
 { 
     print Dumper($result);
 } 
