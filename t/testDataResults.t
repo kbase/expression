@@ -19,11 +19,23 @@ use lib "lib";
 use lib "../lib"; 
 use ExpressionServicesClient;
 
-my $debug = 0;
-my $temp = shift;
-if ($temp == 1)
+my %print_hash;
+if (scalar(@ARGV)>0)
 {
-    $debug = 1;
+    foreach my $arg (@ARGV)
+    {
+	$print_hash{$arg} = 1;
+	print $arg . "\n";
+    }
+}
+
+
+
+my $debug = 0;
+my $temp = undef;
+if (defined($temp))
+{
+    $debug = $temp;
 }
 my $n_tests = 111; 
 
@@ -75,7 +87,10 @@ my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','
 		     'custom','experimentalUnitID','strainID','sourceId','strainDescription','seriesIds',
 		     'sampleAnnotationIDs','genomeScientificName','sampleId','externalSourceId','sampleType');
 #check that each Key exists  33 checks 11-43
-#print Dumper($result);
+if ($debug > 0) 
+{ 
+    print Dumper($result); 
+} 
 foreach my $exp_key (@expected_keys)
 {
     ok(exists($result->{'kb|sample.2'}->{$exp_key}), 'get_expression_samples_data() sample has the key : '.$exp_key);
@@ -117,7 +132,7 @@ eval {
 ok($@ eq '',"get_expression_samples_data_by_series_id call ". $@);
 ok($result,"get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.1']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_series_ids('kb|series.0','kb|series.1']) appropriately has 2 entries"); 
-if ($debug == 1)
+if ($debug > 1)
 {
     print Dumper($result);
 }
