@@ -64,8 +64,8 @@ default:
 
 # Test Section
 
-test:	@echo "make test should be run from the expression directory (where you checked it out"
-	test-client test-scripts test-service
+test:	test-client test-scripts test-service
+	@echo "make test should be run from the expression directory (where you checked it out"
 	@echo "running client and script tests"
 
 # test-all is deprecated. 
