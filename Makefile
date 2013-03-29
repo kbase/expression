@@ -97,7 +97,7 @@ test-client:
 # for services will move in this direction.
 test-scripts:
 	# run each test
-	for t in $(SCRIPT_TESTS) ; do \
+	for t in $(SCRIPTS_TESTS) ; do \
 		if [ -f $$t ] ; then \
 			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
 			if [ $$? -ne 0 ] ; then \
