@@ -11,14 +11,13 @@
 #  created: 3/19/2013
 
 use strict; 
-use warnings;
+use warnings; 
 use Data::Dumper; 
-use Test::More;
-use lib "../lib/Bio/KBase/ExpressionServices"; 
+use Test::More; 
 use lib "lib"; 
-use lib "../lib"; 
-use ExpressionServicesClient;
-
+use lib "t"; 
+use Bio::KBase::ExpressionServices::ExpressionServicesClient; 
+use Server; 
 
 #############################################################################
 # HERE IS A LIST OF METHODS AND PARAMETERS THAT WE WANT TO TEST
