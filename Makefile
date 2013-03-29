@@ -21,9 +21,9 @@ SRC_PERL = $(wildcard scripts/*.pl)
 
 # You can change these if you are putting your tests somewhere
 # else or if you are not using the standard .t suffix
-CLIENT_TESTS = $(wildcard client-tests/*.t)
-SCRIPTS_TESTS = $(wildcard script-tests/*.t)
-SERVER_TESTS = $(wildcard server-tests/*.t)
+CLIENT_TESTS = $(wildcard t/client-tests/*.t)
+SCRIPTS_TESTS = $(wildcard t/script-tests/*.t)
+SERVER_TESTS = $(wildcard t/server-tests/*.t)
 
 SERVICE = ExpressionServices
 $(SERVICE_DIR) ?= /kb/deployment/services/$(SERVICE)
@@ -64,7 +64,8 @@ default:
 
 # Test Section
 
-test: test-client test-scripts test-service
+test:	@echo "make test should be run from the expression directory (where you checked it out"
+	test-client test-scripts test-service
 	@echo "running client and script tests"
 
 # test-all is deprecated. 
