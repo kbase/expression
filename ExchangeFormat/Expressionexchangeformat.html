@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <title>Expression</title>
+  <link href="Expressionexchangeformat.css" rel="stylesheet">
+</head>
+
+<body>
+<h1>Exchange Format for Expression Data</h1>
+<p>Version 2</p>
+<p>A well-defined exchange format will be created for every table or set of 
+tables in the KBase Central Database Model (CDM).  The exchange format defines 
+input files that must be created along with the structure of the file contents.
+It will give the data providers a blueprint for preparing KBase-ready data and
+will serve as the basis for data loading scripts for the Central Data Store 
+(CDS).</p>
+
+<h2>Expression Data</h2>
+<p>EXPRESSION EXCHANGE FORMAT:
+This exchange format describes the files included in the exchange for expression data.<br />
+This includes microarray, RNA-Seq (expression), qPCR and proteomics data.
+The files included in this exchange are:</p>
+<ol>
+<li>sample.tab</li>
+<li>series.tab</li>
+<li>platform.tab</li>
+<li>log2level.tab </li>
+<li>sample_annotation.tab </li>
+<li>person.tab</li>
+<li>protocol.tab</li>
+<li>publication.tab</li>
+<li>strain.tab</li>
+<li>environment.tab</li>
+<li>media.tab</li>
+<li>time_series.tab</li>
+<li>experimentMeta.tab</li>
+<li>experimentalUnit.tab</li>
+</ol>
+<p>The sample.tab and log2level.tab are the truly important files.<br />
+The other tables are primarily to attach meta data to the sample.</p>
+
+<h3>Notes</h3>
+
+<p>Field requirements are as follows:</p>
+<ul>
+<li>M - mandatory</li>
+<li>R - recommended</li>
+<li>C - conditional</li>
+<li>O - optional</li>
+</ul>
+
+<p>See the index for information on properly formatting source IDs.<p>
+
+<h3>Input</h3>
+
+<p>The following options for input formats are available:<p>
+<table>
+<tr><th>Type</th><th>Description</th></tr>
+<tr><td>Delimited text</td><td>Text files delimited by a tab.
+Each file has an initial header row matching the Column table in this document. Column order does not matter.
+Filenames are the Incoming ID value appended with .tab.
+An empty column value may optionally be denoted with '.'.</td></tr>
+<tr><td>Excel file</td><td>An excel file with a worksheet for each table in this document.
+Each worksheet has an initial header row matching the Column table in this document. Column order does not matter. Worksheet names are the Incoming ID value.
+</td></tr>
+</table>
+
+<h3>Tables</h3>
+
+<h4>Sample</h4>
+<p>A sample is typically a single expression experiment (ex: individual microarray, or RNA-Seq run).<br />
+Potentially replicates could be collapsed/averaged into one sample.<br />
+A sample is some biological sample run in a particular combination of platform, environment, protocol and media.</p>
+<p>Incoming ID: sample</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Sample</td></tr>
+<tr><td>title</td><td>R</td><td>String (500 char max)</td><td>The title of sample.</td></tr>
+<tr><td>description</td><td>R</td><td>String (500 char max)</td><td>The description of the sample.</td></tr>
+<tr><td>molecule</td><td>M</td><td>One of the strings cytoplasminc RNA/genomic DNA, total RNA, polyA RNA, total RNA/genomic DNA, nuclear RNA, protein, nuclear RAN/genomic DNA, cytoplasmic RNA, polyA RNA/genomic DNA</td><td>Enumerated values [total RNA, polyA RNA, cytoplasmic RNA, nuclear RNA, protein, total RNA/genomic DNA,<br />
+polyA RNA/genomic DNA,  cytoplasmic RNA/genomic DNA, nuclear RNA/genomic DNA]</td></tr>
+<tr><td>type</td><td>M</td><td>One of the strings qPCR, microarray, RNA-Seq, proteomics</td><td>Enumerated values [microarray, RNA-Seq, qPCR, proteomics]</td></tr>
+<tr><td>externalSourceId</td><td>O</td><td>String (250 char max)</td><td>A way to identify the external source of the sample, typically maps to a GEO Sample (GSM#).</td></tr>
+<tr><td>dataSource</td><td>O</td><td>String (250 char max)</td><td>The Data Source will be a way to identify where the data came from.<br />
+Examples might be : GEO, SEED Expression Pipeline, CSHL Expression Pipeline, Enigma, M3D.</td></tr>
+<tr><td>kbaseSubmissionDate</td><td>R</td><td>Date-time</td><td>Date that the sample was uploaded to KBase.  If empty defaults to the date of the upload.</td></tr>
+<tr><td>externalSourceDate</td><td>O</td><td>Date-time</td><td>Date associated with the external source (ex: GEO submission date).</td></tr>
+<tr><td>originalLog2Median</td><td>R</td><td>Float</td><td>The original median of the log2level values for the sample in log2 space.<br />
+If the data already has a median of zero, this column should be empty "."
+If the median for the log2levels for a each sample have not been set to a median of zero, then 
+the uploader should do it themselves or run the log2level.tab and sample.tab file through the preprocessor.
+The Prepreprocessor will adjust the log2levels for each sample so that the median is zero.  Additionally the preprocessor
+will update the originalLog2Median field for each sample in the sample file with what the originalLog2Median was for a given sample.
+This allows for original values to be obtained, but also puts the data in comparable space.</td></tr>
+<tr><td>custom</td><td>M</td><td>Boolean (true/false)</td><td>Custom refers to a sample being created from the averaging of existing samples, typically replicates.
+Always FALSE, as Custom operations will be done through a future web interface and 
+this exchange format does not support custom averagings.</td></tr>
+<tr><td>persons</td><td>O</td><td>See description</td><td>Comma separated list of source ids (from the person tab) of the contact people for the sample.</td></tr>
+<tr><td>strain-id</td><td>M</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Strain that the sample was for (refers to the strain tab).</td></tr>
+<tr><td>platform-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Platform that the sample was for.</td></tr>
+<tr><td>protocol-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source id of the protocol associated with the sample.</td></tr>
+<tr><td>experimentalUnit-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Experimental unit that this sample is associated with.</td></tr>
+</table>
+
+<h4>Series</h4>
+<p>A series is a collection of samples that are grouped as a single scientific study/publication.</p>
+<p>Incoming ID: series</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Series</td></tr>
+<tr><td>title</td><td>M</td><td>String (500 char max)</td><td>Title of the series.</td></tr>
+<tr><td>summary</td><td>R</td><td>String (500 char max)</td><td>Summary of the series.</td></tr>
+<tr><td>design</td><td>R</td><td>String (500 char max)</td><td>Design of the Series</td></tr>
+<tr><td>externalSourceId</td><td>O</td><td>String (250 char max)</td><td>A way to identify the external source of the sample, typically maps to a GEO Series (GSE#).</td></tr>
+<tr><td>kbaseSubmissionDate</td><td>R</td><td>Date-time</td><td>Date that the series was uploaded to KBase.  If empty defaults to the date of the upload.</td></tr>
+<tr><td>externalSourceDate</td><td>O</td><td>Date-time</td><td>Date associated with the external source (ex: GEO submission date).</td></tr>
+<tr><td>publicationIds</td><td>O</td><td>See description</td><td>Comma separated list of all the KBase ID or source-id of the publication.</td></tr>
+<tr><td>samples</td><td>M</td><td>See description</td><td>Comma separated list of all the samples that make up the series.<br />
+Note the sample identifiers can be Kbase ids or sample source-ids.</td></tr>
+</table>
+
+<h4>Platform</h4>
+<p>A platform is an identifier for the layout of the microarray or at least identifying the technology</p>
+<p>Incoming ID: platform</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Platform</td></tr>
+<tr><td>strain-id</td><td>M</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Strain that the platform was designed for.<br />
+Note that it is possible the platform to be designed for a different strain than what the sample run on it is.<br />
+Refers to strain tab.</td></tr>
+<tr><td>type</td><td>M</td><td>One of the strings qPCR, microarray, RNA-Seq, proteomics</td><td>Enumerated values [microarray, RNA-Seq, qPCR, proteomics].</td></tr>
+<tr><td>technology</td><td>R</td><td>String (500 char max)</td><td>Technology used.  Brand name/ model.</td></tr>
+<tr><td>externalSourceId</td><td>O</td><td>String (250 char max)</td><td>Typically maps to a GEO Platform (GPL#).</td></tr>
+<tr><td>title</td><td>R</td><td>String (500 char max)</td><td>The title of platform.</td></tr>
+</table>
+
+<h4>Log2Level</h4>
+<p>Holds the log2level values for all of the features normalized so that the log2level median of the sample is zero 
+(the log2level median of the sample is subtracted out from each level within the sample).
+NOTE IT IS REQUIRED that the levels are in log2 level space and have been normalized so that the median
+of all a sample's levels for features equals zero.  If this has ne been done, convert your levels into log2level space and then
+have the preprocessor process the log2level.tab and sample.tab files.  After that the data should be good to upload.</p>
+<p>Incoming ID: log2level</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Log2Level</td></tr>
+<tr><td>numberOfMeasurements</td><td>R</td><td>Integer</td><td>The number of measurements that went into this log2level value</td></tr>
+<tr><td>log2Level</td><td>M</td><td>Float</td><td>The normalized log2level for a feature in a given sample</td></tr>
+<tr><td>feature-id</td><td>M</td><td>Source or KBase ID</td><td>The Kbase identifier of the feature.  Must already exist in the DB.</td></tr>
+<tr><td>sample-id</td><td>M</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Sample that this measurement was part of.</td></tr>
+<tr><td>confidenceScore</td><td>O</td><td>Float</td><td>The confidence score of that log2Level.</td></tr>
+<tr><td>stdDev</td><td>O</td><td>Float</td><td>If multiple values for a given feature were used to give an average log2level, then the standard deviation for the multiple values 
+for a feature should be determined.  Could be multiple probes for a feature and/or if replicates were averaged together.<br />
+Conditional, but recommended if the number of measurements is greater than 1.</td></tr>
+<tr><td>confidenceType</td><td>M</td><td>One of the strings Zscore, null, pValue</td><td>Type of confidence score. Enumerated [pValue,Zscore,null]</td></tr>
+</table>
+<p>*Note that log2Level needs to be in log2 space.  Additionally the median of all log2Levels for a 
+given sample need to be normalized so that there median is equal to zero.  The original median log2 level 
+should be stored in the sample table.</p>
+
+<h4>SampleAnnotation</h4>
+<p>Holds annotation information for a sample</p>
+<p>Incoming ID: sampleAnnotation</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this SampleAnnotation</td></tr>
+<tr><td>ontology-id</td><td>M</td><td>KBase ID</td><td>This is a reference to the id in the Ontology table.  The Ontology table
+is a controlled vocabulary table that contains the ontology terms from 3 ontology databases.
+The ontologies could be Plant Ontologies (PO#s), Plant Environmental Ontologies (EO#s), Bacterial Environmental Ontologies (ENVO#s).
+The ontology id entered here should be the corresponding KBase id in the Ontology for the ontology term desired.</td></tr>
+<tr><td>annotationDate</td><td>R</td><td>Date-time</td><td>Date of the annotation.  If empty defaults to the date of the upload.</td></tr>
+<tr><td>person-id</td><td>O</td><td>Source or KBase ID</td><td>Source id of the person that performed the annotation.  If empty it is assumed to be done by an automated process.</td></tr>
+<tr><td>sample-id</td><td>M</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Sample that this annotation is for.</td></tr>
+</table>
+
+<h4>Person</h4>
+<p>A person is a human being involved with an experiment.</p>
+<p>Incoming ID: person</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Person</td></tr>
+<tr><td>Contact-Email</td><td>M</td><td>String (250 char max)</td><td>The email address of the person.</td></tr>
+<tr><td>Last-Name</td><td>M</td><td>String (250 char max)</td><td>The surname of the person.</td></tr>
+<tr><td>Institution</td><td>M</td><td>String (250 char max)</td><td>The institution where the person works.</td></tr>
+<tr><td>First-Name</td><td>M</td><td>String (250 char max)</td><td>The given name of the person.</td></tr>
+</table>
+
+<h4>Protocol</h4>
+<p>A protocol is a set of instructions for performing a particular measurement.</p>
+<p>Incoming ID: protocol</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Protocol</td></tr>
+<tr><td>Publication</td><td>O</td><td>Publication ID</td><td>The publication ID of the publication describing this experiment.</td></tr>
+<tr><td>Name</td><td>M</td><td>String (250 char max)</td><td>The name of the protocol.</td></tr>
+<tr><td>Description</td><td>M</td><td>String (65000 char max)</td><td>A detailed description of the protocol, e.g. materials and methods.</td></tr>
+</table>
+
+<h4>Publication</h4>
+<p>A publication describes an experiment and/or protocol.</p>
+<p>Incoming ID: publication</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Publication ID</td>
+<td>The Publication ID of this Publication</td></tr>
+<tr><td>Pubdate</td><td>M</td><td>Date-time</td><td>The publication's publication date.</td></tr>
+<tr><td>Title</td><td>M</td><td>String (250 char max)</td><td>The title of the publication.</td></tr>
+</table>
+
+<h4>Strain</h4>
+<p>A strain is an engineered version of a genome with zero or more gene
+knockouts.</p>
+<p>Incoming ID: strain</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Strain</td></tr>
+<tr><td>AggregateData</td><td>M</td><td>Boolean (true/false)</td><td>Denotes whether this entity represents a physical strain (False) or aggregate
+data calculated from one or more strains (True).</td></tr>
+<tr><td>Name</td><td>R</td><td>String (250 char max)</td><td>The common or laboratory name of the strain, e.g. DH5a or JMP1004.</td></tr>
+<tr><td>Reference-strain</td><td>M</td><td>Boolean (true/false)</td><td>Boolean that denotes this strain is identical to the parent genome. In contrast
+to Wildtype, a reference strain is abstract and does not actually exist, but is
+used for data that references a genome but not a particular strain. Before
+adding a reference strain to a load, ensure that one does not already exist in
+KBase. If a RF exists, link to that reference strain rather than creating a new
+one.</td></tr>
+<tr><td>Parent-strain-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the strain from which this
+strain was derived.</td></tr>
+<tr><td>Genome-id</td><td>M</td><td>KBase ID</td><td>Kbase ID of the genome this strain was derived from.</td></tr>
+<tr><td>Knockouts</td><td>O</td><td>See description</td><td>The KBase IDs of all the Features that are knocked out
+in this strain in the format knockout1;knockout2;</td></tr>
+<tr><td>Wildtype</td><td>M</td><td>Boolean (true/false)</td><td>Boolean that denotes that this strain is a wildtype strain presumably identical
+to the parent genome.</td></tr>
+<tr><td>Description</td><td>R</td><td>String (250 char max)</td><td>A description of the strain, e.g. 'E. coli MG1655 with a glnA knockout.'</td></tr>
+</table>
+<p><ul>
+<li>A wildtype strain cannot have a parent strain or knockouts.</li>
+<li>A reference strain cannot have AggregateData = True and must have
+Wildtype = True</li>
+</ul></p>
+
+<h4>Environment</h4>
+<p>The environment specifies the conditions used for an experiment, including the
+media, any additional compounds, and arbitrary parameters specified by the
+user.</p>
+<p>Incoming ID: environment</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Environment</td></tr>
+<tr><td>Media-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the media in this environment.</td></tr>
+<tr><td>Description</td><td>R</td><td>String (250 char max)</td><td>The description of the environment.</td></tr>
+<tr><td>Parameters</td><td>O</td><td>See description</td><td>Arbitrary key-value pairs associated with this
+environment in the format key1,value1;key2,value2;... For example:
+Flask size,200ml;Shaker speed,200rpm;...</td></tr>
+<tr><td>OxygenConcentration</td><td>M</td><td>Float</td><td>The oxygen concentration in the environment in Molar
+(mol/L). A value of -1 indicates that there is oxygen in the environment but
+the concentration is not known (e.g. an open air shake flask experiment).</td></tr>
+<tr><td>pH</td><td>O</td><td>Float</td><td>The pH of the environment.</td></tr>
+<tr><td>Conditions</td><td>O</td><td>See description</td><td>The names and/or KBase IDs of compounds and
+their concentrations and units in this environment above and beyond the media
+content in the format
+compound1$concentration$units!compound2$concentration$units!...
+Allowed units are g/L, mol/L, and vol%.</td></tr>
+<tr><td>Temperature</td><td>M</td><td>Float</td><td>The temperature of the environment in Kelvin.</td></tr>
+</table>
+
+<h4>Media</h4>
+<p>A media defines the constituents of an experimental media.</p>
+<p>Incoming ID: media</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this Media</td></tr>
+<tr><td>Solid</td><td>M</td><td>Boolean (true/false)</td><td>Whether the media is solid (True) or liquid (False).</td></tr>
+<tr><td>Name</td><td>M</td><td>String (250 char max)</td><td>The name of the media.</td></tr>
+<tr><td>Mod-date</td><td>M</td><td>Date-time</td><td>The date of the last time this media definition was modified or created.</td></tr>
+<tr><td>Is-defined</td><td>M</td><td>Boolean (true/false)</td><td>Whether the media is defined (True) or not (False).</td></tr>
+<tr><td>Conditions</td><td>O</td><td>See description</td><td>The names and/or KBase IDs of compounds and their concentrations and units in
+the media in the format
+compound1$concentration$units!compound2$concentration$units!</td></tr>
+<tr><td>Type</td><td>M</td><td>String (250 char max)</td><td>The media type, e.g. experimental, biolog, predicted, rescue.</td></tr>
+<tr><td>Is-minimal</td><td>M</td><td>Boolean (true/false)</td><td>Whether the media is a minimal media (True) or not (False).</td></tr>
+<tr><td>Description</td><td>R</td><td>String (250 char max)</td><td>A description of the use and contents of the media.</td></tr>
+</table>
+
+<h4>TimeSeries</h4>
+<p>A time series orders experimental units temporally.</p>
+<p>Incoming ID: time_series</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this TimeSeries</td></tr>
+<tr><td>TimeUnits</td><td>M</td><td>String (250 char max)</td><td>The units of time for this time series, e.g. 'seconds', 'hours', or more
+abstractly, 'number of times culture grown to saturation.'</td></tr>
+<tr><td>Name</td><td>R</td><td>String (250 char max)</td><td>The name of this time series.</td></tr>
+<tr><td>Comments</td><td>O</td><td>String (250 char max)</td><td>Any comments on this time series.</td></tr>
+</table>
+
+<h4>ExperimentMeta</h4>
+<p>The experiment meta information includes the name, description, etc. of
+the experiment, which consists of several experimental units. The description
+should provide the experimental plan, general results, and conclusions, if
+possible.</p>
+<p>Incoming ID: experiment_meta</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this ExperimentMeta</td></tr>
+<tr><td>Start-date</td><td>M</td><td>Date-time</td><td>The date this experiment was started.</td></tr>
+<tr><td>Description</td><td>R</td><td>String (65000 char max)</td><td>Description of the experiment.</td></tr>
+<tr><td>People</td><td>M</td><td>See description</td><td>The source or KBase IDs and roles (e.g. PI, Experimentalist, Technician, etc.)
+of people that participated in this experiment and their roles in the format
+personid,role;personid,role;.</td></tr>
+<tr><td>Title</td><td>M</td><td>String (250 char max)</td><td>The title of this experiment.</td></tr>
+<tr><td>Comments</td><td>O</td><td>String (65000 char max)</td><td>Any comments for the experiment.</td></tr>
+<tr><td>Publication</td><td>O</td><td>See description</td><td>The publication IDs of the publications describing this experiment in the
+format pub1;pub2;pub3</td></tr>
+</table>
+
+<h4>ExperimentalUnit</h4>
+<p>An experimental unit denotes a particular strain used in an experiment and the
+environment the experiment was performed in and links measurements to that
+pairing. Each experimental unit belongs to a particular experiment.</p>
+<p>Incoming ID: experimental_unit</p>
+<table>
+<tr><th>Column</th><th>Required</th><th>Type</th><th>Description</th></tr>
+<tr><td>source-id</td><td>M</td><td>Source ID</td>
+<td>The Source ID of this ExperimentalUnit</td></tr>
+<tr><td>Experiment-id</td><td>M</td><td>Source or KBase ID</td><td>The source or KBase ID of the ExperimentMeta entity to which the experimental
+unit belongs</td></tr>
+<tr><td>Environment-id</td><td>M</td><td>Source or KBase ID</td><td>The source or KBase ID of the environment used for the experimental unit.</td></tr>
+<tr><td>Strain-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the strain in the experimental unit.  Leave this
+field empty to denote a control experimental unit without a strain.</td></tr>
+<tr><td>Group-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the group this experimental unit belongs to.</td></tr>
+<tr><td>Location</td><td>O</td><td>String (250 char max)</td><td>The location of the experimental unit in the group. Often a plate locator,
+e.g. 'G11' for 96 well plates.</td></tr>
+<tr><td>Group-meta</td><td>M</td><td>Boolean (true/false)</td><td>Boolean that denotes that this ExperimentalUnit's data measures the group of
+EUs as a whole - for example, summary statistics. False if the EU is not part
+of a group. Generally there should be at most one meta EU per group.</td></tr>
+<tr><td>Timeseries-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the time series this experimental unit belongs to.</td></tr>
+<tr><td>Time</td><td>C</td><td>Float</td><td>The time at which the data was taken.</td></tr>
+<tr><td>Time-meta</td><td>M</td><td>Boolean (true/false)</td><td>Boolean that denotes that this ExperimentalUnit's data measures the
+time series as a whole - for example, lag and doubling times for bacterial
+growth curves. False if the EU is not part of a time series. Generally there
+should be at most one meta EU per time series.</td></tr>
+</table>
+<p><ul>
+<li>If a Timeseries-id is supplied a Time value must be supplied.</li>
+</ul></p>
+
+
+<h2>Appendix: KBase source IDs</h2>
+In order to reload or update data in KBase, the new data must be mappable to 
+the data it is replacing or updating. KBase maintains a mapping from the 
+external ID to the KBase ID for each piece of data provided with a source-id 
+by the data provider. These source-ids must be unique for all data 
+corresponding to a specific entity in KBase. 
+
+<h4>Definitions</h4>
+<ul>
+<li>Alphanumeric - the letters a through z, lower or upper case, and the digits
+0-9.</li> 
+<li>Data namespace - the portion of the source-id that provides a namespace for
+uniquely identifying a piece of data in a KBase entity table within a load
+namespace.</li>
+<li>Exchange format (EF) - a format for providing data for loading into
+KBase.</li>
+<li>Load namespace - the portion of the source-id that provides a namespace for
+uniquely identifying data loads.</li>
+<li>source-id - An ID that uniquely refers to a piece of data in a particular
+KBase entity table.</li>
+</ul>
+
+<h4>source-id structure</h4>
+<p>A source-id is of the form:</p>
+
+<code>[provider ID]:[load ID].[version]|[data ID]</code>
+
+<p>[provider ID]:[load ID].[version]| is the <em>load namespace</em> portion of the
+source-id. The maximum length of the load namespace is 180 characters.</p>
+
+<p>[data ID] is the <em>data namespace</em> portion of the source-id. It is a
+string consisting of alphanumeric characters as well as the dash (-)
+and underscore (_) characters. The maximum length of the data ID is 70
+characters. The data ID uniquely identifies a piece of data in its respective
+exchange format table, although not necessarily in the entire set of
+exchange format tables for a load. Combined with the load namespace, the
+data ID uniquely identifies a piece of data in its respective KBase entity
+table. The data ID generally is the ID of the entity used at the source.</p>
+
+<p>[provider ID] is the valid email address of the provider of the data, which
+thus guarantees uniqueness of the source-id from provider to provider and
+prevents source-id namespace clashes between providers. The email address may
+only include alphanumeric characters as well as the characters .@-_.</p>
+
+<p>[load ID] is a string consisting of alphanumeric characters as well as the
+dash (-) and underscore (_) characters chosen by the data provider to uniquely
+identify the set of data in the load. This load ID will be used when reloading
+or updating the data. The data provider is responsible for ensuring uniqueness
+of the load ID for a particular dataset within all the provider's datasets.</p>
+
+<p>[version] is an integer starting at zero. This number should be incremented
+by one when data is updated. The data provider is responsible for correctly
+setting the version number. </p>
+
+<p>Example:</p>
+
+<code>gaprice@lbl.gov:micro-pheno_Shew2011.1|SMMLR_5402910</code>
+
+<h4>Exceptions</h4>
+
+<p>source-ids for publications have a different structure than other types of
+source-ids. The load namespace for a publication source-id is the id for a
+publication resource followed by a pipe, and the data namespace is the
+id of the publication from the publication resource. The currently supported
+publication resources are pubmed and DOI.org, with respective load namespaces
+of pubmed| and doi|.</p>
+
+<p>Examples:</p>
+
+<code>
+<p>doi|10.1371/journal.pgen.1002385</p>
+
+<p>pubmed|22882546</p>
+</code>
+
+<p>Note that the / and . characters are allowed in DOI IDs, although they are
+not normally allowed in source-ids.</p>
+
+</body>
