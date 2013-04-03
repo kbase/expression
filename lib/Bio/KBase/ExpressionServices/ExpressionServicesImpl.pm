@@ -1670,7 +1670,7 @@ sub get_expression_data_by_feature_ids
     my $get_feature_log2level_q = qq^select sam.id, fea.id, l2l.log2Level
                                      from Sample sam
                                      inner join SampleLevels sl on sam.id = sl.from_link
-                                     inner join Log2Level l2l on ls.to_link = l2l.id
+                                     inner join Log2Level l2l on sl.to_link = l2l.id
                                      inner join FeatureWithLevels fwl on l2l.id = fwl.to_link
                                      inner join Feature fea on fwl.from_link = fea.id
                                      inner join StrainWithSample sws on sam.id = sws.to_link
