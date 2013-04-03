@@ -374,8 +374,8 @@ sub get_expression_samples_data
     #PersonIds     
     my $get_sample_person_ids_q = qq^select sam.id, per.id 
                                      from Sample sam 
-                                     inner join SampleContactPerson scp on sam.id = scp.to_link 
-                                     inner join Person per on scp.from_link = per.id 
+                                     inner join SampleContactPerson scp on sam.id = scp.from_link 
+                                     inner join Person per on scp.to_link = per.id 
                                      where sam.id in (^.
                                   join(",", ("?") x @{$sampleIds}) . ") ";
     my $get_sample_person_ids_qh = $dbh->prepare($get_sample_person_ids_q) or die "Unable to prepare : get_sample_person_ids_q : ".           
