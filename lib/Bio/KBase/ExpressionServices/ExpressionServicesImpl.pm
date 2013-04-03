@@ -1256,8 +1256,8 @@ sub get_expression_samples_data_by_strain_ids
     my $get_sample_ids_by_strain_ids_q = 
         qq^select str.id, sam.id
            from Sample sam 
-           inner join SampleForStrain sfs on sam.id = sfs.to_link
-           inner join Strain str on sfs.from_link = str.id 
+           inner join StrainWithSample sws on sam.id = sws.to_link
+           inner join Strain str on sws.from_link = str.id 
            where str.id in (^. 
 	join(",", ("?") x @{$strainIDs}) . ") ".
 	$sample_type_part;
@@ -1514,8 +1514,8 @@ sub get_expression_samples_data_by_genome_ids
     my $get_strain_ids_by_genome_ids_q = 
         qq^select gen.id, str.id
            from Sample sam 
-           inner join SampleForStrain sfs on sam.id = sfs.to_link
-           inner join Strain str on sfs.from_link = str.id
+           inner join StrainWithSample sws on sam.id = sws.to_link
+           inner join Strain str on sws.from_link = str.id
            inner join GenomeParentOf gpo on str.id = gpo.to_link
            inner join Genome gen on gpo.from_link = gen.id
            where gen.id in (^.
@@ -1669,12 +1669,12 @@ sub get_expression_data_by_feature_ids
     } 
     my $get_feature_log2level_q = qq^select sam.id, fea.id, l2l.log2Level
                                      from Sample sam
-                                     inner join LevelInSample lis on sam.id = lis.from_link
-                                     inner join Log2Level l2l on lis.to_link = l2l.id
-                                     inner join LevelForFeature lfl on l2l.id = lfl.to_link
-                                     inner join Feature fea on lfl.from_link = fea.id
-                                     inner join SampleForStrain sfs on sam.id = sfs.to_link
-                                     inner join Strain str on sfs.from_link = str.id
+                                     inner join SampleLevels sl on sam.id = sl.from_link
+                                     inner join Log2Level l2l on ls.to_link = l2l.id
+                                     inner join FeatureWithLevels fwl on l2l.id = fwl.to_link
+                                     inner join Feature fea on fwl.from_link = fea.id
+                                     inner join StrainWithSample sws on sam.id = sws.to_link
+                                     inner join Strain str on sws.from_link = str.id
                                      where fea.id in (^.
                                  join(",", ("?") x @{$featureIds}). ") ". 
                                  $wild_type_part . 
