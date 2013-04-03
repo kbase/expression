@@ -278,20 +278,20 @@ sub get_expression_samples_data
                                     env.id, env.description as env_description, 
                                     pro.id, pro.description, pro.name 
                                     from Sample sam  
-                                    inner join SampleForStrain sfs on sam.id = sfs.to_link 
-                                    inner join Strain str on sfs.from_link = str.id 
+                                    inner join StrainWithSample sws on sam.id = sws.to_link 
+                                    inner join Strain str on sws.from_link = str.id 
                                     inner join GenomeParentOf gpo on str.id = gpo.to_link 
                                     inner join Genome gen on gpo.from_link = gen.id 
-                                    left outer join SampleRunOnPlatform srp on sam.id = srp.to_link 
-                                    left outer join Platform plt on srp.from_link = plt.id 
+                                    left outer join PlatformWithSamples pws on sam.id = pws.to_link 
+                                    left outer join Platform plt on pws.from_link = plt.id 
                                     left outer join HasExpressionSample hes on sam.id = hes.to_link 
                                     left outer join ExperimentalUnit eu on hes.from_link = eu.id 
                                     left outer join HasExperimentalUnit heu on eu.id = heu.to_link 
                                     left outer join ExperimentMeta em on heu.from_link = em.id 
                                     left outer join IsContextOf ico on eu.id = ico.to_link 
                                     left outer join Environment env on ico.from_link = env.id 
-                                    left outer join SampleUsesProtocol sup on sam.id = sup.to_link 
-                                    left outer join Protocol pro on sup.from_link = pro.id 
+                                    left outer join ProtocolForSample pfs on sam.id = pfs.to_link 
+                                    left outer join Protocol pro on pfs.from_link = pro.id 
                                     where sam.id in ( ^. 
 				 join(",", ("?") x @{$sampleIds}) . ") "; 
     my $get_sample_meta_data_qh = $dbh->prepare($get_sample_meta_data_q) or die "Unable to prepare : get_sample_meta_data_q : ".
@@ -389,10 +389,10 @@ sub get_expression_samples_data
     #log2Levels
     my $get_log2levels_q = qq^select sam.id, fea.id, l2l.log2Level
                               from Sample sam
-                              inner join LevelInSample lis on sam.id = lis.from_link
-                              inner join Log2Level l2l on lis.to_link = l2l.id
-                              inner join LevelForFeature lfl on l2l.id = lfl.to_link
-                              inner join Feature fea on lfl.from_link = fea.id
+                              inner join SampleLevels sl on sam.id = sl.from_link
+                              inner join Log2Level l2l on sl.to_link = l2l.id
+                              inner join FeatureWithLevels fwl on l2l.id = fwl.to_link
+                              inner join Feature fea on fwl.from_link = fea.id
                               where sam.id in (^. 
                            join(",", ("?") x @{$sampleIds}) . ") ";  
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
