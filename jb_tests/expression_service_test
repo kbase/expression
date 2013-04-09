@@ -1,13 +1,21 @@
 use strict;
 use Data::Dumper;
 use Bio::KBase::ExpressionServices::ExpressionServicesClient;
+#FOR STARMAN
 my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
+#FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
+#(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
+#Log into your instance
+#sudo su
+#source /kb/deployment/user-env.sh
+#plackup --listen :9999 /kb/dev_container/modules/expression/lib/ExpressionServices.psgi 
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
 
 my $result;
 print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data([]);
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
-#$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
+$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\
@@ -33,7 +41,7 @@ print "get_expression_samples_data_by_strain_ids()\n";
 
 #get_expression_samples_data_by_genome_ids
 print "get_expression_samples_data_by_genome_ids()\n";
-$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y');
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y');
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','N');
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'RNA-Seq','Y');
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.0'],'microarray','Y');
