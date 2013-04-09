@@ -13,7 +13,7 @@ from biokbase.exchangeformatsupport.argumentspecs import \
     KBaseID_Argument as _KBaseID_Argument, \
     ManyToManyArgument as _ManyToManyArgument, \
     PubID_Argument as _PubID_Argument, TextArgument as _TextArgument, \
-    SourceOrKBID_Argument as _SourceOrKBID_Argument, LoadInfo as _LoadInfo, \
+    SourceOrKBID_Argument as _SourceOrKBID_Argument, RelInfo as _RelInfo, \
     UnitsArgument as _UnitsArgument, URL_Argument as _URL_Argument, \
     StringEnumerationArgument as _StringEnumerationArgument
 from biokbase.exchangeformatsupport.exceptions import \
@@ -391,10 +391,10 @@ class ConditionsArgument(_ManyToManyArgument, _HasCompounds):
 
     DOC_TYPE = 'See description'
 
-    def __init__(self, argumentName, loadinfo, docs=None, noentryok=False,
+    def __init__(self, argumentName, relinfo, docs=None, noentryok=False,
                  unique=True):
         super(ConditionsArgument, self).__init__(
-            argumentName, CompoundRel, _COMPOUND_ROW_SEP, loadinfo, docs=docs,
+            argumentName, CompoundRel, _COMPOUND_ROW_SEP, relinfo, docs=docs,
             noentryok=noentryok, unique=unique)
 
     def compounds(self, argument):
@@ -474,15 +474,15 @@ class Sample(_ExchangeFormatEntity):
                                                  noentryok='R', unique=False),
             'custom': _SemiBooleanArgument('custom', docs=docs['sam']['custom'], cdsname='custom', unique=False),
             'persons': _ManyToManyArgument('persons', PersonRelSample, _PERSONSAMPLE_ROW_SEP, 
-                                           _LoadInfo('SampleContactPerson',reverse=True), docs=docs['sam']['persons'], 
+                                           _RelInfo('SampleContactPerson',reverse=True), docs=docs['sam']['persons'], 
                                            noentryok ='O', unique=False),
-            'strain': _SourceOrKBID_Argument('strain-id', 'Strain', _LoadInfo('StrainWithSample'),
+            'strain': _SourceOrKBID_Argument('strain-id', 'Strain', _RelInfo('StrainWithSample'),
                                              docs=docs['sam']['strain'], unique=False),
-            'platform': _SourceOrKBID_Argument('platform-id', 'Platform', _LoadInfo('PlatformWithSamples'),
+            'platform': _SourceOrKBID_Argument('platform-id', 'Platform', _RelInfo('PlatformWithSamples'),
                                                docs=docs['sam']['platform'], noentryok='R', unique=False),
-            'protocol': _SourceOrKBID_Argument('protocol-id', 'Protocol', _LoadInfo('ProtocolForSample'),
+            'protocol': _SourceOrKBID_Argument('protocol-id', 'Protocol', _RelInfo('ProtocolForSample'),
                                                docs=docs['sam']['protocol'], noentryok='R', unique=False),
-            'experimentalUnit': _SourceOrKBID_Argument('experimentalUnit-id', 'ExperimentalUnit', _LoadInfo('HasExpressionSample'),
+            'experimentalUnit': _SourceOrKBID_Argument('experimentalUnit-id', 'ExperimentalUnit', _RelInfo('HasExpressionSample'),
                                                        docs=docs['sam']['experimentalUnit'], noentryok='R', unique=False),
           }
 
@@ -515,8 +515,8 @@ class Series(_ExchangeFormatEntity):
 	    'externalSourceDate': _DateTimeArgument('externalSourceDate', docs=docs['ser']['externalSourceDate'], 
                                                 cdsname='externalSourceDate', noentryok = 'O',unique=False),
 	    'publicationIds': _ManyToManyArgument('publicationIds', PublicationRel, _PUBLICATION_ROW_SEP, 
-						  _LoadInfo('SeriesPublishedIn', reverse=True), docs=docs['ser']['publicationIds'], noentryok='O'),
-	    'samples': _ManyToManyArgument('samples', SampleSeriesRel, _SAMPLE_ROW_SEP, _LoadInfo('SampleInSeries'),docs=docs['ser']['samples']),
+						  _RelInfo('SeriesPublishedIn', reverse=True), docs=docs['ser']['publicationIds'], noentryok='O'),
+	    'samples': _ManyToManyArgument('samples', SampleSeriesRel, _SAMPLE_ROW_SEP, _RelInfo('SampleInSeries'),docs=docs['ser']['samples']),
           }
 			
     def __init__(self, sourceID, title, summary, design, externalSourceId, 
@@ -541,7 +541,7 @@ class Platform(_ExchangeFormatEntity):
 	    'technology': _LongStringArgument('technology', docs=docs['plt']['technology'], cdsname='technology', noentryok = 'R', unique = False),
 	    'type': _StringEnumerationArgument('type', ALLOWED_TYPES, docs=docs['plt']['type'], cdsname='type', unique = False),
 	    'externalSourceId': _StringArgument('externalSourceId', docs=docs['plt']['externalSourceId'], cdsname='externalSourceId', noentryok = 'O', unique = False),
-	    'strain': _SourceOrKBID_Argument('strain-id', 'Strain', _LoadInfo('StrainWithPlatforms'), docs=docs['plt']['strain'], unique=False),
+	    'strain': _SourceOrKBID_Argument('strain-id', 'Strain', _RelInfo('StrainWithPlatforms'), docs=docs['plt']['strain'], unique=False),
            }
 			
 			
@@ -562,9 +562,9 @@ class Log2Level(_ExchangeFormatEntity):
             'numberOfMeasurements': _IntArgument('numberOfMeasurements', docs=docs['l2l']['numberOfMeasurements'], cdsname='numberOfMeasurements', noentryok='R', unique = False),
             'confidenceScore': _FloatArgument('confidenceScore', docs=docs['l2l']['confidenceScore'], cdsname='confidenceScore', noentryok='O', unique = False),
             'confidenceType': _StringEnumerationArgument('confidenceType', ALLOWED_CONFIDENCE_TYPES, docs=docs['l2l']['confidenceType'], cdsname='confidenceType', unique = False),
-            'sample': _SourceOrKBID_Argument('sample-id', 'Sample', _LoadInfo('SampleLevels'),
+            'sample': _SourceOrKBID_Argument('sample-id', 'Sample', _RelInfo('SampleLevels'),
                                              docs=docs['l2l']['sample'], unique=False),
-            'feature': _SourceOrKBID_Argument('feature-id', 'Feature', _LoadInfo('FeatureWithLevels'),
+            'feature': _SourceOrKBID_Argument('feature-id', 'Feature', _RelInfo('FeatureWithLevels'),
                                               docs=docs['l2l']['feature'], unique=False),
           }
 			
@@ -579,13 +579,13 @@ class SampleAnnotation(_ExchangeFormatEntity):
 
    INC_ID = 'sampleAnnotation'
 	
-   DEF = { 'ontologyID': _KBaseID_Argument('ontology-id', 'Ontology', _LoadInfo('OntologyForSample'),
+   DEF = { 'ontologyID': _KBaseID_Argument('ontology-id', 'Ontology', _RelInfo('OntologyForSample'),
                                         docs=docs['sam_ann']['ontologyID']),
            'annotationDate': _DateTimeArgument('annotationDate', docs=docs['sam_ann']['annotationDate'], 
                                                 cdsname='annotationDate', noentryok= 'R', unique=False), 
-           'person': _SourceOrKBID_Argument('person-id', 'Person', _LoadInfo('PersonAnnotatedSample'),
+           'person': _SourceOrKBID_Argument('person-id', 'Person', _RelInfo('PersonAnnotatedSample'),
                                             docs=docs['sam_ann']['person'], noentryok='O', unique=False),
-           'sample': _SourceOrKBID_Argument('sample-id', 'Sample', _LoadInfo('SampleHasAnnotations'),
+           'sample': _SourceOrKBID_Argument('sample-id', 'Sample', _RelInfo('SampleHasAnnotations'),
                                             docs=docs['sam_ann']['sample']),
          }  
    def __init__(self, sourceID, ontologyID, annotationDate, person, sample):
@@ -634,7 +634,7 @@ class Protocol(_ExchangeFormatEntity):
                                         cdsname='description'),
            'publication': _PubID_Argument(
                               'Publication', 'Publication',
-                              _LoadInfo('PublishedProtocol'),
+                              _RelInfo('PublishedProtocol'),
                               docs=docs['pro']['pub'], noentryok='O'),
            }
 
@@ -688,15 +688,15 @@ class Strain(_ExchangeFormatEntity):
                                   'Reference-strain', docs=docs['str']['ref'],
                                   cdsname='referenceStrain', unique=False),
            'genomeID': _KBaseID_Argument(
-                           'Genome-id', 'Genome', _LoadInfo('GenomeParentOf'),
+                           'Genome-id', 'Genome', _RelInfo('GenomeParentOf'),
                            docs=docs['str']['gen'], unique=False),
            'strainID': _SourceOrKBID_Argument('Parent-strain-id', 'Strain',
-                                              _LoadInfo('StrainParentOf'),
+                                              _RelInfo('StrainParentOf'),
                                               docs=docs['str']['str'],
                                               noentryok='O', unique=False),
            'knockouts': _ManyToManyArgument(
                             'Knockouts', KnockoutRel, _KNOCKOUT_ROW_SEP,
-                            _LoadInfo('HasKnockoutIn', reverse=True),
+                            _RelInfo('HasKnockoutIn', reverse=True),
                             docs=docs['str']['ko'], noentryok='O',
                             unique=False),
            }  # can have completely identical strains in the DB
@@ -739,16 +739,16 @@ class Environment(_ExchangeFormatEntity):
            'pH': _FloatArgument('pH', docs=docs['env']['pH'], noentryok='O'),
            'mediaID': _SourceOrKBID_Argument(
                           'Media-id', 'Media', docs=docs['env']['med'],
-                          loadinfo=_LoadInfo('UsedIn'), noentryok='O'),
+                          relinfo=_RelInfo('UsedIn'), noentryok='O'),
            'conditions': ConditionsArgument(
                              'Conditions', docs=docs['env']['cond'],
-                             loadinfo=_LoadInfo('IncludesAdditionalCompounds',
+                             relinfo=_RelInfo('IncludesAdditionalCompounds',
                                                reverse=True),
                              noentryok='O'),
            'parameters': _ManyToManyArgument(
                              'Parameters', ParameterRel, _PARAM_ROW_SEP,
                              docs=docs['env']['param'],
-                             loadinfo=_LoadInfo('HasParameter', reverse=True),
+                             relinfo=_RelInfo('HasParameter', reverse=True),
                              noentryok='O')
            }
 
@@ -783,7 +783,7 @@ class Media(_ExchangeFormatEntity):
                                    cdsname='type', unique=False),
            'conditions': ConditionsArgument(
                              'Conditions',
-                             _LoadInfo('HasPresenceOf', reverse=True),
+                             _RelInfo('HasPresenceOf', reverse=True),
                              docs=docs['med']['cond'], noentryok='O')}   
 
 
@@ -827,12 +827,12 @@ class ExperimentMeta(_ExchangeFormatEntity):
            'comments': _TextArgument('Comments', docs=docs['meta']['comm'],
                                      cdsname='comments', noentryok='O'),
            'people': _ManyToManyArgument('People', PersonRel, _PERSON_ROW_SEP,
-                                         _LoadInfo('PerformedExperiment'),
+                                         _RelInfo('PerformedExperiment'),
                                          docs=docs['meta']['ppl']),
            'publications': _ManyToManyArgument(
                                'Publication', PublicationRel,
                                _PUBLICATION_ROW_SEP,
-                               _LoadInfo('PublishedExperiment'),
+                               _RelInfo('PublishedExperiment'),
                                docs=docs['meta']['pub'], noentryok='O'),
            }
 
@@ -856,18 +856,18 @@ class ExperimentalUnit(_ExchangeFormatEntity):
 
     DEF = {'experimentID': _SourceOrKBID_Argument(
                                'Experiment-id', 'ExperimentMeta',
-                               _LoadInfo('HasExperimentalUnit'),
+                               _RelInfo('HasExperimentalUnit'),
                                docs=docs['eu']['exp']),
            'environmentID': _SourceOrKBID_Argument(
                                 'Environment-id', 'Environment',
-                                _LoadInfo('IsContextOf'),
+                                _RelInfo('IsContextOf'),
                                 docs=docs['eu']['env']),
            'strainID': _SourceOrKBID_Argument(
-                           'Strain-id', 'Strain', _LoadInfo('EvaluatedIn'),
+                           'Strain-id', 'Strain', _RelInfo('EvaluatedIn'),
                            docs=docs['eu']['str'], noentryok='O'),
            'groupID': _SourceOrKBID_Argument(
                           'Group-id', 'ExperimentalUnitGroup',
-                          _LoadInfo('ContainsExperimentalUnit',
+                          _RelInfo('ContainsExperimentalUnit',
                                    ('location', 'groupmeta')),
                           docs=docs['eu']['grp'], noentryok='O'),
            'location': _StringArgument('Location', cdsname='location',
@@ -877,7 +877,7 @@ class ExperimentalUnit(_ExchangeFormatEntity):
                             cdsname='groupMeta'),
            'timeseriesID': _SourceOrKBID_Argument(
                                'Timeseries-id', 'TimeSeries',
-                               _LoadInfo('OrdersExperimentalUnit',
+                               _RelInfo('OrdersExperimentalUnit',
                                         ('time', 'timemeta')),
                                docs=docs['eu']['ts'], noentryok='O'),
            'time': _FloatArgument('Time', docs=docs['eu']['time'],
