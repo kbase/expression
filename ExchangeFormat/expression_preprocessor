@@ -1,0 +1,242 @@
+use POSIX;
+use strict;
+
+my $dir = shift;	
+my $ls = `ls $dir`;	
+my @ls_array = split(/\s+/,$ls);
+my %ls_hash;
+
+foreach my $ls_output (@ls_array)
+{
+	$ls_hash{$ls_output} = 1;
+}
+my $error_message = '';
+if (!exists($ls_hash{'sample.tab'}))
+{
+	$error_message .= "A sample.tab file was not found in $dir : This program requires a sample.tab file.\n";
+}
+if (!exists($ls_hash{'log2level.tab'}))
+{ 
+        $error_message .= "A log2Level.tab file was not found in $dir : This program requires a log2Level.tab file.\n";
+} 
+my $sample_file = $dir . "/sample.tab";
+open (IN,$sample_file) or die "Unable to open sample file : $sample_file.\n\n"; 
+my @sample_lines = (<IN>); 
+close(IN);
+chomp(@sample_lines);
+for (my $i = 0; $i <  scalar(@sample_lines); $i++)
+{
+	$sample_lines[$i] =~ s/\r//; 
+}
+my %sample_lines_hash;  #key source_id ->values an array ref to the elements on the line
+my %samples_needing_exp_records; #hash of source_ids keys needing experimental unit and experiment meta entries. 
+my $sample_header_line = shift(@sample_lines);  #Should be the following
+#source-id	title	description	molecule	type	externalSourceId dataSource kbaseSubmissionDate 
+#externalSourceDate originalLog2Median custom persons strain-id platform-id protocol-id experimentalUnit-id
+#indices:
+#	0-	source-id
+#	1-	title   
+#	2-	description     
+#	3-	molecule        
+#	4-	type    
+#	5-	externalSourceId
+#	6-	dataSource
+#	7-	kbaseSubmissionDate 
+#	8-	externalSourceDate 
+#	9-	originalLog2Median
+#	10-	custom 
+#	11-	persons 
+#	12-	strain-id
+#	13-	platform-id
+#	14-	protocol-id
+#	15-	experimentalUnit-id
+my $test_sample_headers = "source-id\ttitle\tdescription\tmolecule\ttype\texternalSourceId\tdataSource\tkbaseSubmissionDate\texternalSourceDate\t".
+   			"originalLog2Median\tcustom\tpersons\tstrain-id\tplatform-id\tprotocol-id\texperimentalUnit-id";
+if ($sample_header_line ne  $test_sample_headers)
+{
+   $error_message .= "The headers for the sample are not correct.  The following headers were expected : \n".
+   		  $test_sample_headers."\nIf you think your headers are correct you may want make sure they have unix line returns.\n".
+		  "Sample header:\n$sample_header_line:\nExpected:\n$test_sample_headers:\n\n";
+}
+if ($error_message ne '')
+{ 
+        print $error_message;
+        exit; 
+} 
+foreach my $sample_line (@sample_lines)
+{
+	my @sample_elements = split("\t",$sample_line);
+	if ($sample_elements[0] eq '')
+	{
+		$error_message .= "One of the lines in the sample file does not contain a source_id\n";
+	}
+	elsif (!(($sample_elements[9] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) || ($sample_elements[9] eq ".")))
+	{
+		$error_message .= "The Sample with source-id of ".$sample_elements[0]." does not have a valid originalLog2Median (must be a number or .)\n";
+	}
+	else #populate data_structure.
+	{
+#	        #CUSTOM IS ALWAYS FALSE (will add capability for custom averagings later). 
+#        	$sample_elements[10] = 'FALSE'; 
+		$sample_lines_hash{$sample_elements[0]} = \@sample_elements;
+	}
+}
+#check that Median of Log2Level is Zero
+my $log2Level_file = $dir . "/log2level.tab"; 
+open (IN,$log2Level_file) or die "Unable to open log2Level file : $log2Level_file.\n\n";
+my @log2Level_lines = (<IN>);
+close(IN); 
+chomp(@log2Level_lines);
+my %log2Level_lines_hash; #key log2Level {sample_source_id}->{feature_id}= array ref to the elements of the log2_level_line
+my $log2Level_header_line = shift(@log2Level_lines);  #Should be the following 
+# log2Level.tab file has these headers: 
+# source-id	log2level     stdDev	numberOfMeasurements	confidenceScore	confidenceType	sample	feature
+# indices:
+#	0-	source-id	
+#	1-	log2level     
+#	2-	stdDev	
+#	3-	numberOfMeasurements	
+#	4-	confidenceScore	
+#	5-	confidenceType	
+#	6-	sample	
+#	7-	feature
+foreach my $log2Level_line (@log2Level_lines) 
+{ 
+	my $log2Level_line_error_message = '';
+        my @log2Level_elements = split("\t",$log2Level_line); 
+        if ($log2Level_elements[0] eq '') 
+        { 
+          $log2Level_line_error_message .= "One of the lines in the log2Level file does not contain a source_id\n"; 
+        }
+	else
+	{ 
+	  if (($log2Level_elements[7] eq '') || ($log2Level_elements[7] eq '.'))
+	  {
+	          $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
+		  " does not have a valid featureId\n"; 
+	  }
+          if (($log2Level_elements[1] eq '') || ($log2Level_elements[1] eq '.'))
+          { 
+                  $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
+                  " is empty for the log2Level\n";
+          } 
+	  unless ($log2Level_elements[1] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/)
+          {
+                  $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
+                  " does not have a valid log2Level number (".$log2Level_elements[1].")\n";
+          } 
+          if (($log2Level_elements[6] eq '') || ($log2Level_elements[6] eq '.'))
+          {
+                  $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
+                  " does not have a valid Sample (column 7)\n";
+          } 
+	}
+	if ($log2Level_line_error_message ne '')
+	{
+		$error_message .= $log2Level_line_error_message;
+	}
+	else #populate data_structure. 
+        { 
+		$log2Level_elements[1] =~ s/\s//g;
+                $log2Level_lines_hash{$log2Level_elements[6]}->{$log2Level_elements[7]} = \@log2Level_elements;
+        }
+}
+
+#print "ERROR MESSAGE:\n".$error_message."\n";
+
+#go through each sample and load all log2Levels into an array
+#numerical sort the array and see if median is zero (within tolerance) 
+#if not within tolerance then determine the median replace it within the sample file
+# and change all the log2Levels for that sample by subtracting out the determined median.
+my $threshold = .00001;
+my $need_new_log2level_file = 0;
+foreach my $sample_id (sort(keys(%log2Level_lines_hash)))
+{
+	my @sample_log2Levels = ();
+	foreach my $feature_id (keys(%{$log2Level_lines_hash{$sample_id}}))
+	{
+		push(@sample_log2Levels,$log2Level_lines_hash{$sample_id}->{$feature_id}->[1]);
+	}
+	my @sorted_log2Levels = sort {$a <=> $b} @sample_log2Levels;
+	my $num_elements = scalar @sorted_log2Levels;
+	my $median;
+	if (($num_elements%2) == 0)
+	{
+		$median = (($sorted_log2Levels[(($num_elements-1)/2)]) +
+			  ($sorted_log2Levels[(($num_elements)/2)]))/2
+	}
+	else #odd elements just take middle one
+	{
+		$median = $sorted_log2Levels[floor($num_elements/2)]
+	}
+	#print "OLD SAMPLE: $sample_id - MEDIAN: $median - NUM ELEMENTS $num_elements \n";
+	if (abs($median) > $threshold)
+	{
+		$need_new_log2level_file = 1;
+		#set the originalLog2Median in for the sample
+		$sample_lines_hash{$sample_id}->[9] = $median;
+		#change the log2Levels from the original score minus the new median.
+		foreach my $feature_id (keys(%{$log2Level_lines_hash{$sample_id}})) 
+        	{
+			$log2Level_lines_hash{$sample_id}->{$feature_id}->[1] = $log2Level_lines_hash{$sample_id}->{$feature_id}->[1] - $median;
+        	}
+	}
+}
+
+if ($error_message ne "")
+{
+	print "THE FOLLOWING ERRORS NEED TO BE ADDRESSED BEFORE THE PREPROCESSOR CAN WORK:\n".$error_message."\n";
+	exit;
+}
+
+if ($need_new_log2level_file == 1)
+{
+	#Move original sample.tab and log2level.tab to original_sample.tab and original_log2level.tab respectively. 
+	#(Only does log2level if the median of all sample was not zero) 
+	`mv $dir/sample.tab $dir/original_sample.tab`; 
+
+	`mv $dir/log2level.tab $dir/original_log2level.tab`;
+	open (LOG2LEVEL_FILE, ">".$log2Level_file) or die "Unable to make the log2level file : $log2Level_file $!\n";
+	print LOG2LEVEL_FILE  $log2Level_header_line . "\n";
+	foreach my $sample_id (sort(keys(%log2Level_lines_hash)))
+	{
+        	foreach my $feature_id (keys(%{$log2Level_lines_hash{$sample_id}}))
+		{
+			my @temp_arr =  @{$log2Level_lines_hash{$sample_id}->{$feature_id}};
+			print LOG2LEVEL_FILE join("\t",@temp_arr) . "\n";
+		} 
+	}
+	close (LOG2LEVEL_FILE);
+
+	#make new sample.tab file
+	open (SAMPLE_FILE, ">".$sample_file) or die "Unable to make the new sample file : $sample_file $!\n";
+	my $new_sample_file_header = "source-id\ttitle\tdescription\tmolecule\ttype\texternalSourceId\tdataSource\tkbaseSubmissionDate\texternalSourceDate\t".
+                           "originalLog2Median\tcustom\tpersons\tstrain-id\tplatform-id\tprotocol-id\texperimentalUnit-id\n";
+	print SAMPLE_FILE $new_sample_file_header;
+
+	foreach my $sample_source_id (sort(keys(%sample_lines_hash)))
+	{
+		for (my $i=0;$i<=15 ; $i++)
+		{
+			print SAMPLE_FILE $sample_lines_hash{$sample_source_id}->[$i] . "\t";
+		}
+		print SAMPLE_FILE ".\n";
+	}
+
+	#close Sample
+	close(SAMPLE_FILE);
+
+	print "\nSuccess:\n";
+	print "The original $sample_file has been renamed to $dir/original_sample.tab \n";
+	print "The original $log2Level_file has been renamed to $dir/original_log2level.tab \n"; 
+
+	print "The following_files have been created : \n" .$sample_file . "\n";
+	if ($need_new_log2level_file == 1)
+	{ 
+  	  print $log2Level_file . "\n";
+	}
+}
+else
+{
+	print "\nAll Samples already had a median log level of 0 already.  Nothing needed to be done. \n";
+}	
