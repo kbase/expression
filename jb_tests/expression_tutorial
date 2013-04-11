@@ -1,0 +1,166 @@
+use strict;
+use Data::Dumper;
+use Bio::KBase::ExpressionServices::ExpressionServicesClient;
+#FOR STARMAN
+my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
+#FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
+#(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
+#Log into your instance
+#sudo su
+#source /kb/deployment/user-env.sh
+#plackup --listen :9999 /kb/dev_container/modules/expression/lib/ExpressionServices.psgi 
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
+
+my $result;
+
+
+my %print_hash; 
+if (scalar(@ARGV)>0) 
+{ 
+    foreach my $arg (@ARGV) 
+    { 
+        $print_hash{$arg} = 1; 
+    } 
+} 
+ 
+print "NOTE THIS TEST SCRIPT HAS AN OPTION TO PASS ADDITIONAL INTEGER ARGUMENTS TO IT\n". 
+"The following integers being present will result in the Data Dumper of the returned results to be printed for the following calls:\n". 
+"**********************************************************************************************************************************\n". 
+"1 - client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); \n". 
+"2 - client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); \n". 
+"3 - client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); \n". 
+"4 - client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n". 
+"5 - client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray'); \n". 
+"6 - client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N'); \n\n"; 
+
+print "Calling get_expression_samples_data(['kb|sample.2','kb|sample.3']) \n\n";
+$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
+
+print "kb|sample.2 Sample title : ".$result->{'kb|sample.2'}->{'sampleTitle'}."\n";
+print "kb|sample.2 Genome ID : ".$result->{'kb|sample.2'}->{'genomeID'}."\n";
+print "kb|sample.2 Genome Scientific Name : ".$result->{'kb|sample.2'}->{'genomeScientificName'}."\n";
+print "kb|sample.2 KBaseSubmissionDate : ".$result->{'kb|sample.2'}->{'kbaseSubmissionDate'}."\n";
+print "kb|sample.3 ExternalSourceDate : ".$result->{'kb|sample.3'}->{'externalSourceDate'}."\n";
+print "kb|sample.2 ExperimentMetaId : ".$result->{'kb|sample.2'}->{'experimentMetaId'}."\n";
+print "kb|sample.2 Experiment Title : ".$result->{'kb|sample.2'}->{'experimentTitle'}."\n";
+print "kb|sample.2 Experiment Description : ".$result->{'kb|sample.2'}->{'experimentDescription'}."\n";
+print "kb|sample.2 Environment Description : ".$result->{'kb|sample.2'}->{'environmentDescription'}."\n";
+print "kb|sample.3 StrainID : ".$result->{'kb|sample.3'}->{'strainID'}."\n"; 
+print "kb|sample.3 StrainDescription : ".$result->{'kb|sample.3'}->{'strainDescription'}."\n"; 
+print "kb|sample.3 WildType : ".$result->{'kb|sample.3'}->{'wildtype'}."\n"; 
+print "kb|sample.3 Platform Technology : ".$result->{'kb|sample.3'}->{'platformTechnology'}."\n"; 
+print "kb|sample.3 Protocol Description : ".$result->{'kb|sample.3'}->{'protocolDescription'}."\n"; 
+print "kb|sample.3 Sample Type : ".$result->{'kb|sample.3'}->{'sampleType'}."\n"; 
+print "kb|sample.3 Molecule : ".$result->{'kb|sample.3'}->{'molecule'}."\netc....\n"; 
+if (exists($print_hash{1})) 
+{ 
+    print Dumper($result); 
+} 
+
+print "\n\nCalling get_expression_samples_data_by_series_ids(['kb|series.1','kb|series.0']) \n\n";
+$result = $client->get_expression_samples_data_by_series_ids(['kb|series.1','kb|series.0']);
+foreach my $series_id (keys(%{$result}))
+{
+	print "SERIES : $series_id\n";
+	foreach my $sample_id (keys(%{$result->{$series_id}}))
+	{
+		print "\tSample : $sample_id\n";
+	}
+}
+if (exists($print_hash{2})) 
+{ 
+    print Dumper($result); 
+} 
+
+
+print "\n\nCalling get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) \n\n";
+$result = $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']);
+foreach my $experimental_unit_id (keys(%{$result})) 
+{ 
+        print "EXPERIMENTAL UNIT : $experimental_unit_id\n";
+        foreach my $sample_id (keys(%{$result->{$experimental_unit_id}}))
+        { 
+                print "\tSample : $sample_id\n"; 
+        } 
+}
+if (exists($print_hash{3})) 
+{
+    print Dumper($result);
+} 
+
+
+print "\n\nCalling get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']) \n\n"; 
+$result = $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); 
+foreach my $experimental_unit_id (keys(%{$result})) 
+{ 
+        print "EXPERIMENTAL UNIT : $experimental_unit_id\n"; 
+        foreach my $sample_id (keys(%{$result->{$experimental_unit_id}})) 
+        { 
+                print "\tSample : $sample_id\n"; 
+        } 
+} 
+if (exists($print_hash{3})) 
+{ 
+    print Dumper($result); 
+} 
+
+
+print "\n\nCalling get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) \n\n";
+$result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']);
+foreach my $experiment_meta_id (keys(%{$result}))
+{
+	print "EXPERIMENT META : $experiment_meta_id\n";		
+	foreach my $experimental_unit_id (keys(%{$result->{$experiment_meta_id}}))
+	{
+		print "\tEXPERIMENTAL UNIT : $experimental_unit_id\n"; 
+        	foreach my $sample_id (keys(%{$result->{$experiment_meta_id}->{$experimental_unit_id}})) 
+        	{ 
+                  print "\t\tSample : $sample_id\n"; 
+        	} 
+	}
+} 
+if (exists($print_hash{4})) 
+{ 
+    print Dumper($result); 
+} 
+
+
+print "\n\nCalling get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray') \n\n";
+$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray');
+foreach my $strain_id (keys(%{$result})) 
+{ 
+        print "STRAIN ID : $strain_id\n"; 
+        foreach my $sample_id (keys(%{$result->{$strain_id}})) 
+        { 
+                print "\tSample : $sample_id\n"; 
+        } 
+} 
+if (exists($print_hash{5})) 
+{ 
+    print Dumper($result); 
+} 
+ 
+
+print "\n\nCalling get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y') \n\n";
+$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y');
+foreach my $genome_id (keys(%{$result})) 
+{ 
+        print "GENOME : $genome_id\n"; 
+        foreach my $strain_id (keys(%{$result->{$genome_id}})) 
+        { 
+                print "\tSTRAIN ID : $strain_id\n"; 
+                foreach my $sample_id (keys(%{$result->{$genome_id}->{$strain_id}})) 
+                { 
+                  print "\t\tSample : $sample_id\n"; 
+                } 
+        } 
+} 
+if (exists($print_hash{6})) 
+{ 
+    print Dumper($result); 
+} 
+
+#get_expression_data_by_feature_ids
+print "\n\nCalling get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y') \n\n";
+$result = $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y');
+print Dumper($result) . "\n----------------------------\n";
