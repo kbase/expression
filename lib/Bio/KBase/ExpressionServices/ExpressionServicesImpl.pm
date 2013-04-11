@@ -268,8 +268,8 @@ sub get_expression_samples_data
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
     my $get_sample_meta_data_q = qq^select sam.id, sam.source_id, sam.title as sample_title, sam.description as sample_description,  
-                                    sam.molecule, sam.type,  
-                                    sam.dataSource, sam.externalSourceId, sam.kbaseSubmissionDate, sam.externalSourceDate,  
+                                    sam.molecule, sam.type, sam.dataSource, sam.externalSourceId, 
+                                    FROM_UNIXTIME(sam.kbaseSubmissionDate), FROM_UNIXTIME(sam.externalSourceDate),  
                                     sam.custom, sam.originalLog2Median, 
                                     str.id, str.referenceStrain, str.wildtype, str.description,  
                                     gen.id, gen.scientific_name, 
