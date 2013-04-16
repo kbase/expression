@@ -2244,7 +2244,7 @@
                         <Field name="name" type="string">
                                 <Notes>Type of the ontology.</Notes>
                         </Field> 
-			<Field name="definition" type="long-string">
+			<Field name="definition" type="text">
 				<Notes>Definition of the ontology</Notes>
 			</Field>
 			<Field name="ontologySource" type="string">
