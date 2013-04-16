@@ -88,9 +88,9 @@ foreach my $ontology_source (keys(%ontology_databases))
 #	print "NAME: ". $name ."\n";
 #	print "DEF: ". $def ."\n\n";
     }
-    print $ontology_source . "BAD COUNT $bad_count \n";
-    print $ontology_source . "ALREADY IN DATABASE COUNT $already_in_the_db_count \n";
-    print $ontology_source . "INSERTED COUNT $inserted_count \n";
+    print $ontology_source . " RUNNING BAD COUNT $bad_count \n";
+    print $ontology_source . " RUNNING ALREADY IN DATABASE COUNT $already_in_the_db_count \n";
+    print $ontology_source . " RUNNNING INSERTED COUNT $inserted_count \n";
 }
 
 exit(); 
