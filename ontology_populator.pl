@@ -7,9 +7,8 @@ use strict;
 my %ontology_databases = ("Plant Ontology" => "http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co",
 			  "Plant Environmental Ontology" => "http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo",
 			  "Microbial Environmental Ontology" => "http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo");
-my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost','expressionSelect', '', 
-		       { RaiseError => 1, ShowErrorStatement => 1 } 
-    ); 
+#my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost','expressionSelect', '', { RaiseError => 1, ShowErrorStatement => 1 } ); 
+my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost','root', '', { RaiseError => 1, ShowErrorStatement => 1 } ); 
 
 my $does_ontology_exist_q = qq^select id from Ontology where id = ? ^;
 my $does_ontology_exist_qh = $dbh->prepare($does_ontology_exist_q) or die "Unable to prepare does_ontology_exist_q : $does_ontology_exist_q : " . $dbh->errstr();
