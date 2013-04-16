@@ -2230,19 +2230,22 @@
 		<DisplayInfo theme="cyan">
 			<RegionInfo name="Expression_v2" row="4" col="6" />
 		</DisplayInfo>
-		<Notes>-- Environmental Ontology. http://environmentontology.org/  
+		<Notes>-- Environmental Ontology. (ENVO Terms) http://environmentontology.org/  
 		-- Plant Ontology (PO Terms). http://www.plantontology.org/   
 		-- Plant Environmental Ontology (EO Terms). http://www.gramene.org/plant_ontology/index.html#eo
+		-- ENVO : http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo
+		-- PO : http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co
+		-- EO : http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo
 		</Notes>
 		<Fields>
-			<Field name="term" type="string">
-				<Notes>Ontologgy Term.</Notes>
+			<Field name="id" type="string">
+				<Notes>Ontologgy ID.</Notes>
 			</Field>
-			<Field name="description" type="long-string">
-				<Notes>Description of the ontology</Notes>
-			</Field>
-			<Field name="type" type="string">
-				<Notes>Type of the ontology.</Notes>
+                        <Field name="name" type="string">
+                                <Notes>Type of the ontology.</Notes>
+                        </Field> 
+			<Field name="definition" type="long-string">
+				<Notes>Definition of the ontology</Notes>
 			</Field>
 			<Field name="ontologySource" type="string">
 				<Notes>Enumerated value (ENVO, EO, PO).</Notes>
@@ -2251,8 +2254,7 @@
 		<Indexes>
 			<Index>
 				<IndexFields>
-					<IndexField name="term" order="ascending" />
-					<IndexField name="type" order="ascending" />
+					<IndexField name="id" order="ascending" />
 				</IndexFields>
 			</Index>
 		</Indexes>	

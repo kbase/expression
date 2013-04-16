@@ -15,7 +15,7 @@ from biokbase.exchangeformatsupport.argumentspecs import \
     PubID_Argument as _PubID_Argument, TextArgument as _TextArgument, \
     SourceOrKBID_Argument as _SourceOrKBID_Argument, RelInfo as _RelInfo, \
     UnitsArgument as _UnitsArgument, URL_Argument as _URL_Argument, \
-    StringEnumerationArgument as _StringEnumerationArgument
+    StringEnumerationArgument as _StringEnumerationArgument, StringID_Argument as _StringID_Argument    
 from biokbase.exchangeformatsupport.exceptions import \
     ExchangeFormatValueError as _ExchangeFormatValueError
 from biokbase.exchangeformatsupport.exchangeformat import \
@@ -579,7 +579,7 @@ class SampleAnnotation(_ExchangeFormatEntity):
 
    INC_ID = 'sampleAnnotation'
 	
-   DEF = { 'ontologyID': _KBaseID_Argument('ontology-id', 'Ontology', _RelInfo('OntologyForSample'),
+   DEF = { 'ontologyID': _StringID_Argument('ontology-id', 'Ontology', _RelInfo('OntologyForSample'),
                                         docs=docs['sam_ann']['ontologyID']),
            'annotationDate': _DateTimeArgument('annotationDate', docs=docs['sam_ann']['annotationDate'], 
                                                 cdsname='annotationDate', noentryok= 'R', unique=False), 
