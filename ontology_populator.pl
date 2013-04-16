@@ -55,6 +55,10 @@ foreach my $ontology_source (keys(%ontology_databases))
 		$term_line =~ m{\"(.*?)\"};
 		$def = $1;
 	    }
+	    if ($term_line =~ /^\[Typedef\]/)
+	    {
+		$last;
+	    }
 	}
 	unless (defined($def))
 	{
