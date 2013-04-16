@@ -17,6 +17,8 @@ my $insert_ontology_q = qq^insert into Ontology (id,name,definition,ontologySour
 my $insert_ontology_qh = $dbh->prepare($insert_ontology_q) or die "Unable to prepare insert_ontology_q : $insert_ontology_q : " . $dbh->errstr(); 
 
 my $bad_count = 0;
+my $already_in_the_db_count = 0;
+my $inserted_count = 0;
 foreach my $ontology_source (keys(%ontology_databases))
 {
     my $ua = LWP::UserAgent->new();
@@ -65,13 +67,27 @@ foreach my $ontology_source (keys(%ontology_databases))
 	    $bad_count++;
 	    next; #should never happen but 
 	}
-
-	#make sure id, name defined
+        #CHECK IF IN THE db ALREADY
+	$does_ontology_exist_qh->execute($id) or die "Unable to executee does_ontology_exist_q $id : $does_ontology_exist_q : " . $does_ontology_exist_qh->errstr(); 
+	my $exist_check = undef;
+	($exist_check) = $does_ontology_exist_qh->fetchrow_array();
+	if (defined($exist_check))
+	{
+	    $already_in_the_db_count++;
+	}
+	#IF NOT IN DB DO THE INSERT
+	else
+	{
+	    $insert_ontology_qh->execute($id,$name,$def,$ontology_source) or die "Unable to execute insert_ontology_q : $insert_ontology_q : " . $insert_ontology_qh->errstr(); 
+	    $inserted_count++;
+	}
 #	print "ID: ". $id ."\n";
 #	print "NAME: ". $name ."\n";
 #	print "DEF: ". $def ."\n\n";
     }
-    print $ontology_source . " COUNT $bad_count \n";
+    print $ontology_source . "BAD COUNT $bad_count \n";
+    print $ontology_source . "ALREADY IN DATABASE COUNT $already_in_the_db_count \n";
+    print $ontology_source . "INSERTED COUNT $inserted_count \n";
 }
 
 exit(); 
