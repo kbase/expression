@@ -577,7 +577,7 @@ class SampleAnnotation(_ExchangeFormatEntity):
 	
    ID_PREFIX = 'kb|sampAnn'
 
-   INC_ID = 'sampleAnnotation'
+   INC_ID = 'sample_annotation'
 	
    DEF = { 'ontologyID': _StringID_Argument('ontology-id', 'Ontology', _RelInfo('OntologyForSample'),
                                         docs=docs['sam_ann']['ontologyID']),
