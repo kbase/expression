@@ -387,12 +387,12 @@ sub get_expression_samples_data
     }
 
     #log2Levels
-    my $get_log2levels_q = qq^select sam.id, fea.id, l2l.log2Level
+    my $get_log2levels_q = qq^select sam.id, fea.id, msm.value
                               from Sample sam
-                              inner join SampleLevels sl on sam.id = sl.from_link
-                              inner join Log2Level l2l on sl.to_link = l2l.id
-                              inner join FeatureWithLevels fwl on l2l.id = fwl.to_link
-                              inner join Feature fea on fwl.from_link = fea.id
+                              inner join SampleMeasurements sl on sam.id = sl.from_link
+                              inner join Measurment msm on sl.to_link = msm.id
+                              inner join FeatureMeasuredBy fmb on msm.id = fmb.to_link
+                              inner join Feature fea on fmb.from_link = fea.id
                               where sam.id in (^. 
                            join(",", ("?") x @{$sampleIds}) . ") ";  
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
@@ -1669,9 +1669,9 @@ sub get_expression_data_by_feature_ids
     } 
     my $get_feature_log2level_q = qq^select sam.id, fea.id, l2l.log2Level
                                      from Sample sam
-                                     inner join SampleLevels sl on sam.id = sl.from_link
-                                     inner join Log2Level l2l on sl.to_link = l2l.id
-                                     inner join FeatureWithLevels fwl on l2l.id = fwl.to_link
+                                     inner join SampleMeasurments sm on sam.id = sm.from_link
+                                     inner join Measurment msm on sm.to_link = msm.id
+                                     inner join FeatureWithLevels fwl on msm.id = fwl.to_link
                                      inner join Feature fea on fwl.from_link = fea.id
                                      inner join StrainWithSample sws on sam.id = sws.to_link
                                      inner join Strain str on sws.from_link = str.id
