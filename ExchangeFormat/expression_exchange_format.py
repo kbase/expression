@@ -528,7 +528,7 @@ class Sample(_ExchangeFormatEntity):
                                                docs=docs['sam']['protocol'], noentryok='R', unique=False),
             'experimentalUnit': _SourceOrKBID_Argument('experimentalUnit-id', 'ExperimentalUnit', _RelInfo('HasExpressionSample'),
                                                        docs=docs['sam']['experimentalUnit'], noentryok='R', unique=False),
-            'defaultControlSampleId': _SourceOrKBID_Argument('defaultControlSampleId', 'Sample', _RelInfo('DefaultControlSample'), 
+            'defaultControlSampleId': _SourceOrKBID_Argument('defaultControlSample-id', 'Sample', _RelInfo('DefaultControlSample'), 
                                                        docs=docs['sam']['defaultControlSampleId'], noentryok='R', unique=False), 
             'dataQualityLevel': _IntArgument(None, , cdsname='dataQualityLevel', unique = False), 
           }
