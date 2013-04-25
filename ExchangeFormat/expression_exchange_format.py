@@ -49,7 +49,7 @@ _PERSONSAMPLE_ROW_SEP = ','
 _SAMPLE_ROW_SEP = ',';
 
 ALLOWED_MOLECULES = frozenset(['total RNA', 'polyA RNA', 'cytoplasmic RNA', 'nuclear RNA','protein','total RNA/genomic DNA',
-								'polyA RNA/genomic DNA','cytoplasminc RNA/genomic DNA','nuclear RAN/genomic DNA'])
+								'polyA RNA/genomic DNA','cytoplasminc RNA/genomic DNA','nuclear RNA/genomic DNA'])
 ALLOWED_TYPES = frozenset(['microarray','RNA-Seq','qPCR','proteomics'])
 ALLOWED_CONFIDENCE_TYPES = frozenset(['pValue','Zscore','null'])
 ALLOWED_UNITS = frozenset(['vol%', 'g/L', 'mol/L'])
@@ -69,7 +69,7 @@ The files included in this exchange are:
 1.	sample.tab
 2.	series.tab
 3.	platform.tab
-4.	log2level.tab 
+4.	measurment.tab 
 5.	sample_annotation.tab 
 6.	person.tab
 7.	protocol.tab
@@ -80,6 +80,7 @@ The files included in this exchange are:
 12.	time_series.tab
 13.	experimentMeta.tab
 14.	experimentalUnit.tab
+15.     measurementDescription.tab
 
 The sample.tab and log2level.tab are the truly important files.  
 The other tables are primarily to attach meta data to the sample.
@@ -124,6 +125,7 @@ docs['sam']['strain'] = 'The KBase identifier or source-id for the Strain that t
 docs['sam']['platform'] = 'The KBase identifier or source-id for the Platform that the sample was for.'
 docs['sam']['protocol'] = 'The KBase identifier or source id of the protocol associated with the sample.'
 docs['sam']['experimentalUnit'] = 'The KBase identifier or source-id for the Experimental unit that this sample is associated with.'
+docs['sam']['defaultControlSampleId'] = 'The KBase identifier or source-id for the sample that should be used for this sample for default comparisons.'
 
 
 # SERIES TABLE - 2
@@ -154,28 +156,49 @@ Note that it is possible the platform to be designed for a different strain than
 Refers to strain tab.'''
 
 
-# LOG2LEVEL TABLE - 4
-
-docs['l2l']['pre'] = '''
-Holds the log2level values for all of the features normalized so that the log2level median of the sample is zero 
-(the log2level median of the sample is subtracted out from each level within the sample).
-NOTE IT IS REQUIRED that the levels are in log2 level space and have been normalized so that the median
-of all a sample's levels for features equals zero.  If this has ne been done, convert your levels into log2level space and then
-have the preprocessor process the log2level.tab and sample.tab files.  After that the data should be good to upload.'''
-docs['l2l']['log2Level'] = 'The normalized log2level for a feature in a given sample'
-docs['l2l']['stdDev'] = '''
-If multiple values for a given feature were used to give an average log2level, then the standard deviation for the multiple values 
-for a feature should be determined.  Could be multiple probes for a feature and/or if replicates were averaged together.  
-Conditional, but recommended if the number of measurements is greater than 1.'''
-docs['l2l']['numberOfMeasurements'] = 'The number of measurements that went into this log2level value'
-docs['l2l']['confidenceScore'] = 'The confidence score of that log2Level.'
-docs['l2l']['confidenceType'] = 'Type of confidence score. Enumerated [pValue,Zscore,null]'
-docs['l2l']['sample'] = 'The KBase identifier or source-id for the Sample that this measurement was part of.'
-docs['l2l']['feature'] = 'The Kbase identifier of the feature.  Must already exist in the DB.'
-docs['l2l']['post'] = '''
-*Note that log2Level needs to be in log2 space.  Additionally the median of all log2Levels for a 
-given sample need to be normalized so that there median is equal to zero.  The original median log2 level 
-should be stored in the sample table.'''
+# MEASUREMENT TABLE - 4                                                                                                                      
+ 
+docs['meas']['pre'] = '''                                          
+Holds the measurement values for all of the features normalized so that the measurements are in Log2 space.  
+The log2level measurement median of the sample is zero 
+(the measurement median of the sample is subtracted out from each level within the sample).     
+NOTE IT IS REQUIRED that the measurements are in log2 level space and have been normalized so that the median      
+of all a sample's levels for features equals zero.  If this has not been done, convert your levels into log2level space and then        
+have the preprocessor process the measurement.tab and sample.tab files.  After that the data should be good to upload.'''
+docs['meas']['post'] = '''                                                                                                               
+*Note that log2Level needs to be in log2 space.  Additionally the median of all log2Levels for a    
+given sample need to be normalized so that there median is equal to zero.  The original median log2 level
+should be stored in the sample table.''' 
+docs['meas']['sampleId'] = '''                                                                                                                 
+The source or KBase ID of the sample to which the measurement belongs.''' 
+docs['meas']['desc'] = '''                                                                                                                
+The source or KBase ID of the measurement description that describes this                                                                 
+measurement.  Note that the measurements need to be in log2 space and with median
+of all the measurements for a given sample set to zero.''' 
+docs['meas']['feat'] = '''                                                                                                                
+The KBase id of the feature (e.g. gene/RNA etc.) that this measurement                                                                    
+quantifies.''' 
+docs['meas']['val'] = '''
+The value is abundance of for expression for a feature.  This value needs to be in Log2 space.  
+The median of all the values for a given sample needs to be set to zero.  
+Note if the values are in log2 space but not normalized with a zero median just run the 
+preprocessor from the directory that has the measurment.tab and sample.tab file in it.
+This is a required field.''' 
+docs['meas']['mean'] = '''                                                                                                                
+The mean of the measurement if multiple replicates were taken.''' 
+docs['meas']['med'] = '''                                                                                                                 
+The median of the measurement if multiple replicates were taken.'''
+docs['meas']['std'] = '''                                                                                                                 
+The standard deviation of the measurement if multiple replicates were taken.''' 
+docs['meas']['N'] = 'The number of replicates, if taken.'
+docs['meas']['pval'] = '''                                                                                                                
+The p-value of multiple replicates if they are included in the measurement.                                                               
+The exact meaning of the p-value is specified in the Measurement Description                                                              
+object for this measurement.''' 
+docs['meas']['Z'] = '''                                                                                                                   
+The Z-score of multiple replicates if they are included in the measurement.                                                               
+The exact meaning of the p-value is specified in the Measurement Description                                                              
+object for this measurement.''' 
 
 
 # SAMPLE_ANNOTATION TABLE - 5
@@ -360,6 +383,27 @@ time series as a whole - for example, lag and doubling times for bacterial
 growth curves. False if the EU is not part of a time series. Generally there
 should be at most one meta EU per time series.'''
 
+# MEASUREMENT DESCRIPTION TABLE - 15
+
+docs['md']['pre'] = '''A measurement description (MD) explains what a                       
+particular measurement represents. The measurement table is a generic table used to store all measurements.
+For the case of expression all the measurements should be some  Please try   
+to use MDs that already exist in kbase as algorithms are keyed to MDs.  
+NOTE * Really this file should not exist (or not have values) unless there is some sort of special measurement 
+type that you are doing that has not been previously described (not previously stored in the database).''' 
+docs['md']['name'] = 'The name of the measurement.' 
+docs['md']['desc'] = '''       
+The description of the measurement and what it means. Contains which attributes  
+in the Measurement table should be filled in for this measurement description 
+and what those values represent. Generally either the value and/or one or more  
+of the statistical fields should be included.''' 
+docs['md']['unit'] = 'The units for the measurement.' 
+docs['md']['cat'] = '''    
+The category the measurement fits into, for example phenotype, experimental
+input, or environment.'''
+
+
+
 ###############################################
 #
 # Relationships
@@ -484,16 +528,20 @@ class Sample(_ExchangeFormatEntity):
                                                docs=docs['sam']['protocol'], noentryok='R', unique=False),
             'experimentalUnit': _SourceOrKBID_Argument('experimentalUnit-id', 'ExperimentalUnit', _RelInfo('HasExpressionSample'),
                                                        docs=docs['sam']['experimentalUnit'], noentryok='R', unique=False),
+            'defaultControlSampleId': _SourceOrKBID_Argument('defaultControlSampleId', 'Sample', _RelInfo('DefaultControlSample'), 
+                                                       docs=docs['sam']['defaultControlSampleId'], noentryok='R', unique=False), 
+            'dataQualityLevel': _IntArgument(None, , cdsname='dataQualityLevel', unique = False), 
           }
 
     def __init__(self, sourceID, title, description, molecule, type, externalSourceId, 
                  dataSource, kbaseSubmissionDate, externalSourceDate, originalLog2Median, custom,
-                         persons, strain, platform, protocol, experimentalUnit):
+                         persons, strain, platform, protocol, experimentalUnit, defaultControlSampleId):
         if kbaseSubmissionDate in ('', None, self.NO_ENTRY_SYM):
             kbaseSubmissionDate = str(datetime.datetime.now())
+        dataQualityLevel = 1
         super(Sample, self).__init__(sourceID, title, description, molecule, type, externalSourceId, 
                  dataSource, kbaseSubmissionDate, externalSourceDate, originalLog2Median, custom,
-                         persons, strain, platform, protocol, experimentalUnit)
+                         persons, strain, platform, protocol, experimentalUnit, defaultControlSampleId, dataQualityLevel)
 
 
 # Series - 2
@@ -544,31 +592,59 @@ class Platform(_ExchangeFormatEntity):
 	    'strain': _SourceOrKBID_Argument('strain-id', 'Strain', _RelInfo('StrainWithPlatforms'), docs=docs['plt']['strain'], unique=False),
            }
 			
-			
-# Log2Level - 4
 
-class Log2Level(_ExchangeFormatEntity):
+ 
+ 
+class Measurement(_ExchangeFormatEntity): 
+ 
+    DOC_PRE = docs['meas']['pre'] 
+ 
+    DOC_POST = docs['meas']['post'] 
+ 
+    ID_PREFIX = 'kb|meas' 
+ 
+    INC_ID = 'measurement' 
+ 
+    ORDER = ['sampleID', 'measdescID', 'featureKBID', 'value', 'mean', 
+             'median', 'stddev', 'N', 'pvalue', 'zscore'] 
+ 
+    DEF = {'sampleID': _SourceOrKBID_Argument(
+                            'sample-id', 'Sample',
+                            _RelInfo('SampleMeasurements'),
+                            docs=docs['meas']['sampleId'], unique=False),
+           'measdescID': _SourceOrKBID_Argument(
+                             'measurment-description-id', 'MeasurementDescription',
+                             _RelInfo('DescribesMeasurement'), 
+                             docs=docs['meas']['desc'], unique=False),
+           'featureKBID': _KBaseID_Argument( 
+                              'KB-feature-id', 'Feature', 
+                              _RelInfo('FeatureMeasuredBy'),
+                              docs=docs['meas']['feat'], 
+                              unique=False), 
+           'value': _FloatArgument('value', docs=docs['meas']['val'],
+                                   cdsname='value',
+                                   unique=False),
+           'mean': _FloatArgument('mean', docs=docs['meas']['mean'],
+                                  cdsname='mean', noentryok='O', 
+                                  unique=False), 
+           'median': _FloatArgument('median', docs=docs['meas']['med'], 
+                                    cdsname='median', noentryok='O', 
+                                    unique=False), 
+           'stddev': _FloatArgument( 
+                         'standard-deviation', docs=docs['meas']['std'], 
+                         cdsname='stddev', noentryok='O', unique=False, 
+                         greaterthanorequal=0), 
+           'N': _IntArgument('N', docs=docs['meas']['N'], noentryok='O', 
+                             unique=False, greaterthanorequal=2), 
+           'pvalue': _FloatArgument( 
+                         'p-value', docs=docs['meas']['pval'], 
+                         cdsname='p-value', noentryok='O', unique=False, 
+                         greaterthanorequal=0, lessthanorequal=1), 
+           'zscore': _FloatArgument('Z-score', docs=docs['meas']['Z'], 
+                                    cdsname='Z-score', noentryok='O', 
+                                    unique=False), 
+           }  # completely identical measurements ok                                                                                      
 
-    DOC_PRE = docs['l2l']['pre']
-	
-    DOC_POST = docs['l2l']['post']
-	
-    ID_PREFIX = 'kb|log'
-			
-    INC_ID = 'log2level'
-			
-    DEF = { 'log2Level': _FloatArgument('log2Level', docs=docs['l2l']['log2Level'], cdsname='log2Level', unique = False),
-            'stdDev': _FloatArgument('stdDev', docs=docs['l2l']['stdDev'], cdsname='stdDev', noentryok='O', unique = False),
-            'numberOfMeasurements': _IntArgument('numberOfMeasurements', docs=docs['l2l']['numberOfMeasurements'], cdsname='numberOfMeasurements', noentryok='R', unique = False),
-            'confidenceScore': _FloatArgument('confidenceScore', docs=docs['l2l']['confidenceScore'], cdsname='confidenceScore', noentryok='O', unique = False),
-            'confidenceType': _StringEnumerationArgument('confidenceType', ALLOWED_CONFIDENCE_TYPES, docs=docs['l2l']['confidenceType'], cdsname='confidenceType', unique = False),
-            'sample': _SourceOrKBID_Argument('sample-id', 'Sample', _RelInfo('SampleLevels'),
-                                             docs=docs['l2l']['sample'], unique=False),
-            'feature': _SourceOrKBID_Argument('feature-id', 'Feature', _RelInfo('FeatureWithLevels'),
-                                              docs=docs['l2l']['feature'], unique=False),
-          }
-			
-			
 # SampleAnnotation - 5
 
 class SampleAnnotation(_ExchangeFormatEntity):
@@ -893,9 +969,28 @@ class ExperimentalUnit(_ExchangeFormatEntity):
                 'If a time series ID is specified a time value must be ' +
                 'provided.')
 
+
+class MeasurementDescription(_ExchangeFormatEntity): 
+ 
+    DOC_PRE = docs['md']['pre'] 
+ 
+    ID_PREFIX = 'kb|measdesc' 
+ 
+    INC_ID = 'measurement_description' 
+ 
+    DEF = {'name': _StringArgument('Name', docs=docs['md']['name'], 
+                                   cdsname='name', unique=False), 
+           'description': _TextArgument('Description', docs=docs['md']['desc'], 
+                                        cdsname='description'), 
+           'unitOfMeasure': _StringArgument('Units', docs=docs['md']['unit'], 
+                                           cdsname='unitOfMeasure'), 
+           'category': _StringArgument('Category', docs=docs['md']['cat'], 
+                                       cdsname='category'), 
+           } 
+
  
 EXCHANGE_FORMAT = _ExchangeFormat(EF_NAME, PREAMBLE, VERSION, FILE_SUFFIX,
                     _EF_NO_ENTRY_SYMBOL, _EF_LINE_SEP,
-                    [Sample, Series, Platform, Log2Level, SampleAnnotation, 
+                    [Sample, Series, Platform, Measurement, SampleAnnotation, 
                      Person, Protocol, Publication, Strain, Environment,
-                     Media, TimeSeries, ExperimentMeta, ExperimentalUnit])
+                     Media, TimeSeries, ExperimentMeta, ExperimentalUnit, MeasurementDescription])

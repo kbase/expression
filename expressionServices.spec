@@ -18,49 +18,75 @@ module ExpressionServices {
     /* Sample type controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics */
     typedef string SampleType;
     
-    /* Kbase Series Id */ 
+    /* Kbase Series ID */ 
     typedef string SeriesID; 
     
-    /* list of KBase Series Ids */
+    /* list of KBase Series IDs */
     typedef list<SeriesID> SeriesIDs;
     
-    /* Kbase ExperimentMeta Id */ 
+    /* Kbase ExperimentMeta ID */ 
     typedef string ExperimentMetaID; 
     
-    /* list of KBase ExperimentMeta Ids */
+    /* list of KBase ExperimentMeta IDs */
     typedef list<ExperimentMetaID> ExperimentMetaIDs;
     
-    /* Kbase ExperimentalUnitId */ 
+    /* Kbase ExperimentalUnitID */ 
     typedef string ExperimentalUnitID; 
     
-    /* list of KBase ExperimentUnitIds */
+    /* list of KBase ExperimentUnitIDs */
     typedef list<ExperimentalUnitID> ExperimentalUnitIDs;
     
     /* mapping kbase feature id as the key and log2level as the value */
-    typedef mapping<FeatureID feature_id, Log2Level log2level> DataExpressionLevelsForSample; 
-    
-    /* Kbase SampleAnnotation Id */ 
+    typedef mapping<FeatureID featureID, Log2Level log2level> DataExpressionLevelsForSample; 
+
+    /* Log2Ratio Log2Level of sample over log2Level of another sample for a given feature */ 
+    typedef float Log2Ratio; 
+
+    /* mapping kbase feature id as the key and log2lRatio as the value */
+    typedef mapping<FeatureID featureID, Log2Ratio log2Ratio> DataSampleComparison;
+
+    /* Kbase SampleAnnotation ID */ 
     typedef string SampleAnnotationID; 
+ 
+    /* Kbase OntologyID  */ 
+    typedef string OntologyID; 
     
-    /* list of KBase SampleAnnotation Ids */
-    typedef list<SampleAnnotationID> SampleAnnotationIDs;
+    /* list of Kbase Ontology IDs */
+    typedef list<OntologyID> OntologyIDs;
+
+    /* Kbase OntologyName */
+    typedef string OntologyName;
+
+    /* Kbase OntologyDefinition */
+    typedef string OntologyDefinition;
+
+    /* Data structure for top level information for sample annotation and ontology */
+    typedef structure {
+	SampleAnnotationID sampleAnnotationID;
+	OntologyID ontologyID;
+	OntologyName ontologyName;
+	OntologyDefinition ontologyDefinition;
+    } SampleAnnotation;
     
-    /* Kbase Person Id */ 
+    /* list of Sample Annotations associated with the Sample */
+    typdef list<SampleAnnotation> SampleAnnotations;
+
+    /* Kbase Person ID */ 
     typedef string PersonID; 
     
-    /* list of KBase PersonsIds */
+    /* list of KBase PersonsIDs */
     typedef list<PersonID> PersonIDs;
     
-    /* KBase StrainId */
+    /* KBase StrainID */
     typedef string StrainID;
     
-    /* list of KBase StrainIds */
+    /* list of KBase StrainIDs */
     typedef list<StrainID> StrainIDs;
     
-    /* KBase GenomeId */
+    /* KBase GenomeID */
     typedef string GenomeID;
     
-    /* list of KBase GenomeIds */
+    /* list of KBase GenomeIDs */
     typedef list<GenomeID> GenomeIDs;
     
     /* Single integer 1= WildTypeonly, 0 means all strains ok */
@@ -68,14 +94,14 @@ module ExpressionServices {
     
     /* Data structure for all the top level metadata and value data for an expression sample */
     typedef structure {
-	SampleID sampleId;
-	string sourceId;
+	SampleID sampleID;
+	string sourceID;
 	string sampleTitle;
 	string sampleDescription;
 	string molecule;
 	SampleType sampleType;
 	string dataSource;
-	string externalSourceId;
+	string externalSourceID;
 	string externalSourceDate;
 	string kbaseSubmissionDate;
 	string custom;
@@ -86,62 +112,67 @@ module ExpressionServices {
 	string strainDescription;
 	GenomeID genomeID;
 	string genomeScientificName;
-	string platformId;
+	string platformID;
 	string platformTitle;
 	string platformTechnology;
 	ExperimentalUnitID experimentalUnitID;
 	ExperimentMetaID experimentMetaID;
 	string experimentTitle;
 	string experimentDescription;
-	string environmentId;
+	string environmentID;
 	string environmentDescription;
-	string protocolId;
+	string protocolID;
 	string protocolDescription;
 	string protocolName;
-	SampleAnnotationIDs sampleAnnotationIDs;
-	SeriesIDs seriesIds;
-	PersonIDs personIds;
+	SampleAnnotations sampleAnnotations;
+	SeriesIDs seriesIDs;
+	PersonIDs personIDs;
 	DataExpressionLevelsForSample dataExpressionLevelsForSample;
 	} ExpressionDataSample;
     
-    /* Mapping between sampleId and ExpressionDataSample */
-    typedef mapping<SampleID sampleId, ExpressionDataSample> ExpressionDataSamplesMap;
+    /* Mapping between sampleID and ExpressionDataSample */
+    typedef mapping<SampleID sampleID, ExpressionDataSample> ExpressionDataSamplesMap;
     
-    /*mapping between seriesIds and all Samples it contains*/
-    typedef mapping<SeriesID series_id, ExpressionDataSamplesMap> SeriesExpressionDataSamplesMapping;
+    /*mapping between seriesIDs and all Samples it contains*/
+    typedef mapping<SeriesID seriesID, ExpressionDataSamplesMap> SeriesExpressionDataSamplesMapping;
     
-    /*mapping between experimentalUnitIds and all Samples it contains*/
+    /*mapping between experimentalUnitIDs and all Samples it contains*/
     typedef mapping<ExperimentalUnitID experimentalUnitID, ExpressionDataSamplesMap> ExperimentalUnitExpressionDataSamplesMapping;
 
-    /*mapping between experimentMetaIds and ExperimentalUnitExpressionDataSamplesMapping it contains*/
+    /*mapping between experimentMetaIDs and ExperimentalUnitExpressionDataSamplesMapping it contains*/
     typedef mapping<ExperimentMetaID experimentMetaID, ExperimentalUnitExpressionDataSamplesMapping> ExperimentMetaExpressionDataSamplesMapping;
     
-    /*mapping between strainIds and all Samples it contains*/
+    /*mapping between strainIDs and all Samples it contains*/
     typedef mapping<StrainID strainID, ExpressionDataSamplesMap> StrainExpressionDataSamplesMapping;
 
-    /*mapping between genomeIds and all StrainExpressionDataSamplesMapping it contains*/
+    /*mapping between genomeIDs and all StrainExpressionDataSamplesMapping it contains*/
     typedef mapping<GenomeID genomeID, StrainExpressionDataSamplesMapping> GenomeExpressionDataSamplesMapping;
 
+    /*mapping between ontologyIDs (concatenated if searched for with the and operator) and all the Samples that match that term(s)*/
+    typedef mapping<OntologyID ontologyID, ExpressionDataSamplesMap> OntologyExpressionDataSampleMapping;
+
     /* mapping kbase sample id as the key and a single log2level (for a scpecified feature id, one mapping higher) as the value */
-    
-    typedef mapping<SampleID sampled, Log2Level log2level> SampleLog2LevelMapping; 
+    typedef mapping<SampleID sampleID, Log2Level log2level> SampleLog2LevelMapping; 
     
     /*mapping between FeatureIds and the mappings between samples and log2level mapping*/
-    typedef mapping<FeatureID featureId, SampleLog2LevelMapping sampleLog2LevelMapping> FeatureSampleLog2LevelMapping;
+    typedef mapping<FeatureID featureID, SampleLog2LevelMapping sampleLog2LevelMapping> FeatureSampleLog2LevelMapping;
 
     /*FUNCTIONS*/
     
     /* core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure */
-    funcdef get_expression_samples_data(SampleIDs sampleIds) returns (ExpressionDataSamplesMap expressionDataSamplesMap);
+    funcdef get_expression_samples_data(SampleIDs sampleIDs) returns (ExpressionDataSamplesMap expressionDataSamplesMap);
 
-    /* given a list of SeriesIds returns mapping of SeriesId to expressionDataSamples */
-    funcdef get_expression_samples_data_by_series_ids(SeriesIDs seriesIds) returns (SeriesExpressionDataSamplesMapping seriesExpressionDataSamplesMapping);
+    /* given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples */
+    funcdef get_expression_samples_data_by_series_ids(SeriesIDs seriesIDs) returns (SeriesExpressionDataSamplesMapping seriesExpressionDataSamplesMapping);
     
-    /* given a list of ExperimentalUnitIds returns mapping of ExperimentalUnitId to expressionDataSamples */
+    /* given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples */
     funcdef get_expression_samples_data_by_experimental_unit_ids(ExperimentalUnitIDs experimentalUnitIDs) returns (ExperimentalUnitExpressionDataSamplesMapping experimentalUnitExpressionDataSamplesMapping);
     
-    /* given a list of ExperimentMetaIds returns mapping of ExperimentId to experimentalUnitExpressionDataSamplesMapping */
+    /* given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping */
     funcdef get_expression_experimental_unit_samples_data_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (ExperimentMetaExpressionDataSamplesMapping experimentMetaExpressionDataSamplesMapping);
+
+    /* given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping */ 
+    funcdef get_expression_samples_data_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (ExperimentMetaExpressionDataSamplesMapping experimentMetaExpressionDataSamplesMapping); 
     
     /* given a list of Strains, and a SampleType, it returns a StrainExpressionDataSamplesMapping,  StrainId -> ExpressionDataSample*/
     funcdef get_expression_samples_data_by_strain_ids(StrainIDs strainIDs, SampleType sampleType) returns (StrainExpressionDataSamplesMapping strainExpressionDataSamplesMapping);
@@ -149,7 +180,11 @@ module ExpressionServices {
     /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample*/
     funcdef get_expression_samples_data_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (GenomeExpressionDataSamplesMapping genomeExpressionDataSamplesMapping);
 
-    /* given a list of FeatureIds, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleLog2LevelMapping : featureId->{sample_id->log2Level} */
-    funcdef get_expression_data_by_feature_ids(FeatureIDs featureIds, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (FeatureSampleLog2LevelMapping featureSampleLog2LevelMapping);
+    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample  */
+    funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, WildTypeOnly wildTypeOnly) 
+        returns (OntologyExpressionDataSampleMapping ontologyExpressionDataSampleMapping);
+
+    /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleLog2LevelMapping : featureID->{sample_id->log2Level} */
+    funcdef get_expression_data_by_feature_ids(FeatureIDs featureIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (FeatureSampleLog2LevelMapping featureSampleLog2LevelMapping);
     
 }; 
