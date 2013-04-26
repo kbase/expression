@@ -1,4 +1,4 @@
-package Bio::KBase::ExpressionServices::ExpressionServicesImpl;
+package ExpressionServicesImpl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
@@ -18,7 +18,6 @@ ExpressionServices
 #BEGIN_HEADER
 use DBI;
 use Storable qw(dclone);
-use Config::Simple;
 #END_HEADER
 
 sub new
@@ -26,70 +25,56 @@ sub new
     my($class, @args) = @_;
     my $self = {
     };
-    bless $self, $class;    
-    #BEGIN_CONSTRUCTOR 
-#    foreach my $key (keys %ENV) { 
-#	print "$key = $ENV{$key}\n"; 
-#    } 
-
-    #Copied from M. Sneddon's TreeImpl.pm from trees.git f63b672dc14f4600329424bc6b404b507e9c2503   
-    my($deploy) = @args; 
-    if (! $deploy) { 
-        # if not, then go to the config file defined by the deployment and import                                                                                                                      
-        # the deployment settings   
-	my %params; 
-        if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) { 
-#print "IN CONFIG IF\n"; 
-#print "CONFIG FILE $e \n\n";
-            my $EXPRESSION_SERVICE_NAME = $ENV{KB_SERVICE_NAME}; 
-            my $c = Config::Simple->new(); 
-            $c->read($e); 
-#print "CONFIG FILE C: $c \n\n";
-	    my %temp_hash = $c->vars();
-#	    foreach my $c_key (keys(%temp_hash))
-#	    {
-#		print "CKEY: $c_key : Val $temp_hash{$c_key} \n";
-#	    }
-            my @param_list = qw(dbName dbUser dbhost); 
-#print "PAram list : ".join(":",@param_list)."\n";
-            for my $p (@param_list) 
-            { 
-		print "$EXPRESSION_SERVICE_NAME.$p \n\n";
-                my $v = $c->param("$EXPRESSION_SERVICE_NAME.$p"); 
-#print "IN LOOP P: $p v $v \n";
-                if ($v) 
-                { 
-#		    print "IN V IF\n"; 
-                    $params{$p} = $v; 
-                    $self->{$p} = $v; 
-                } 
-            } 
-        } 
-        else 
-        { 
-            $self->{dbName} = 'CS_expression'; 
-            $self->{dbUser} = 'expressionSelect'; 
-            $self->{dbhost} = 'localhost'; 
-#            print "IN CONFIG ELSE\n"; 
-        } 
-        #Create a connection to the EXPRESSION (and print a logging debug mssg)              
-	if( 0 < scalar keys(%params) ) { 
-            warn "Connection to Expression Service established with the following non-default parameters:\n"; 
-            foreach my $key (sort keys %params) { warn "   $key => $params{$key} \n"; } 
-        } else { warn "Connection to Expression established with all default parameters.\n"; } 
-	print "IN IF\n"; 
-    } 
-    else 
-    { 
-        $self->{dbName} = 'CS_expression'; 
-        $self->{dbUser} = 'expressionSelect'; 
-        $self->{dbhost} = 'localhost'; 
-#	print "IN ELSE\n"; 
-    } 
-#    print "\nDBNAME : ".  $self->{dbName}; 
-#    print "\nDBUSER : ".  $self->{dbUser}; 
-#    print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
-    #END_CONSTRUCTOR     
+    bless $self, $class;
+    #BEGIN_CONSTRUCTOR
+    #Copied from M. Sneddon's TreeImpl.pm from trees.git f63b672dc14f4600329424bc6b404b507e9c2503
+    my($deploy) = @args;
+    if (! $deploy) {
+	# if not, then go to the config file defined by the deployment and import
+	# the deployment settings
+	my %params;
+	if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) {
+print "IN CONFIG IF\n";
+	    my $EXPRESSION_SERVICE_NAME = $ENV{KB_SERVICE_NAME};
+	    my $c = Config::Simple->new();
+	    $c->read($e);
+	    my @param_list = qw(dbName dbUser dbhost);
+	    for my $p (@param_list)
+	    {
+		my $v = $c->param("$EXPRESSION_SERVICE_NAME.$p");
+		if ($v)
+		{
+print "IN V IF\n";
+		    $params{$p} = $v;
+		    $self->{$p} = $v;
+		}
+	    }
+	}
+	else
+	{ 
+	    $self->{dbName} = 'CS_expression';
+	    $self->{dbUser} = 'expressionSelect';
+	    $self->{dbhost} = 'localhost'; 
+	    print "IN CONFIG ELSE\n";
+	} 
+	#Create a connection to the EXPRESSION (and print a logging debug mssg)
+	if( 0 < scalar keys(%params) ) {
+	    warn "Connection to Expression Service established with the following non-default parameters:\n";
+	    foreach my $key (sort keys %params) { warn "   $key => $params{$key} \n"; }
+	} else { warn "Connection to Expression established with all default parameters.\n"; }
+print "IN IF\n";
+    }
+    else
+    {
+	$self->{dbName} = 'CS_expression';
+	$self->{dbUser} = 'expressionSelect';
+	$self->{dbhost} = 'localhost';
+print "IN ELSE\n";
+    }
+    print "\nDBNAME : ".  $self->{dbName};
+    print "\nDBUSER : ".  $self->{dbUser};
+    print "\nDBHOST : ".  $self->{dbhost} . "\n";
+    #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
     {
@@ -255,7 +240,7 @@ sub get_expression_samples_data
 							       method_name => 'get_expression_samples_data');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($expressionDataSamplesMap);
     #BEGIN get_expression_samples_data
     $expressionDataSamplesMap = {};
@@ -264,12 +249,21 @@ sub get_expression_samples_data
 	return $expressionDataSamplesMap;
     }
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
-                           { RaiseError => 1, ShowErrorStatement => 1 } 
-        ); 
+    $self->{dbName} = 'CS_expression';
+    $self->{dbUser} = 'expressionSelect';
+    $self->{dbhost} = 'localhost';
+
+
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{db_name}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }  
+        );    
+
+#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+#                           { RaiseError => 1, ShowErrorStatement => 1 } 
+#        ); 
     my $get_sample_meta_data_q = qq^select sam.id, sam.source_id, sam.title as sample_title, sam.description as sample_description,  
-                                    sam.molecule, sam.type, sam.dataSource, sam.externalSourceId, 
-                                    FROM_UNIXTIME(sam.kbaseSubmissionDate), FROM_UNIXTIME(sam.externalSourceDate),  
+                                    sam.molecule, sam.type,  
+                                    sam.dataSource, sam.externalSourceId, sam.kbaseSubmissionDate, sam.externalSourceDate,  
                                     sam.custom, sam.originalLog2Median, 
                                     str.id, str.referenceStrain, str.wildtype, str.description,  
                                     gen.id, gen.scientific_name, 
@@ -278,20 +272,20 @@ sub get_expression_samples_data
                                     env.id, env.description as env_description, 
                                     pro.id, pro.description, pro.name 
                                     from Sample sam  
-                                    inner join StrainWithSample sws on sam.id = sws.to_link 
-                                    inner join Strain str on sws.from_link = str.id 
+                                    inner join SampleForStrain sfs on sam.id = sfs.to_link 
+                                    inner join Strain str on sfs.from_link = str.id 
                                     inner join GenomeParentOf gpo on str.id = gpo.to_link 
                                     inner join Genome gen on gpo.from_link = gen.id 
-                                    left outer join PlatformWithSamples pws on sam.id = pws.to_link 
-                                    left outer join Platform plt on pws.from_link = plt.id 
+                                    left outer join SampleRunOnPlatform srp on sam.id = srp.to_link 
+                                    left outer join Platform plt on srp.from_link = plt.id 
                                     left outer join HasExpressionSample hes on sam.id = hes.to_link 
                                     left outer join ExperimentalUnit eu on hes.from_link = eu.id 
                                     left outer join HasExperimentalUnit heu on eu.id = heu.to_link 
                                     left outer join ExperimentMeta em on heu.from_link = em.id 
                                     left outer join IsContextOf ico on eu.id = ico.to_link 
                                     left outer join Environment env on ico.from_link = env.id 
-                                    left outer join ProtocolForSample pfs on sam.id = pfs.to_link 
-                                    left outer join Protocol pro on pfs.from_link = pro.id 
+                                    left outer join SampleUsesProtocol sup on sam.id = sup.to_link 
+                                    left outer join Protocol pro on sup.from_link = pro.id 
                                     where sam.id in ( ^. 
 				 join(",", ("?") x @{$sampleIds}) . ") "; 
     my $get_sample_meta_data_qh = $dbh->prepare($get_sample_meta_data_q) or die "Unable to prepare : get_sample_meta_data_q : ".
@@ -374,8 +368,8 @@ sub get_expression_samples_data
     #PersonIds     
     my $get_sample_person_ids_q = qq^select sam.id, per.id 
                                      from Sample sam 
-                                     inner join SampleContactPerson scp on sam.id = scp.from_link 
-                                     inner join Person per on scp.to_link = per.id 
+                                     inner join SampleContactPerson scp on sam.id = scp.to_link 
+                                     inner join Person per on scp.from_link = per.id 
                                      where sam.id in (^.
                                   join(",", ("?") x @{$sampleIds}) . ") ";
     my $get_sample_person_ids_qh = $dbh->prepare($get_sample_person_ids_q) or die "Unable to prepare : get_sample_person_ids_q : ".           
@@ -387,12 +381,12 @@ sub get_expression_samples_data
     }
 
     #log2Levels
-    my $get_log2levels_q = qq^select sam.id, fea.id, msm.value
+    my $get_log2levels_q = qq^select sam.id, fea.id, l2l.log2Level
                               from Sample sam
-                              inner join SampleMeasurements sl on sam.id = sl.from_link
-                              inner join Measurment msm on sl.to_link = msm.id
-                              inner join FeatureMeasuredBy fmb on msm.id = fmb.to_link
-                              inner join Feature fea on fmb.from_link = fea.id
+                              inner join LevelInSample lis on sam.id = lis.from_link
+                              inner join Log2Level l2l on lis.to_link = l2l.id
+                              inner join LevelForFeature lfl on l2l.id = lfl.to_link
+                              inner join Feature fea on lfl.from_link = fea.id
                               where sam.id in (^. 
                            join(",", ("?") x @{$sampleIds}) . ") ";  
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
@@ -570,7 +564,7 @@ sub get_expression_samples_data_by_series_ids
 							       method_name => 'get_expression_samples_data_by_series_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($seriesExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_series_ids
     $seriesExpressionDataSamplesMapping = {};
@@ -578,9 +572,13 @@ sub get_expression_samples_data_by_series_ids
     { 
         return $seriesExpressionDataSamplesMapping;
     } 
-    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '',
+#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+#                           { RaiseError => 1, ShowErrorStatement => 1 } 
+#        ); 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{db_name}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
+
     my $get_sample_ids_by_series_ids_q = 
         qq^select ser.id, sam.id
            from Sample sam 
@@ -784,7 +782,7 @@ sub get_expression_samples_data_by_experimental_unit_ids
 							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($experimentalUnitExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_experimental_unit_ids
     $experimentalUnitExpressionDataSamplesMapping = {};
@@ -792,7 +790,10 @@ sub get_expression_samples_data_by_experimental_unit_ids
     { 
         return $experimentalUnitExpressionDataSamplesMapping; 
     }
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+#                           { RaiseError => 1, ShowErrorStatement => 1 } 
+#        ); 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{db_name}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
 
@@ -1005,7 +1006,7 @@ sub get_expression_experimental_unit_samples_data_by_experiment_meta_ids
 							       method_name => 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($experimentMetaExpressionDataSamplesMapping);
     #BEGIN get_expression_experimental_unit_samples_data_by_experiment_meta_ids
     $experimentMetaExpressionDataSamplesMapping = {}; 
@@ -1013,9 +1014,13 @@ sub get_expression_experimental_unit_samples_data_by_experiment_meta_ids
     { 
         return $experimentMetaExpressionDataSamplesMapping; 
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+#			   { RaiseError => 1, ShowErrorStatement => 1 } 
+#	); 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{db_name}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
+
     my %experimentMetaExpressionDataSamplesMapping_hash; 
     my %experimental_unit_ids_hash; 
     my $get_experimental_unit_ids_by_experiment_meta_ids_q = 
@@ -1221,7 +1226,7 @@ sub get_expression_samples_data_by_strain_ids
 							       method_name => 'get_expression_samples_data_by_strain_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($strainExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_strain_ids
     $strainExpressionDataSamplesMapping = {};
@@ -1250,14 +1255,18 @@ sub get_expression_samples_data_by_strain_ids
     { 
         #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.                                                                                                                                                           
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+#                           { RaiseError => 1, ShowErrorStatement => 1 } 
+#        ); 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{db_name}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
+
     my $get_sample_ids_by_strain_ids_q = 
         qq^select str.id, sam.id
            from Sample sam 
-           inner join StrainWithSample sws on sam.id = sws.to_link
-           inner join Strain str on sws.from_link = str.id 
+           inner join SampleForStrain sfs on sam.id = sfs.to_link
+           inner join Strain str on sfs.from_link = str.id 
            where str.id in (^. 
 	join(",", ("?") x @{$strainIDs}) . ") ".
 	$sample_type_part;
@@ -1464,7 +1473,7 @@ sub get_expression_samples_data_by_genome_ids
 							       method_name => 'get_expression_samples_data_by_genome_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($genomeExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_genome_ids
     $genomeExpressionDataSamplesMapping = {};
@@ -1472,17 +1481,28 @@ sub get_expression_samples_data_by_genome_ids
     {
 	return $genomeExpressionDataSamplesMapping;
     }
-#print "\nDBNAME : ".  $self->{dbName}; 
-# print "\nDBUSER : ".  $self->{dbUser}; 
-#print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
- 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',   
-                           { RaiseError => 1, ShowErrorStatement => 1 }    
-        );  
 
-#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+print "\nDBNAME : ".  $self->{dbName};
+print "\nDBUSER : ".  $self->{dbUser}; 
+print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
+
+my $connect1 = 'DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost};
+my $connect2 = $self->{dbUser};
+
+print "CONNECT 1 &".$connect1."&\n";
+print "CONNECT 2 &".$connect2."&\n";
+
+#    my $dbh = DBI->connect($connect1, $connect2, '', 
 #                           { RaiseError => 1, ShowErrorStatement => 1 } 
 #        ); 
+
+
+#    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+#                           { RaiseError => 1, ShowErrorStatement => 1 } 
+#        ); 
+    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
     my $wild_type_part = "";
     if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE"))
     {
@@ -1514,8 +1534,8 @@ sub get_expression_samples_data_by_genome_ids
     my $get_strain_ids_by_genome_ids_q = 
         qq^select gen.id, str.id
            from Sample sam 
-           inner join StrainWithSample sws on sam.id = sws.to_link
-           inner join Strain str on sws.from_link = str.id
+           inner join SampleForStrain sfs on sam.id = sfs.to_link
+           inner join Strain str on sfs.from_link = str.id
            inner join GenomeParentOf gpo on str.id = gpo.to_link
            inner join Genome gen on gpo.from_link = gen.id
            where gen.id in (^.
@@ -1630,7 +1650,7 @@ sub get_expression_data_by_feature_ids
 							       method_name => 'get_expression_data_by_feature_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($featureSampleLog2LevelMapping);
     #BEGIN get_expression_data_by_feature_ids
     $featureSampleLog2LevelMapping = {};
@@ -1638,9 +1658,18 @@ sub get_expression_data_by_feature_ids
     {
 	return $featureSampleLog2LevelMapping; 
     }
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+
+    print "\nDBNAME : ".  $self->{dbName};
+    print "\nDBUSER : ".  $self->{dbUser}; 
+    print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
+
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{db_name}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
+
+#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
+#                           { RaiseError => 1, ShowErrorStatement => 1 } 
+#        ); 
     my $wild_type_part = ""; 
     if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
     { 
@@ -1669,12 +1698,12 @@ sub get_expression_data_by_feature_ids
     } 
     my $get_feature_log2level_q = qq^select sam.id, fea.id, l2l.log2Level
                                      from Sample sam
-                                     inner join SampleMeasurments sm on sam.id = sm.from_link
-                                     inner join Measurment msm on sm.to_link = msm.id
-                                     inner join FeatureWithLevels fwl on msm.id = fwl.to_link
-                                     inner join Feature fea on fwl.from_link = fea.id
-                                     inner join StrainWithSample sws on sam.id = sws.to_link
-                                     inner join Strain str on sws.from_link = str.id
+                                     inner join LevelInSample lis on sam.id = lis.from_link
+                                     inner join Log2Level l2l on lis.to_link = l2l.id
+                                     inner join LevelForFeature lfl on l2l.id = lfl.to_link
+                                     inner join Feature fea on lfl.from_link = fea.id
+                                     inner join SampleForStrain sfs on sam.id = sfs.to_link
+                                     inner join Strain str on sfs.from_link = str.id
                                      where fea.id in (^.
                                  join(",", ("?") x @{$featureIds}). ") ". 
                                  $wild_type_part . 
