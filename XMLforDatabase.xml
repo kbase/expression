@@ -2198,7 +2198,7 @@
                         <Index> 
                                 <Notes>Allows for quick retrieval of certain dataQualityLevels.</Notes> 
                                 <IndexFields> 
-                                        <IndexField name="dataQualityLevels" order="ascending" /> 
+                                        <IndexField name="dataQualityLevel" order="ascending" /> 
                                 </IndexFields> 
                         </Index> 
 
