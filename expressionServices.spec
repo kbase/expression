@@ -36,8 +36,8 @@ module ExpressionServices {
     /* list of KBase ExperimentUnitIDs */
     typedef list<ExperimentalUnitID> ExperimentalUnitIDs;
     
-    /* mapping kbase feature id as the key and measurment as the value */
-    typedef mapping<FeatureID featureID, Measurment measurement> DataExpressionLevelsForSample; 
+    /* mapping kbase feature id as the key and measurement as the value */
+    typedef mapping<FeatureID featureID, Measurement measurement> DataExpressionLevelsForSample; 
 
     /*Mapping from Label (often a sample id, but free text to identify} to DataExpressionLevelsForSample */
     typedef mapping<string label, DataExpressionLevelsForSample dataExpressionLevelsForSample> LabelDataMapping;
@@ -83,7 +83,7 @@ module ExpressionServices {
     } SampleAnnotation;
     
     /* list of Sample Annotations associated with the Sample */
-    typdef list<SampleAnnotation> SampleAnnotations;
+    typedef list<SampleAnnotation> SampleAnnotations;
 
     /* Kbase Person ID */ 
     typedef string PersonID; 
@@ -166,10 +166,10 @@ module ExpressionServices {
     typedef mapping<OntologyID ontologyID, ExpressionDataSamplesMap> OntologyExpressionDataSampleMapping;
 
     /* mapping kbase sample id as the key and a single measurement (for a scpecified feature id, one mapping higher) as the value */
-    typedef mapping<SampleID sampleID, Measurment measurment> SampleMeasurmentMapping; 
+    typedef mapping<SampleID sampleID, Measurement measurement> SampleMeasurementMapping; 
     
     /*mapping between FeatureIds and the mappings between samples and log2level mapping*/
-    typedef mapping<FeatureID featureID, SampleMeasurmentMapping sampleMeasurmentMapping> FeatureSampleMeasurmentMapping;
+    typedef mapping<FeatureID featureID, SampleMeasurementMapping sampleMeasurementMapping> FeatureSampleMeasurementMapping;
 
     /*FUNCTIONS*/
     
@@ -200,7 +200,7 @@ module ExpressionServices {
 
     /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: featureID->{sample_id->measurement}*/
     funcdef get_expression_data_by_feature_ids(FeatureIDs featureIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) 
-        returns (FeatureSampleMeasurementMapping featureSampleMeasurmentMapping);
+        returns (FeatureSampleMeasurementMapping featureSampleMeasurementMapping);
 
     /* Compare samples takes two data structures labelDataMapping, the first is numerator, the 2nd is the denominator in the comparison. returns a SampleComparisonMapping */
     funcdef compare_samples(LabelDataMapping numeratorsDataMapping, LableDataMapping denominatorsDataMapping) returns (SampleComparisonMapping sampleComparisonMapping);
