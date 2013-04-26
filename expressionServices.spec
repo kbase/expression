@@ -203,7 +203,7 @@ module ExpressionServices {
         returns (FeatureSampleMeasurementMapping featureSampleMeasurementMapping);
 
     /* Compare samples takes two data structures labelDataMapping, the first is numerator, the 2nd is the denominator in the comparison. returns a SampleComparisonMapping */
-    funcdef compare_samples(LabelDataMapping numeratorsDataMapping, LableDataMapping denominatorsDataMapping) returns (SampleComparisonMapping sampleComparisonMapping);
+    funcdef compare_samples(LabelDataMapping numeratorsDataMapping, LabelDataMapping denominatorsDataMapping) returns (SampleComparisonMapping sampleComparisonMapping);
 
     /* Compares each sample vs its defined default control.  If the Default control is not specified for a sample, then nothing is returned for that sample */
     funcdef compare_samples_vs_default_controls(SampleIDs numeratorSampleIDs) returns (SampleComparisonMapping sampleComparisonMapping);
@@ -215,5 +215,5 @@ module ExpressionServices {
     funcdef get_on_off_calls(SampleComparisonMapping sampleComparisonMapping, float off_threshold, float on_threshold) returns (SampleComparisonMapping onOffMappings);
 
     /* Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction */
-    funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, integer count) returns (SampleComparisonMapping onOffMappings);
+    funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, int count) returns (SampleComparisonMapping onOffMappings);
 }; 
