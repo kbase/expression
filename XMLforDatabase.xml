@@ -2173,7 +2173,7 @@
 			<Field name="source-id" type="string">
 				<Notes>The ID of the environment used by the data source.</Notes>
 			</Field>
-			<Field name="dataQualityLevel" type="integer">
+			<Field name="dataQualityLevel" type="int">
 			  <Notes>The quality of the data.  Lower the number the better.  Details need to be worked out.</Notes>
 			</Field>
 		</Fields>
