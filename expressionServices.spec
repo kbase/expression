@@ -6,8 +6,8 @@ module ExpressionServices {
     /* KBase list of Feature IDs , typically CDS/PEG */
     typedef list<FeatureID> FeatureIDs;
     
-    /* Log2Level (Zero median normalized within a sample) for a given feature */
-    typedef float Log2Level;
+    /* Measurement Value (Zero median normalized within a sample) for a given feature */
+    typedef float Measurement;
     
     /* KBase Sample ID for the sample */
     typedef string SampleID;
@@ -36,14 +36,28 @@ module ExpressionServices {
     /* list of KBase ExperimentUnitIDs */
     typedef list<ExperimentalUnitID> ExperimentalUnitIDs;
     
-    /* mapping kbase feature id as the key and log2level as the value */
-    typedef mapping<FeatureID featureID, Log2Level log2level> DataExpressionLevelsForSample; 
+    /* mapping kbase feature id as the key and measurment as the value */
+    typedef mapping<FeatureID featureID, Measurment measurement> DataExpressionLevelsForSample; 
 
-    /* Log2Ratio Log2Level of sample over log2Level of another sample for a given feature */ 
+    /*Mapping from Label (often a sample id, but free text to identify} to DataExpressionLevelsForSample */
+    typedef mapping<string label, DataExpressionLevelsForSample dataExpressionLevelsForSample> LabelDataMapping;
+
+    /* denominator label is the label for the denominator in a comparison.  
+    This label can be a single sampleId (default or defined) or a comma separated list of sampleIds that were averaged.*/
+    typedef string ComparisonDenominatorLabel;
+
+    /* Log2Ratio Log2Level of sample over log2Level of another sample for a given feature.  
+    Note if the Ratio is consumed by On Off Call function it will have 1(on), 0(unknown), -1(off) for its values */ 
     typedef float Log2Ratio; 
 
-    /* mapping kbase feature id as the key and log2lRatio as the value */
-    typedef mapping<FeatureID featureID, Log2Ratio log2Ratio> DataSampleComparison;
+    /* mapping kbase feature id as the key and log2lRatio as the value */ 
+    typedef mapping<FeatureID featureID, Log2Ratio log2Ratio> DataSampleComparison; 
+
+    /* mapping ComparisonDenominatorLabel to DataSampleComparison mapping */
+    typedef mapping<ComparisonDenominatorLabel comparisonDenominatorLabel, DataSampleComparison dataSampleComparison> DenominatorSampleComparison;
+
+    /* mapping Sample Id for the numerator to a DenominatorSampleComparison.  This is the comparison data structure {NumeratorSampleId->{denominatorLabel -> {feature -> log2ratio}}} */
+    typedef mapping<SampleID sampleID, DenominatorSampleComparison denominatorSampleComparison> SampleComparisonMapping;
 
     /* Kbase SampleAnnotation ID */ 
     typedef string SampleAnnotationID; 
@@ -151,11 +165,11 @@ module ExpressionServices {
     /*mapping between ontologyIDs (concatenated if searched for with the and operator) and all the Samples that match that term(s)*/
     typedef mapping<OntologyID ontologyID, ExpressionDataSamplesMap> OntologyExpressionDataSampleMapping;
 
-    /* mapping kbase sample id as the key and a single log2level (for a scpecified feature id, one mapping higher) as the value */
-    typedef mapping<SampleID sampleID, Log2Level log2level> SampleLog2LevelMapping; 
+    /* mapping kbase sample id as the key and a single measurement (for a scpecified feature id, one mapping higher) as the value */
+    typedef mapping<SampleID sampleID, Measurment measurment> SampleMeasurmentMapping; 
     
     /*mapping between FeatureIds and the mappings between samples and log2level mapping*/
-    typedef mapping<FeatureID featureID, SampleLog2LevelMapping sampleLog2LevelMapping> FeatureSampleLog2LevelMapping;
+    typedef mapping<FeatureID featureID, SampleMeasurmentMapping sampleMeasurmentMapping> FeatureSampleMeasurmentMapping;
 
     /*FUNCTIONS*/
     
@@ -184,7 +198,22 @@ module ExpressionServices {
     funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, WildTypeOnly wildTypeOnly) 
         returns (OntologyExpressionDataSampleMapping ontologyExpressionDataSampleMapping);
 
-    /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleLog2LevelMapping : featureID->{sample_id->log2Level} */
-    funcdef get_expression_data_by_feature_ids(FeatureIDs featureIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (FeatureSampleLog2LevelMapping featureSampleLog2LevelMapping);
-    
+    /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: featureID->{sample_id->measurement}*/
+    funcdef get_expression_data_by_feature_ids(FeatureIDs featureIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) 
+        returns (FeatureSampleMeasurementMapping featureSampleMeasurmentMapping);
+
+    /* Compare samples takes two data structures labelDataMapping, the first is numerator, the 2nd is the denominator in the comparison. returns a SampleComparisonMapping */
+    funcdef compare_samples(LabelDataMapping numeratorsDataMapping, LableDataMapping denominatorsDataMapping) returns (SampleComparisonMapping sampleComparisonMapping);
+
+    /* Compares each sample vs its defined default control.  If the Default control is not specified for a sample, then nothing is returned for that sample */
+    funcdef compare_samples_vs_default_controls(SampleIDs numeratorSampleIDs) returns (SampleComparisonMapping sampleComparisonMapping);
+
+    /* Compares each numerator sample vs the average of all the denominator sampleIds*/
+    funcdef compare_samples_vs_the_average(SampleIDs numeratorSampleIDs, SampleIDs denominatorSampleIDs) returns (SampleComparisonMapping sampleComparisonMapping);
+
+    /* Takes in comparison results.  If the value is >= on_threshold it is deemed on (1), if <= off_threshold it is off(-1), meets none then 0.  Thresholds normally set to zero */
+    funcdef get_on_off_calls(SampleComparisonMapping sampleComparisonMapping, float off_threshold, float on_threshold) returns (SampleComparisonMapping onOffMappings);
+
+    /* Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction */
+    funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, integer count) returns (SampleComparisonMapping onOffMappings);
 }; 
