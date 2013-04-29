@@ -69,7 +69,7 @@ The files included in this exchange are:
 1.	sample.tab
 2.	series.tab
 3.	platform.tab
-4.	measurment.tab 
+4.	measurement.tab 
 5.	sample_annotation.tab 
 6.	person.tab
 7.	protocol.tab
@@ -169,9 +169,9 @@ docs['meas']['post'] = '''
 *Note that log2Level needs to be in log2 space.  Additionally the median of all log2Levels for a    
 given sample need to be normalized so that there median is equal to zero.  The original median log2 level
 should be stored in the sample table.''' 
-docs['meas']['sampleId'] = '''                                                                                                                 
+docs['meas']['sampleId'] = '''                                             
 The source or KBase ID of the sample to which the measurement belongs.''' 
-docs['meas']['desc'] = '''                                                                                                                
+docs['meas']['desc'] = '''                                                             
 The source or KBase ID of the measurement description that describes this                                                                 
 measurement.  Note that the measurements need to be in log2 space and with median
 of all the measurements for a given sample set to zero.''' 
@@ -182,7 +182,7 @@ docs['meas']['val'] = '''
 The value is abundance of for expression for a feature.  This value needs to be in Log2 space.  
 The median of all the values for a given sample needs to be set to zero.  
 Note if the values are in log2 space but not normalized with a zero median just run the 
-preprocessor from the directory that has the measurment.tab and sample.tab file in it.
+preprocessor from the directory that has the measurement.tab and sample.tab file in it.
 This is a required field.''' 
 docs['meas']['mean'] = '''                                                                                                                
 The mean of the measurement if multiple replicates were taken.''' 
@@ -614,7 +614,7 @@ class Measurement(_ExchangeFormatEntity):
                             _RelInfo('SampleMeasurements'),
                             docs=docs['meas']['sampleId'], unique=False),
            'measdescID': _SourceOrKBID_Argument(
-                             'measurment-description-id', 'MeasurementDescription',
+                             'measurement-description-id', 'MeasurementDescription',
                              _RelInfo('DescribesMeasurement'), 
                              docs=docs['meas']['desc'], unique=False),
            'featureKBID': _KBaseID_Argument( 
