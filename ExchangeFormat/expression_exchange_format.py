@@ -531,7 +531,7 @@ class Sample(_ExchangeFormatEntity):
                                                        docs=docs['sam']['experimentalUnit'], noentryok='R', unique=False),
             'defaultControlSampleId': _SourceOrKBID_Argument('defaultControlSample-id', 'Sample', _RelInfo('DefaultControlSample'), 
                                                        docs=docs['sam']['defaultControlSampleId'], noentryok='R', unique=False), 
-            'dataQualityLevel': _IntArgument(None, , cdsname='dataQualityLevel', unique = False), 
+            'dataQualityLevel': _IntArgument(None, cdsname='dataQualityLevel', unique = False), 
           }
 
     def __init__(self, sourceID, title, description, molecule, type, externalSourceId, 
