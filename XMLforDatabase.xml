@@ -3850,12 +3850,6 @@
 					caption="Strain with\nPlatforms" />
 		</DisplayInfo>
 	</Relationship>
-	<Relationship name="FeatureWithLevels" from="Feature" to="Log2Level" arity="1M" converse="LevelForFeature">
-		<DisplayInfo theme="cyan">
-			<RegionInfo name="Expression_v2" col="5" row="6" fixed="1"
-					caption="Feature\nwith\nLevels" />
-		</DisplayInfo>
-	</Relationship>
 	<Relationship name="PlatformWithSamples" from="Platform" to="Sample" arity="1M" converse="SampleRunOnPlatform">
 		<DisplayInfo theme="cyan">
 			<RegionInfo name="Expression_v2" col="3" row="3" fixed="1"
