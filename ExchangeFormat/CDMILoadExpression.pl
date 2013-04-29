@@ -41,14 +41,15 @@ use Bio::KBase::CDMI::CDMI;
                     Publication SampleInSeries IsContextOf Media
                     Environment Platform ContainsExperimentalUnit SampleAnnotation
                     GenomeParentOf UsedIn HasKnockoutIn Parameter
-                    PerformedExperiment EvaluatedIn ExperimentMeta Log2Level
-                    SampleContactPerson StrainWithSample PlatformWithSamples HasExperimentalUnit
-                    IncludesAdditionalCompounds OntologyForSample HasParameter SampleLevels
-                    Person TimeSeries SampleHasAnnotations PublishedExperiment
-                    PublishedProtocol ExperimentalUnit Protocol OrdersExperimentalUnit
-                    Series ProtocolForSample StrainWithPlatforms Sample
-                    Strain PersonAnnotatedSample HasExpressionSample HasPresenceOf
-                    SeriesPublishedIn FeatureWithLevels StrainParentOf
+                    PerformedExperiment EvaluatedIn ExperimentMeta SampleContactPerson
+                    StrainWithSample DefaultControlSample PlatformWithSamples HasExperimentalUnit
+                    IncludesAdditionalCompounds OntologyForSample HasParameter FeatureMeasuredBy
+                    SeriesPublishedIn SampleMeasurements Person TimeSeries
+                    SampleHasAnnotations PublishedExperiment PublishedProtocol ExperimentalUnit
+                    DescribesMeasurement Protocol OrdersExperimentalUnit Series
+                    ProtocolForSample StrainWithPlatforms Sample Strain
+                    PersonAnnotatedSample HasExpressionSample HasPresenceOf Measurement
+                    MeasurementDescription StrainParentOf
                     );
     
      # Clear the tables, if necessary.
@@ -78,33 +79,36 @@ use Bio::KBase::CDMI::CDMI;
     $loader->SimpleLoad($inDirectory, 'PerformedExperiment.load', 'PerformedExperiment', { from_link => 0, to_link => 1, role => [2, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'EvaluatedIn.load', 'EvaluatedIn', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'ExperimentMeta.load', 'ExperimentMeta', { source_id => 0, id => 1, startDate => [2, 'timeStamp', 0], description => [3, 'copy', ''], title => [4, 'copy', ''], comments => [5, 'copy', ''] }, 1);
-    $loader->SimpleLoad($inDirectory, 'Log2Level.load', 'Log2Level', { source_id => 0, id => 1, numberOfMeasurements => 2, log2Level => 3, confidenceScore => 4, stdDev => 5, confidenceType => 6 }, 1);
     $loader->SimpleLoad($inDirectory, 'SampleContactPerson.load', 'SampleContactPerson', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'StrainWithSample.load', 'StrainWithSample', { from_link => 0, to_link => 1 }, 1);
+    $loader->SimpleLoad($inDirectory, 'DefaultControlSample.load', 'DefaultControlSample', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'PlatformWithSamples.load', 'PlatformWithSamples', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'HasExperimentalUnit.load', 'HasExperimentalUnit', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'IncludesAdditionalCompounds.load', 'IncludesAdditionalCompounds', { from_link => 0, to_link => 1, units => 2, concentration => 3 }, 1);
     $loader->SimpleLoad($inDirectory, 'OntologyForSample.load', 'OntologyForSample', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'HasParameter.load', 'HasParameter', { from_link => 0, to_link => 1, value => [2, 'copy', ''] }, 1);
-    $loader->SimpleLoad($inDirectory, 'SampleLevels.load', 'SampleLevels', { from_link => 0, to_link => 1 }, 1);
+    $loader->SimpleLoad($inDirectory, 'FeatureMeasuredBy.load', 'FeatureMeasuredBy', { from_link => 0, to_link => 1 }, 1);
+    $loader->SimpleLoad($inDirectory, 'SeriesPublishedIn.load', 'SeriesPublishedIn', { from_link => 0, to_link => 1 }, 1);
+    $loader->SimpleLoad($inDirectory, 'SampleMeasurements.load', 'SampleMeasurements', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'Person.load', 'Person', { source_id => 0, id => 1, contactEmail => [2, 'copy', ''], lastName => [3, 'copy', ''], institution => [4, 'copy', ''], firstName => [5, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'TimeSeries.load', 'TimeSeries', { source_id => 0, id => 1, timeUnits => [2, 'copy', ''], name => [3, 'copy', ''], comments => [4, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'SampleHasAnnotations.load', 'SampleHasAnnotations', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'PublishedExperiment.load', 'PublishedExperiment', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'PublishedProtocol.load', 'PublishedProtocol', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'ExperimentalUnit.load', 'ExperimentalUnit', { source_id => 0, id => 1 }, 1);
+    $loader->SimpleLoad($inDirectory, 'DescribesMeasurement.load', 'DescribesMeasurement', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'Protocol.load', 'Protocol', { source_id => 0, id => 1, description => [2, 'copy', ''], name => [3, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'OrdersExperimentalUnit.load', 'OrdersExperimentalUnit', { from_link => 0, to_link => 1, time => 2, timeMeta => [3, 'semi-boolean', '?'] }, 1);
     $loader->SimpleLoad($inDirectory, 'Series.load', 'Series', { source_id => 0, id => 1, title => 2, summary => 3, externalSourceDate => [4, 'timeStamp', 0], design => 5, externalSourceId => [6, 'copy', ''], kbaseSubmissionDate => [7, 'timeStamp', 0] }, 1);
     $loader->SimpleLoad($inDirectory, 'ProtocolForSample.load', 'ProtocolForSample', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'StrainWithPlatforms.load', 'StrainWithPlatforms', { from_link => 0, to_link => 1 }, 1);
-    $loader->SimpleLoad($inDirectory, 'Sample.load', 'Sample', { source_id => 0, id => 1, externalSourceDate => [2, 'timeStamp', 0], description => 3, externalSourceId => [4, 'copy', ''], title => 5, molecule => 6, custom => [7, 'semi-boolean', '?'], dataSource => [8, 'copy', ''], type => 9, originalLog2Median => 10, kbaseSubmissionDate => [11, 'timeStamp', 0] }, 1);
+    $loader->SimpleLoad($inDirectory, 'Sample.load', 'Sample', { source_id => 0, id => 1, externalSourceDate => [2, 'timeStamp', 0], description => 3, title => 4, molecule => 5, dataSource => [6, 'copy', ''], custom => [7, 'semi-boolean', '?'], kbaseSubmissionDate => [8, 'timeStamp', 0], dataQualityLevel => 9, type => 10, originalLog2Median => 11, externalSourceId => [12, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'Strain.load', 'Strain', { source_id => 0, id => 1, aggregateData => [2, 'semi-boolean', '?'], name => [3, 'copy', ''], wildtype => [4, 'semi-boolean', '?'], referenceStrain => [5, 'semi-boolean', '?'], description => [6, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'PersonAnnotatedSample.load', 'PersonAnnotatedSample', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'HasExpressionSample.load', 'HasExpressionSample', { from_link => 0, to_link => 1 }, 1);
     $loader->SimpleLoad($inDirectory, 'HasPresenceOf.load', 'HasPresenceOf', { from_link => 0, to_link => 1, units => 2, concentration => 3 }, 1);
-    $loader->SimpleLoad($inDirectory, 'SeriesPublishedIn.load', 'SeriesPublishedIn', { from_link => 0, to_link => 1 }, 1);
-    $loader->SimpleLoad($inDirectory, 'FeatureWithLevels.load', 'FeatureWithLevels', { from_link => 0, to_link => 1 }, 1);
+    $loader->SimpleLoad($inDirectory, 'Measurement.load', 'Measurement', { source_id => 0, id => 1, Z_score => 2, median => 3, value => 4, N => 5, stddev => 6, p_value => 7, mean => 8 }, 1);
+    $loader->SimpleLoad($inDirectory, 'MeasurementDescription.load', 'MeasurementDescription', { source_id => 0, id => 1, category => [2, 'copy', ''], unitOfMeasure => [3, 'copy', ''], name => [4, 'copy', ''], description => [5, 'copy', ''] }, 1);
     $loader->SimpleLoad($inDirectory, 'StrainParentOf.load', 'StrainParentOf', { from_link => 0, to_link => 1 }, 1);
     
     # Unspool the relation loaders.
