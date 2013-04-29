@@ -480,7 +480,7 @@ SampleSeriesRel = _create_m2m_relclass('SampleSeriesRel', _SourceOrKBID_Argument
 #   1.  sample.tab
 #   2.  series.tab
 #   3.  platform.tab
-#   4.  log2level.tab 
+#   4.  measurement.tab 
 #   5.  sample_annotation.tab 
 #   6.  person.tab
 #   7.  protocol.tab
@@ -491,7 +491,8 @@ SampleSeriesRel = _create_m2m_relclass('SampleSeriesRel', _SourceOrKBID_Argument
 #   12. time_series.tab
 #   13. experimentMeta.tab
 #   14. experimentalUnit.tab
-#
+#   15. measurementDescription.tab      
+# 
 ###########################################
 
 # Sample - 1
