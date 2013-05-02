@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+11<?xml version="1.0" encoding="UTF-8"?>
 <Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://bio-macpro-1.mcs.anl.gov/~parrello/FIG/Html/ERDB_DBD.xsd">
   <Title>Knowledge Base Bioinformatics Database</Title>
