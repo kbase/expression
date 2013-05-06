@@ -50,7 +50,7 @@ module ExpressionServices {
     Note if the Ratio is consumed by On Off Call function it will have 1(on), 0(unknown), -1(off) for its values */ 
     typedef float Log2Ratio; 
 
-    /* mapping kbase feature id as the key and log2lRatio as the value */ 
+    /* mapping kbase feature id as the key and log2Ratio as the value */ 
     typedef mapping<FeatureID featureID, Log2Ratio log2Ratio> DataSampleComparison; 
 
     /* mapping ComparisonDenominatorLabel to DataSampleComparison mapping */
@@ -182,9 +182,6 @@ module ExpressionServices {
     /* given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples */
     funcdef get_expression_samples_data_by_experimental_unit_ids(ExperimentalUnitIDs experimentalUnitIDs) returns (ExperimentalUnitExpressionDataSamplesMapping experimentalUnitExpressionDataSamplesMapping);
     
-    /* given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping */
-    funcdef get_expression_experimental_unit_samples_data_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (ExperimentMetaExpressionDataSamplesMapping experimentMetaExpressionDataSamplesMapping);
-
     /* given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping */ 
     funcdef get_expression_samples_data_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (ExperimentMetaExpressionDataSamplesMapping experimentMetaExpressionDataSamplesMapping); 
     
@@ -194,8 +191,8 @@ module ExpressionServices {
     /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample*/
     funcdef get_expression_samples_data_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (GenomeExpressionDataSamplesMapping genomeExpressionDataSamplesMapping);
 
-    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample  */
-    funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, WildTypeOnly wildTypeOnly) 
+    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample  */
+    funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (OntologyExpressionDataSampleMapping ontologyExpressionDataSampleMapping);
 
     /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: featureID->{sample_id->measurement}*/
