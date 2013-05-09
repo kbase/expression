@@ -212,5 +212,5 @@ module ExpressionServices {
     funcdef get_on_off_calls(SampleComparisonMapping sampleComparisonMapping, float off_threshold, float on_threshold) returns (SampleComparisonMapping onOffMappings);
 
     /* Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction */
-    funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, int count) returns (SampleComparisonMapping onOffMappings);
+    funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, int count) returns (SampleComparisonMapping topChangersMappings);
 }; 
