@@ -35,10 +35,23 @@ print "NOTE THIS TEST SCRIPT HAS AN OPTION TO PASS ADDITIONAL INTEGER ARGUMENTS 
 "1 - client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); \n".
 "2 - client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); \n".
 "3 - client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); \n".
-"4 - client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n".
+"4 - client->get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n".
 "5 - client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray'); \n".
 "6 - client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N'); \n".
-"7 - client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','N'); \n\n";
+#"7 - client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); \n\n". 
+#"8 - client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y'); \n\n". 
+"9 - client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y'); \n\n"; 
+#"10- client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+#                                 'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
+#                             {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1}, 
+#                                  'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); \n\n". 
+#"11- client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); \n\n". 
+#"12- client->compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'], ['kb|sample.3','kb|sample.8','kb|sample.1']); \n\n". 
+#"13- client->get_on_off_calls($client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+#                                                           'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
+#                                                {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1}, 
+#                                                     'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}),-1,1); \n\n". 
+#"14- client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'BOTH',10); \n\n"; 
 
 my $n_tests = 111; 
 
@@ -84,11 +97,11 @@ ok($@ eq '',"get_expression_samples_data call ". $@);
 ok($result,"get_expression_samples_data(['kb|sample.2','kb|sample.3']) returned");
 ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data('kb|sample.2','kb|sample.3']) appropriately has 2 entries");
 my @expected_keys = ('environmentDescription','kbaseSubmissionDate','genomeID','sampleTitle','experimentDescription',
-		     'originalLog2Median','experimentMetaID','dataExpressionLevelsForSample','protocolId','wildtype',
-		     'platformTitle','platformId','referenceStrain','personIds','experimentTitle','externalSourceDate',
-		     'molecule','protocolName','platformTechnology','protocolDescription','environmentId','dataSource',
-		     'custom','experimentalUnitID','strainID','sourceId','strainDescription','seriesIds',
-		     'sampleAnnotationIDs','genomeScientificName','sampleId','externalSourceId','sampleType');
+		     'originalLog2Median','experimentMetaID','dataExpressionLevelsForSample','protocolID','wildtype',
+		     'platformTitle','platformID','referenceStrain','personIDs','experimentTitle','externalSourceDate',
+		     'molecule','protocolName','platformTechnology','protocolDescription','environmentID','dataSource',
+		     'custom','experimentalUnitID','strainID','sourceID','strainDescription','seriesIDs',
+		     'sampleAnnotationIDs','genomeScientificName','sampleID','externalSourceID','sampleType');
 #check that each Key exists  33 checks 11-43
 if (exists($print_hash{1})) 
 { 
@@ -103,9 +116,9 @@ ok(ref($result->{'kb|sample.2'}->{'dataExpressionLevelsForSample'}) eq 'HASH',
    'get_expression_samples_data does contain a hash of log levels');
 ok(scalar(keys(%{$result->{'kb|sample.2'}->{'dataExpressionLevelsForSample'}})) > 1000,
    'get_expression_samples_data does contains many log levels');
-ok(ref($result->{'kb|sample.2'}->{'personIds'}) eq 'ARRAY', 
+ok(ref($result->{'kb|sample.2'}->{'personIDs'}) eq 'ARRAY', 
    'get_expression_samples_data has an array for PersonIds');
-ok(ref($result->{'kb|sample.2'}->{'seriesIds'}) eq 'ARRAY',
+ok(ref($result->{'kb|sample.2'}->{'seriesIDs'}) eq 'ARRAY',
    'get_expression_samples_data has an array for SeriesIds');
 ok(ref($result->{'kb|sample.2'}->{'sampleAnnotationIDs'}) eq 'ARRAY',
    'get_expression_samples_data has an array for sampleAnnotationIDs');
@@ -172,31 +185,31 @@ if (exists($print_hash{3}))
 } 
 
 
-#Test get_expression_experimental_unit_samples_data_by_experiment_meta_ids 
+#Test get_expression_samples_data_by_experiment_meta_ids 
 #Test 72 - 81      
-print "\n#get_expression_experimental_unit_samples_data_by_experiment_meta_ids portion\n";
+print "\n#get_expression_samples_data_by_experiment_meta_ids portion\n";
 $result = undef;
 eval { 
-    $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]); 
+    $result = $client->get_expression_samples_data_by_experiment_meta_ids([]); 
 }; 
-ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) ". $@);
-ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) returned"); 
-ok(ref($result) eq 'HASH','get_expression_experimental_unit_samples_data_by_experiment_meta_ids returns a hash'); 
-ok(scalar(keys(%{$result})) == 0, 'get_expression_experimental_unit_samples_data_by_experiment_meta_ids([]) appropriately has no entries'); 
+ok($@ eq '',"get_expression_samples_data_by_experiment_meta_ids([]) ". $@);
+ok($result,"get_expression_samples_data_by_experiment_meta_ids([]) returned"); 
+ok(ref($result) eq 'HASH','get_expression_samples_data_by_experiment_meta_ids returns a hash'); 
+ok(scalar(keys(%{$result})) == 0, 'get_expression_samples_data_by_experiment_meta_ids([]) appropriately has no entries'); 
 $result = undef;
 eval { 
-    $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']); 
+    $result = $client->get_expression_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']); 
 }; 
-ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
-ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) returned"); 
-ok(scalar(keys(%{$result})) == 0, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
+ok($@ eq '',"get_expression_samples_data_by_experiment_meta_ids call ". $@);
+ok($result,"get_expression_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) returned"); 
+ok(scalar(keys(%{$result})) == 0, "get_expression_samples_data_by_experiment_meta_ids(['Not A real ID','kb|not Real']) appropriately has no entries"); 
 $result = undef;
 eval { 
-    $result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
+    $result = $client->get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
 }; 
-ok($@ eq '',"get_expression_experimental_unit_samples_data_by_experiment_meta_ids call ". $@);
-ok($result,"get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) returned"); 
-ok(scalar(keys(%{$result})) == 2, "get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
+ok($@ eq '',"get_expression_samples_data_by_experiment_meta_ids call ". $@);
+ok($result,"get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) returned"); 
+ok(scalar(keys(%{$result})) == 2, "get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) appropriately has 2 entries"); 
 if (exists($print_hash{4})) 
 { 
     print Dumper($result);
@@ -296,7 +309,7 @@ eval {
 ok($@ eq '',"get_expression_data_by_feature_ids call ". $@); 
 ok($result,"get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) returned"); 
 ok(scalar(keys(%{$result})) == 2, "get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687']) appropriately has 2 entries"); 
-if (exists($print_hash{7}))
+if (exists($print_hash{9}))
 { 
     print Dumper($result);
 } 

@@ -29,9 +29,23 @@ print "NOTE THIS TEST SCRIPT HAS AN OPTION TO PASS ADDITIONAL INTEGER ARGUMENTS 
 "1 - client->get_expression_samples_data(['kb|sample.2','kb|sample.3']); \n". 
 "2 - client->get_expression_samples_data_by_series_ids(['kb|series.0','kb|series.3']); \n". 
 "3 - client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); \n". 
-"4 - client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n". 
+"4 - client->get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); \n". 
 "5 - client->get_expression_samples_data_by_strain_ids(['kb|str.7634'],'microarray'); \n". 
-"6 - client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N'); \n\n"; 
+"6 - client->get_expression_samples_data_by_genome_ids(['kb|g.20848'],'microarray','N'); \n\n". 
+"7 - client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); \n\n". 
+"8 - client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y'); \n\n".
+"9 - client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y'); \n\n".
+"10- client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3},
+                                 'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+                             {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+                                  'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); \n\n".
+"11- client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); \n\n".
+"12- client->compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'], ['kb|sample.3','kb|sample.8','kb|sample.1']); \n\n". 
+"13- client->get_on_off_calls($client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+           						   'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
+                                  		{    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1}, 
+                                        	     'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}),-1,1); \n\n".
+"14- client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'BOTH',10); \n\n"; 
 
 print "Calling get_expression_samples_data(['kb|sample.2','kb|sample.3']) \n\n";
 $result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
@@ -105,8 +119,8 @@ if (exists($print_hash{3}))
 } 
 
 
-print "\n\nCalling get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) \n\n";
-$result = $client->get_expression_experimental_unit_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']);
+print "\n\nCalling get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']) \n\n";
+$result = $client->get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']);
 foreach my $experiment_meta_id (keys(%{$result}))
 {
 	print "EXPERIMENT META : $experiment_meta_id\n";		
@@ -160,7 +174,76 @@ if (exists($print_hash{6}))
     print Dumper($result); 
 } 
 
-#get_expression_data_by_feature_ids
-print "\n\nCalling get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y') \n\n";
-$result = $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y');
-print Dumper($result) . "\n----------------------------\n";
+if (exists($print_hash{7}))
+{
+	print "\nCalling get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); \n\n"; 
+	$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y');
+	print Dumper($result) . "\n----------------------------\n";		 
+}
+
+if (exists($print_hash{8}))
+{ 
+	print "\nCalling get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y'); \n\n";
+	$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y');
+	print Dumper($result) . "\n----------------------------\n";		 
+}
+
+if (exists($print_hash{9}))
+{	
+	#get_expression_data_by_feature_ids
+	print "\n\nCalling get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y') \n\n";
+	$result = $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y');
+	print Dumper($result) . "\n----------------------------\n";
+}
+
+if (exists($print_hash{10}))
+{
+	#compare_samples
+	print "\n\nCalling compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+	                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+        				   {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+                                           	'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); \n\n";
+	$result = $client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+	                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+					   {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+                                           	'denominator2'=>{'feature1'=>-.5,'feature2'=>0}});
+	print Dumper($result) . "\n----------------------------\n";
+}
+
+if (exists($print_hash{11}))
+{
+	#Compare Sample vs Default Controls
+	print "\n\nCalling client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']);\n\n"; 
+	$result = $client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); 
+	print Dumper($result) . "\n----------------------------\n";
+}
+
+if (exists($print_hash{12}))
+{
+	#Compare Samples vs Average
+	print "\n\nCalling compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'], ['kb|sample.3','kb|sample.8','kb|sample.1']); \n\n"; 
+	$result = $client->compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'], ['kb|sample.3','kb|sample.8','kb|sample.1']); 
+ 	print Dumper($result) . "\n----------------------------\n";
+}
+
+if (exists($print_hash{13}))
+{
+	#GET ON OFF CALLS
+	print "\n\nCalling get_on_off_calls($client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+                                                           'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+                                                {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+                                                     'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}),-1,1); \n\n";
+        $result = $client->get_on_off_calls($client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3}, 
+                                                           'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+                                                {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+                                                     'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}),-1,1); 
+ 	print Dumper($result) . "\n----------------------------\n";
+}
+
+if (exists($print_hash{14}))
+{
+	#GET TOP CHANGERS
+	print "\n\nCalling get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'BOTH',10); \n\n";
+	$result = $client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'BOTH',10);
+ 	print Dumper($result) . "\n----------------------------\n";
+}
