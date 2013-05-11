@@ -212,7 +212,14 @@ foreach my $sample_id (sort(keys(%measurement_lines_hash)))
 	{
 		$median = $sorted_measurements[floor($num_elements/2)]
 	}
-	#print "OLD SAMPLE: $sample_id - MEDIAN: $median - NUM ELEMENTS $num_elements \n";
+	#
+if ($sample_id eq 'jkbaumohl@lbl.gov:AD_Shew2012.1|growth_expr_LB360min')
+{
+print "OLD SAMPLE: $sample_id - MEDIAN: $median - NUM ELEMENTS $num_elements \n";
+print join("\n",@sorted_measurements); 
+}
+
+
 	if (abs($median) > $threshold)
 	{
 		$need_new_measurement_file = 1;
