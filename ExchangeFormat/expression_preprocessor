@@ -37,8 +37,8 @@ my $header_counter = 0;
 foreach my $header_column (@header_columns)
 { 
   $header_column = trim($header_column);
-  $originalLog2MedianColIndex = column_header_checker($header_column,'originalLog2Median',$originalLog2MedianColIndex,$header_counter);
-  $sampleSourceIdColIndex = column_header_checker($header_column,'source-id',$sampleSourceIdColIndex,$header_counter);
+  $originalLog2MedianColIndex = column_header_checker($header_column,'^originalLog2Median$',$originalLog2MedianColIndex,$header_counter);
+  $sampleSourceIdColIndex = column_header_checker($header_column,'^source-id$',$sampleSourceIdColIndex,$header_counter);
   $header_counter++;
 }
 unless (defined($originalLog2MedianColIndex) && defined($sampleSourceIdColIndex))
@@ -96,10 +96,10 @@ my $header_counter = 0;
 foreach my $header_column (@measurement_header_columns) 
 { 
   $header_column = trim($header_column); 
-  $kbFeatureIdColIndex = column_header_checker($header_column,'KB-feature-id',$kbFeatureIdColIndex,$header_counter); 
-  $valueColIndex = column_header_checker($header_column,'value',$valueColIndex,$header_counter); 
-  $sampleIdColIndex = column_header_checker($header_column,'sample-id',$sampleIdColIndex,$header_counter); 
-  $measurementSourceIdColIndex = column_header_checker($header_column,'source-id',$measurementSourceIdColIndex,$header_counter); 
+  $kbFeatureIdColIndex = column_header_checker($header_column,'^KB-feature-id$',$kbFeatureIdColIndex,$header_counter); 
+  $valueColIndex = column_header_checker($header_column,'^value$',$valueColIndex,$header_counter); 
+  $sampleIdColIndex = column_header_checker($header_column,'^sample-id$',$sampleIdColIndex,$header_counter); 
+  $measurementSourceIdColIndex = column_header_checker($header_column,'^source-id$',$measurementSourceIdColIndex,$header_counter); 
   $header_counter++; 
 } 
 unless (defined($kbFeatureIdColIndex) && defined($valueColIndex)  && defined($sampleIdColIndex)  && defined($measurementSourceIdColIndex)) 
