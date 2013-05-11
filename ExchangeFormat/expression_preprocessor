@@ -15,9 +15,9 @@ if (!exists($ls_hash{'sample.tab'}))
 {
 	$error_message .= "A sample.tab file was not found in $dir : This program requires a sample.tab file.\n";
 }
-if (!exists($ls_hash{'log2level.tab'}))
+if (!exists($ls_hash{'measurement.tab'}))
 { 
-        $error_message .= "A log2Level.tab file was not found in $dir : This program requires a log2Level.tab file.\n";
+        $error_message .= "A measurement.tab file was not found in $dir : This program requires a measurement.tab file.\n";
 } 
 my $sample_file = $dir . "/sample.tab";
 open (IN,$sample_file) or die "Unable to open sample file : $sample_file.\n\n"; 
@@ -27,68 +27,150 @@ chomp(@sample_lines);
 for (my $i = 0; $i <  scalar(@sample_lines); $i++)
 {
 	$sample_lines[$i] =~ s/\r//; 
-}
+}	
 my %sample_lines_hash;  #key source_id ->values an array ref to the elements on the line
-my %samples_needing_exp_records; #hash of source_ids keys needing experimental unit and experiment meta entries. 
-my $sample_header_line = shift(@sample_lines);  #Should be the following
-#source-id	title	description	molecule	type	externalSourceId dataSource kbaseSubmissionDate 
-#externalSourceDate originalLog2Median custom persons strain-id platform-id protocol-id experimentalUnit-id
-#indices:
-#	0-	source-id
-#	1-	title   
-#	2-	description     
-#	3-	molecule        
-#	4-	type    
-#	5-	externalSourceId
-#	6-	dataSource
-#	7-	kbaseSubmissionDate 
-#	8-	externalSourceDate 
-#	9-	originalLog2Median
-#	10-	custom 
-#	11-	persons 
-#	12-	strain-id
-#	13-	platform-id
-#	14-	protocol-id
-#	15-	experimentalUnit-id
-my $test_sample_headers = "source-id\ttitle\tdescription\tmolecule\ttype\texternalSourceId\tdataSource\tkbaseSubmissionDate\texternalSourceDate\t".
-   			"originalLog2Median\tcustom\tpersons\tstrain-id\tplatform-id\tprotocol-id\texperimentalUnit-id";
-if ($sample_header_line ne  $test_sample_headers)
-{
-   $error_message .= "The headers for the sample are not correct.  The following headers were expected : \n".
-   		  $test_sample_headers."\nIf you think your headers are correct you may want make sure they have unix line returns.\n".
-		  "Sample header:\n$sample_header_line:\nExpected:\n$test_sample_headers:\n\n";
-}
-if ($error_message ne '')
+my $sample_header_line = shift(@sample_lines);  #Must contain source-id and originalLog2Medain column headers
+my @header_columns = split(/\t/,$sample_header_line);
+my $originalLog2MedianColIndex = undef;
+my $sampleSourceIdColIndex = undef;
+foreach my $header_column (@header_columns)
 { 
-        print $error_message;
+  $header_column = trim($header_column);
+  $originalLog2MedianColIndex = column_header_checker($header_column,'originalLog2Median',$originalLog2MedianColIndex,$header_counter);
+  $sampleSourceIdColIndex = column_header_checker($header_column,'source-id',$sampleSourceIdColIndex,$header_counter);
+  $header_counter++;
+}
+unless (defined($originalLog2MedianColIndex) && defined($sampleSourceIdColIndex))
+{
+	$error_message .= "The sample.tab file must have a 'source-id' and 'originalLog2Median' column headers.\n";
+}
+if (($originalLog2MedianColIndex eq "duplicate") || ($sampleSourceIdColIndex eq "duplicate"))
+{
+	$error_message .= "The sample.tab file has a duplicate column headers for 'source-id' and/or 'originalLog2Median'.\n";
+}
+if ($error_message ne '') 
+{ 
+        print $error_message; 
         exit; 
 } 
-foreach my $sample_line (@sample_lines)
-{
-	my @sample_elements = split("\t",$sample_line);
-	if ($sample_elements[0] eq '')
-	{
-		$error_message .= "One of the lines in the sample file does not contain a source_id\n";
-	}
-	elsif (!(($sample_elements[9] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) || ($sample_elements[9] eq ".")))
-	{
-		$error_message .= "The Sample with source-id of ".$sample_elements[0]." does not have a valid originalLog2Median (must be a number or .)\n";
-	}
-	else #populate data_structure.
-	{
-#	        #CUSTOM IS ALWAYS FALSE (will add capability for custom averagings later). 
-#        	$sample_elements[10] = 'FALSE'; 
-		$sample_lines_hash{$sample_elements[0]} = \@sample_elements;
-	}
-}
-#check that Median of Log2Level is Zero
-my $log2Level_file = $dir . "/log2level.tab"; 
-open (IN,$log2Level_file) or die "Unable to open log2Level file : $log2Level_file.\n\n";
-my @log2Level_lines = (<IN>);
+
+foreach my $sample_line (@sample_lines) 
+{ 
+        my @sample_elements = split("\t",$sample_line); 
+        if ($sample_elements[$sampleSourceIdColIndex] eq '') 
+        { 
+                $error_message .= "One of the lines in the sample file does not contain a source_id\n"; 
+        } 
+        elsif (!(($sample_elements[$originalLog2MedianColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
+	      || ($sample_elements[$originalLog2MedianColIndex] eq "."))) 
+        { 
+                $error_message .= "The Sample with source-id of ".$sample_elements[$sampleSourceIdColIndex].
+			       " does not have a valid originalLog2Median (must be a number or .)\n"; 
+        } 
+        else #populate data_structure. 
+        { 
+#               #CUSTOM IS ALWAYS FALSE (will add capability for custom averagings later). 
+#               $sample_elements[10] = 'FALSE'; 
+                $sample_lines_hash{$sample_elements[$sampleSourceIdColIndex]} = \@sample_elements; 
+        } 
+} 
+#check that Median of Log2Level is Zero 
+my $measurement_file = $dir . "/measurement.tab"; 
+open (IN,$measurement_file) or die "Unable to open measurement file : $measurement_file.\n\n"; 
+my @measurement_lines = (<IN>); 
 close(IN); 
-chomp(@log2Level_lines);
-my %log2Level_lines_hash; #key log2Level {sample_source_id}->{feature_id}= array ref to the elements of the log2_level_line
-my $log2Level_header_line = shift(@log2Level_lines);  #Should be the following 
+chomp(@measurement_lines); 
+for (my $i = 0; $i <  scalar(@measurement_lines); $i++) 
+{ 
+        $measurement_lines[$i] =~ s/\r//; 
+} 
+
+source-id       sample-id       measurement-description-id      KB-feature-id   value   mean    median  standard-deviation      N       p-value Z-score
+
+my $measurement_header_line = shift(@measurement_lines);  #Must contain value, sample-id, source-id and KB-feature-id column headers 
+my @measurement_header_columns = split(/\t/,$measurement_header_line); 
+my $kbFeatureIdColIndex = undef; 
+my $valueColIndex = undef; 
+my $sampleIdColIndex = undef; 
+my $measurementSourceIdColIndex = undef;
+foreach my $header_column (@measurement_header_columns) 
+{ 
+  $header_column = trim($header_column); 
+  $kbFeatureIdColIndex = column_header_checker($header_column,'KB-feature-id',$kbFeatureIdColIndex,$header_counter); 
+  $valueColIndex = column_header_checker($header_column,'value',$valueColIndex,$header_counter); 
+  $sampleIdColIndex = column_header_checker($header_column,'sample-id',$sampleIdColIndex,$header_counter); 
+  $measurementSourceIdColIndex = column_header_checker($header_column,'source-id',$measurementSourceIdColIndex,$header_counter); 
+  $header_counter++; 
+} 
+unless (defined($kbFeatureIdColIndex) && defined($valueColIndex)  && defined($sampleIdColIndex)  && defined($measurementSourceIdColIndex)) 
+{ 
+        $error_message .= "The measurement.tab file must have a 'source-id','KB-feature-id','value' and 'sample-id' column headers.\n"; 
+} 
+if (($kbFeatureIdColIndex eq "duplicate") || ($valueColIndex eq "duplicate") 
+   || ($sampleIdColIndex eq "duplicate") || ($measurementSourceIdColIndex eq "duplicate")) 
+{ 
+        $error_message .= "The measurement.tab file has a duplicate column headers for 'source-id','KB-feature-id','value' and/or 'sample-id'.\n"; 
+} 
+if ($error_message ne '') 
+{ 
+        print $error_message; 
+        exit; 
+} 
+my %measurement_lines_hash; #key {sample_source_id}->{feature_id}= array ref to the elements of the measurement_line 
+foreach my $measurement_line (@measurement_lines) 
+{ 
+        my $measurement_line_error_message = '';	
+        my @measurement_elements = split("\t",$measurement_line); 
+        if ($measurement_elements[$measurementSourceIdColIndex] eq '') 
+        { 
+          $measurement_line_error_message .= "One of the lines in the measurement file does not contain a source_id\n"; 
+        } 
+        else 
+        { 
+          if (($measurement_elements[$valueColIndex] eq '') || ($measurement_elements[$valColIndex] eq '.')) 
+          { 
+                  $measurement_line_error_message .= "The measurement record with the source-id ". 
+		  				  $measurement_elements[$measurementSourceIdColIndex] . " is empty for the value\n"; 
+          } 
+          if (($measurement_elements[$kbFeatureIdIndex] eq '') || ($measurement_elements[$kbFeatureIdIndex] eq '.')) 
+          { 
+                  $measurement_line_error_message .= "The measurement record with the source-id ". 
+		  				  $measurement_elements[$measurementSourceIdColIndex] . " does not have a feature_id\n"; 
+          } 
+          unless ($measurement_elements[$valColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
+          { 
+                  $measurement_line_error_message .= "The measurement record with the source-id ". 
+		  				  $measurment_elements[$measurementSourceIdColIndex] . 
+                  				  " does not have a valid value number (".$measurement_elements[$valColIndex].")\n"; 
+          } 
+          if (($measurement_elements[$sampleIdColIndex] eq '') || ($measurement_elements[$sampleIdColIndex] eq '.')) 
+          { 
+                  $measurement_line_error_message .= "The measurement record with the source-id ". 
+		  				  $measurement_elements[$measurementSourceIdColIndex] . 
+                  				  " does not have a valid sample-id.\n"; 
+          } 
+          unless (exisits($sample_lines_hash{($measurement_elements[$sampleIdColIndex]}))) 
+          { 
+                  $measurement_line_error_message .= "The measurement record with the source-id ". 
+                                                  $measurement_elements[$measurementSourceIdColIndex] .
+                                                  " has a sample_id that does not exist in the sample.tab file..\n";
+          } 
+        } 
+        if ($measurement_line_error_message ne '') 
+        { 
+                $error_message .= $measurement_line_error_message; 
+        } 
+        else #populate data_structure. 
+        { 
+                $measurement_elements[$valueColIndex] =~ s/\s//g; 
+                $measurement_lines_hash{$measurement_elements[$sampleIdColIndex]}->{$measurement_elements[$kbFeatureIdColIndex]} 
+						= \@measurement_elements; 
+        } 
+} 
+ 
+#print "ERROR MESSAGE:\n".$error_message."\n"; 
+
+
 # log2Level.tab file has these headers: 
 # source-id	log2level     stdDev	numberOfMeasurements	confidenceScore	confidenceType	sample	feature
 # indices:
@@ -100,85 +182,44 @@ my $log2Level_header_line = shift(@log2Level_lines);  #Should be the following
 #	5-	confidenceType	
 #	6-	sample	
 #	7-	feature
-foreach my $log2Level_line (@log2Level_lines) 
-{ 
-	my $log2Level_line_error_message = '';
-        my @log2Level_elements = split("\t",$log2Level_line); 
-        if ($log2Level_elements[0] eq '') 
-        { 
-          $log2Level_line_error_message .= "One of the lines in the log2Level file does not contain a source_id\n"; 
-        }
-	else
-	{ 
-	  if (($log2Level_elements[7] eq '') || ($log2Level_elements[7] eq '.'))
-	  {
-	          $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
-		  " does not have a valid featureId\n"; 
-	  }
-          if (($log2Level_elements[1] eq '') || ($log2Level_elements[1] eq '.'))
-          { 
-                  $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
-                  " is empty for the log2Level\n";
-          } 
-	  unless ($log2Level_elements[1] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/)
-          {
-                  $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
-                  " does not have a valid log2Level number (".$log2Level_elements[1].")\n";
-          } 
-          if (($log2Level_elements[6] eq '') || ($log2Level_elements[6] eq '.'))
-          {
-                  $log2Level_line_error_message .= "The log2Level record with the source-id ". $log2Level_elements[0] . 
-                  " does not have a valid Sample (column 7)\n";
-          } 
-	}
-	if ($log2Level_line_error_message ne '')
-	{
-		$error_message .= $log2Level_line_error_message;
-	}
-	else #populate data_structure. 
-        { 
-		$log2Level_elements[1] =~ s/\s//g;
-                $log2Level_lines_hash{$log2Level_elements[6]}->{$log2Level_elements[7]} = \@log2Level_elements;
-        }
-}
 
-#print "ERROR MESSAGE:\n".$error_message."\n";
 
 #go through each sample and load all log2Levels into an array
 #numerical sort the array and see if median is zero (within tolerance) 
 #if not within tolerance then determine the median replace it within the sample file
 # and change all the log2Levels for that sample by subtracting out the determined median.
 my $threshold = .00001;
-my $need_new_log2level_file = 0;
-foreach my $sample_id (sort(keys(%log2Level_lines_hash)))
+my $need_new_measurement_file = 0;
+foreach my $sample_id (sort(keys(%measurement_lines_hash)))
 {
-	my @sample_log2Levels = ();
-	foreach my $feature_id (keys(%{$log2Level_lines_hash{$sample_id}}))
+	my @sample_measurements = ();
+	foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}}))
 	{
-		push(@sample_log2Levels,$log2Level_lines_hash{$sample_id}->{$feature_id}->[1]);
+		push(@sample_measurements,$measurement_lines_hash{$sample_id}->{$feature_id}->[1]);
 	}
-	my @sorted_log2Levels = sort {$a <=> $b} @sample_log2Levels;
-	my $num_elements = scalar @sorted_log2Levels;
+	my @sorted_measurements = sort {$a <=> $b} @sample_measurements;
+	my $num_elements = scalar @sorted_measurements;
 	my $median;
 	if (($num_elements%2) == 0)
 	{
-		$median = (($sorted_log2Levels[(($num_elements-1)/2)]) +
-			  ($sorted_log2Levels[(($num_elements)/2)]))/2
+		$median = (($sorted_measurements[(($num_elements-1)/2)]) +
+			  ($sorted_measurements[(($num_elements)/2)]))/2
 	}
 	else #odd elements just take middle one
 	{
-		$median = $sorted_log2Levels[floor($num_elements/2)]
+		$median = $sorted_measurements[floor($num_elements/2)]
 	}
 	#print "OLD SAMPLE: $sample_id - MEDIAN: $median - NUM ELEMENTS $num_elements \n";
 	if (abs($median) > $threshold)
 	{
-		$need_new_log2level_file = 1;
+		$need_new_measurement_file = 1;
 		#set the originalLog2Median in for the sample
-		$sample_lines_hash{$sample_id}->[9] = $median;
+		$sample_lines_hash{$sample_id}->[$originalLog2MedianColIndex] = $median;
 		#change the log2Levels from the original score minus the new median.
-		foreach my $feature_id (keys(%{$log2Level_lines_hash{$sample_id}})) 
+		foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}})) 
         	{
-			$log2Level_lines_hash{$sample_id}->{$feature_id}->[1] = $log2Level_lines_hash{$sample_id}->{$feature_id}->[1] - $median;
+			$measurement_lines_hash{$sample_id}->{$feature_id}->[$valColIndex] = 
+				$measurement_lines_hash{$sample_id}->{$feature_id}->[$valColIndex] - $median;
         	}
 	}
 }
@@ -189,30 +230,28 @@ if ($error_message ne "")
 	exit;
 }
 
-if ($need_new_log2level_file == 1)
+if ($need_new_measurement_file == 1)
 {
-	#Move original sample.tab and log2level.tab to original_sample.tab and original_log2level.tab respectively. 
+	#Move original sample.tab and measurement.tab to original_sample.tab and original_measurement.tab respectively. 
 	#(Only does log2level if the median of all sample was not zero) 
 	`mv $dir/sample.tab $dir/original_sample.tab`; 
 
-	`mv $dir/log2level.tab $dir/original_log2level.tab`;
-	open (LOG2LEVEL_FILE, ">".$log2Level_file) or die "Unable to make the log2level file : $log2Level_file $!\n";
-	print LOG2LEVEL_FILE  $log2Level_header_line . "\n";
-	foreach my $sample_id (sort(keys(%log2Level_lines_hash)))
+	`mv $dir/measurement.tab $dir/original_measurement.tab`;
+	open (MEASUREMENT_FILE, ">".$measurement_file) or die "Unable to make the measurement file : $measurement_file $!\n";
+	print MEASUREMENT_FILE  $measurement_header_line . "\n";
+	foreach my $sample_id (sort(keys(%measurement_lines_hash)))
 	{
-        	foreach my $feature_id (keys(%{$log2Level_lines_hash{$sample_id}}))
+        	foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}}))
 		{
-			my @temp_arr =  @{$log2Level_lines_hash{$sample_id}->{$feature_id}};
-			print LOG2LEVEL_FILE join("\t",@temp_arr) . "\n";
+			my @temp_arr =  @{$measurement_lines_hash{$sample_id}->{$feature_id}};
+			print MEASUREMENT_FILE join("\t",@temp_arr) . "\n";
 		} 
 	}
-	close (LOG2LEVEL_FILE);
+	close (MEASUREMENT_FILE);
 
 	#make new sample.tab file
 	open (SAMPLE_FILE, ">".$sample_file) or die "Unable to make the new sample file : $sample_file $!\n";
-	my $new_sample_file_header = "source-id\ttitle\tdescription\tmolecule\ttype\texternalSourceId\tdataSource\tkbaseSubmissionDate\texternalSourceDate\t".
-                           "originalLog2Median\tcustom\tpersons\tstrain-id\tplatform-id\tprotocol-id\texperimentalUnit-id\n";
-	print SAMPLE_FILE $new_sample_file_header;
+	print SAMPLE_FILE $sample_header_line;
 
 	foreach my $sample_source_id (sort(keys(%sample_lines_hash)))
 	{
@@ -240,3 +279,55 @@ else
 {
 	print "\nAll Samples already had a median log level of 0 already.  Nothing needed to be done. \n";
 }	
+
+
+
+
+
+
+sub column_header_checker ( $ $ $ $ )
+{ 
+    my $col_name = shift; 
+    my $reg_ex = shift; 
+    my $column_exists_flag = shift;
+    my $counter = shift;
+ 
+    if ($col_name =~ m/$reg_ex/i) 
+    { 
+        if (defined($column_exists_flag))
+        { 
+            return "duplicate";
+        } 
+        else 
+        { 
+            return $counter; 
+        } 
+    } 
+    else 
+    {		
+        return $column_exists_flag; 
+    } 
+} 
+
+# Perl trim function to remove whitespace from the start and end of the string
+sub trim($)
+{
+	my $string = shift;
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	return $string;
+}
+# Left trim function to remove leading whitespace
+sub ltrim($)
+{
+	my $string = shift;
+	$string =~ s/^\s+//;
+	return $string;
+}
+# Right trim function to remove trailing whitespace
+sub rtrim($)
+{
+	my $string = shift;
+	$string =~ s/\s+$//;
+	return $string;
+}
