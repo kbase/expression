@@ -218,8 +218,8 @@ foreach my $sample_id (sort(keys(%measurement_lines_hash)))
 		#change the log2Levels from the original score minus the new median.
 		foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}})) 
         	{
-			$measurement_lines_hash{$sample_id}->{$feature_id}->[$valColIndex] = 
-				$measurement_lines_hash{$sample_id}->{$feature_id}->[$valColIndex] - $median;
+			$measurement_lines_hash{$sample_id}->{$feature_id}->[$valueColIndex] = 
+				$measurement_lines_hash{$sample_id}->{$feature_id}->[$valueColIndex] - $median;
         	}
 	}
 }
@@ -267,12 +267,12 @@ if ($need_new_measurement_file == 1)
 
 	print "\nSuccess:\n";
 	print "The original $sample_file has been renamed to $dir/original_sample.tab \n";
-	print "The original $log2Level_file has been renamed to $dir/original_log2level.tab \n"; 
+	print "The original $measurement_file has been renamed to $dir/original_measurement.tab \n"; 
 
 	print "The following_files have been created : \n" .$sample_file . "\n";
-	if ($need_new_log2level_file == 1)
+	if ($need_new_measurement_file == 1)
 	{ 
-  	  print $log2Level_file . "\n";
+  	  print $measurement_file . "\n";
 	}
 }
 else
