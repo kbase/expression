@@ -173,20 +173,6 @@ foreach my $measurement_line (@measurement_lines)
  
 #print "ERROR MESSAGE:\n".$error_message."\n"; 
 
-
-# log2Level.tab file has these headers: 
-# source-id	log2level     stdDev	numberOfMeasurements	confidenceScore	confidenceType	sample	feature
-# indices:
-#	0-	source-id	
-#	1-	log2level     
-#	2-	stdDev	
-#	3-	numberOfMeasurements	
-#	4-	confidenceScore	
-#	5-	confidenceType	
-#	6-	sample	
-#	7-	feature
-
-
 #go through each sample and load all log2Levels into an array
 #numerical sort the array and see if median is zero (within tolerance) 
 #if not within tolerance then determine the median replace it within the sample file
@@ -198,7 +184,7 @@ foreach my $sample_id (sort(keys(%measurement_lines_hash)))
 	my @sample_measurements = ();
 	foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}}))
 	{
-		push(@sample_measurements,$measurement_lines_hash{$sample_id}->{$feature_id}->[1]);
+		push(@sample_measurements,$measurement_lines_hash{$sample_id}->{$feature_id}->[$valueColIndex]);
 	}
 	my @sorted_measurements = sort {$a <=> $b} @sample_measurements;
 	my $num_elements = scalar @sorted_measurements;
