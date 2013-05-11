@@ -109,7 +109,10 @@ unless (defined($kbFeatureIdColIndex) && defined($valueColIndex)  && defined($sa
 if (($kbFeatureIdColIndex eq "duplicate") || ($valueColIndex eq "duplicate") 
    || ($sampleIdColIndex eq "duplicate") || ($measurementSourceIdColIndex eq "duplicate")) 
 { 
-        $error_message .= "The measurement.tab file has a duplicate column headers for 'source-id','KB-feature-id','value' and/or 'sample-id'.\n"; 
+        $error_message .= "The measurement.tab file has a duplicate column headers for 'source-id','KB-feature-id','value' and/or 'sample-id'.\n";
+        $error_message .= "'source-id' - $measurementSourceIdColIndex \n 'KB-feature-id' - $kbFeatureIdColIndex \n".
+	                  "'value' - $valueColIndex \n 'sample-id' - $sampleIdColIndex .\n";
+ 
 } 
 if ($error_message ne '') 
 { 
