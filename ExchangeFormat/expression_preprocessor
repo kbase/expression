@@ -33,6 +33,7 @@ my $sample_header_line = shift(@sample_lines);  #Must contain source-id and orig
 my @header_columns = split(/\t/,$sample_header_line);
 my $originalLog2MedianColIndex = undef;
 my $sampleSourceIdColIndex = undef;
+my $header_counter = 0;
 foreach my $header_column (@header_columns)
 { 
   $header_column = trim($header_column);
@@ -85,14 +86,13 @@ for (my $i = 0; $i <  scalar(@measurement_lines); $i++)
         $measurement_lines[$i] =~ s/\r//; 
 } 
 
-source-id       sample-id       measurement-description-id      KB-feature-id   value   mean    median  standard-deviation      N       p-value Z-score
-
 my $measurement_header_line = shift(@measurement_lines);  #Must contain value, sample-id, source-id and KB-feature-id column headers 
 my @measurement_header_columns = split(/\t/,$measurement_header_line); 
 my $kbFeatureIdColIndex = undef; 
 my $valueColIndex = undef; 
 my $sampleIdColIndex = undef; 
 my $measurementSourceIdColIndex = undef;
+my $header_counter = 0;
 foreach my $header_column (@measurement_header_columns) 
 { 
   $header_column = trim($header_column); 
