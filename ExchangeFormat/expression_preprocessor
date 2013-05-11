@@ -127,21 +127,21 @@ foreach my $measurement_line (@measurement_lines)
         } 
         else 
         { 
-          if (($measurement_elements[$valueColIndex] eq '') || ($measurement_elements[$valColIndex] eq '.')) 
+          if (($measurement_elements[$valueColIndex] eq '') || ($measurement_elements[$valueColIndex] eq '.')) 
           { 
                   $measurement_line_error_message .= "The measurement record with the source-id ". 
 		  				  $measurement_elements[$measurementSourceIdColIndex] . " is empty for the value\n"; 
           } 
-          if (($measurement_elements[$kbFeatureIdIndex] eq '') || ($measurement_elements[$kbFeatureIdIndex] eq '.')) 
+          if (($measurement_elements[$kbFeatureIdColIndex] eq '') || ($measurement_elements[$kbFeatureIdColIndex] eq '.')) 
           { 
                   $measurement_line_error_message .= "The measurement record with the source-id ". 
 		  				  $measurement_elements[$measurementSourceIdColIndex] . " does not have a feature_id\n"; 
           } 
-          unless ($measurement_elements[$valColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
+          unless ($measurement_elements[$valueColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
           { 
                   $measurement_line_error_message .= "The measurement record with the source-id ". 
 		  				  $measurement_elements[$measurementSourceIdColIndex] . 
-                  				  " does not have a valid value number (".$measurement_elements[$valColIndex].")\n"; 
+                  				  " does not have a valid value number (".$measurement_elements[$valueColIndex].")\n"; 
           } 
           if (($measurement_elements[$sampleIdColIndex] eq '') || ($measurement_elements[$sampleIdColIndex] eq '.')) 
           { 
@@ -149,7 +149,7 @@ foreach my $measurement_line (@measurement_lines)
 		  				  $measurement_elements[$measurementSourceIdColIndex] . 
                   				  " does not have a valid sample-id.\n"; 
           } 
-          unless (exisits($sample_lines_hash{($measurement_elements[$sampleIdColIndex]}))) 
+          unless (exists($sample_lines_hash{$measurement_elements[$sampleIdColIndex]})) 
           { 
                   $measurement_line_error_message .= "The measurement record with the source-id ". 
                                                   $measurement_elements[$measurementSourceIdColIndex] .
