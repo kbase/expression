@@ -448,6 +448,123 @@ sub get_expression_samples_data
 
 
 
+=head2 get_expression_data_by_samples_and_features
+
+  $labelDataMapping = $obj->get_expression_data_by_samples_and_features($sampleIDs, $featureIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$featureIDs is a FeatureIDs
+$labelDataMapping is a LabelDataMapping
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+FeatureIDs is a reference to a list where each element is a FeatureID
+FeatureID is a string
+LabelDataMapping is a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
+DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
+Measurement is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$featureIDs is a FeatureIDs
+$labelDataMapping is a LabelDataMapping
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+FeatureIDs is a reference to a list where each element is a FeatureID
+FeatureID is a string
+LabelDataMapping is a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
+DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
+Measurement is a float
+
+
+=end text
+
+
+
+=item Description
+
+given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value}
+
+=back
+
+=cut
+
+sub get_expression_data_by_samples_and_features
+{
+    my $self = shift;
+    my($sampleIDs, $featureIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($featureIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"featureIDs\" (value was \"$featureIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_data_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_data_by_samples_and_features');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($labelDataMapping);
+    #BEGIN get_expression_data_by_samples_and_features
+    if (0 == @{$sampleIDs}) 
+    { 
+	my $msg = "get_expression_data_by_samples_and_features requires a list of valid sample ids.  Note that feature ids can be empty.  ".
+	    "If features are empty all features for the sample will be returned";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+							       method_name => 'get_expression_data_by_samples_and_features'); 
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+	); 
+
+    my $get_feature_log2level_q = qq^select sam.id, fea.id, mea.value   
+                                     from Sample sam           
+                                     inner join SampleMeasurements sms on sam.id = sms.from_link      
+                                     inner join Measurement mea on sms.to_link = mea.id       
+                                     inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link      
+                                     inner join Feature fea on fmb.from_link = fea.id       
+                                     where sam.id in (^.
+				     join(",", ("?") x @{$sampleIDs}). ") ";
+    if (scalar(@{$featureIDs}) > 0)
+    {
+	$get_feature_log2level_q .= qq^ and fea.id in (^. join(",", ("?") x @{$featureIDs}). ") ";
+    }
+
+    my $get_feature_log2level_qh = $dbh->prepare($get_feature_log2level_q) or die "Unable to prepare get_feature_log2level_q : ".
+        $get_feature_log2level_q . " : " .$dbh->errstr();
+    $get_feature_log2level_qh->execute(@{$sampleIDs},@{$featureIDs})  or die "Unable to execute get_feature_log2level_q : ".
+        $get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr();
+    while(my ($sample_id,$feature_id,$log2level) = $get_feature_log2level_qh->fetchrow_array())
+    { 
+        $labelDataMapping->{$sample_id}->{$feature_id}=$log2level;
+    } 
+
+    #END get_expression_data_by_samples_and_features
+    my @_bad_returns;
+    (ref($labelDataMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"labelDataMapping\" (value was \"$labelDataMapping\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_data_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_data_by_samples_and_features');
+    }
+    return($labelDataMapping);
+}
+
+
+
+
 =head2 get_expression_samples_data_by_series_ids
 
   $seriesExpressionDataSamplesMapping = $obj->get_expression_samples_data_by_series_ids($seriesIDs)

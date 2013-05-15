@@ -146,7 +146,7 @@ module ExpressionServices {
     
     /* Mapping between sampleID and ExpressionDataSample */
     typedef mapping<SampleID sampleID, ExpressionDataSample> ExpressionDataSamplesMap;
-    
+
     /*mapping between seriesIDs and all Samples it contains*/
     typedef mapping<SeriesID seriesID, ExpressionDataSamplesMap> SeriesExpressionDataSamplesMapping;
     
@@ -175,6 +175,9 @@ module ExpressionServices {
     
     /* core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure */
     funcdef get_expression_samples_data(SampleIDs sampleIDs) returns (ExpressionDataSamplesMap expressionDataSamplesMap);
+
+    /* given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value} */
+    funcdef get_expression_data_by_samples_and_features(SampleIDs sampleIDs, FeatureIDs featureIDs) returns (LabelDataMapping labelDataMapping);
 
     /* given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples */
     funcdef get_expression_samples_data_by_series_ids(SeriesIDs seriesIDs) returns (SeriesExpressionDataSamplesMapping seriesExpressionDataSamplesMapping);
