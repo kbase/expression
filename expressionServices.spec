@@ -176,27 +176,46 @@ module ExpressionServices {
     /* core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure */
     funcdef get_expression_samples_data(SampleIDs sampleIDs) returns (ExpressionDataSamplesMap expressionDataSamplesMap);
 
-    /* given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value} */
+    /* given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value}.  If features is an empty array [], all features with measurment values will be returned. */
     funcdef get_expression_data_by_samples_and_features(SampleIDs sampleIDs, FeatureIDs featureIDs) returns (LabelDataMapping labelDataMapping);
 
     /* given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples */
     funcdef get_expression_samples_data_by_series_ids(SeriesIDs seriesIDs) returns (SeriesExpressionDataSamplesMapping seriesExpressionDataSamplesMapping);
+
+    /* given a list of SeriesIDs returns a list of Sample IDs */
+    funcdef get_expression_sample_ids_by_series_ids(SeriesIDs seriesIDs) returns (SampleIDs sampleIDs);
     
     /* given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples */
     funcdef get_expression_samples_data_by_experimental_unit_ids(ExperimentalUnitIDs experimentalUnitIDs) returns (ExperimentalUnitExpressionDataSamplesMapping experimentalUnitExpressionDataSamplesMapping);
+
+    /* given a list of ExperimentalUnitIDs returns a list of Sample IDs */
+    funcdef get_expression_sample_ids_by_experimental_unit_ids(ExperimentalUnitIDs experimentalUnitIDs) returns (SampleIDs sampleIDs); 
     
     /* given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping */ 
     funcdef get_expression_samples_data_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (ExperimentMetaExpressionDataSamplesMapping experimentMetaExpressionDataSamplesMapping); 
+
+    /* given a list of ExperimentMetaIDs returns a list of Sample IDs */ 
+    funcdef get_expression_sample_ids_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (SampleIDs sampleIDs); 
     
     /* given a list of Strains, and a SampleType, it returns a StrainExpressionDataSamplesMapping,  StrainId -> ExpressionDataSample*/
     funcdef get_expression_samples_data_by_strain_ids(StrainIDs strainIDs, SampleType sampleType) returns (StrainExpressionDataSamplesMapping strainExpressionDataSamplesMapping);
 
+    /* given a list of Strains, and a SampleType, it returns a list of Sample IDs*/
+    funcdef get_expression_sample_ids_by_strain_ids(StrainIDs strainIDs, SampleType sampleType) returns (SampleIDs sampleIDs); 
+
     /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample*/
     funcdef get_expression_samples_data_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (GenomeExpressionDataSamplesMapping genomeExpressionDataSamplesMapping);
+
+    /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs*/ 
+    funcdef get_expression_sample_ids_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (SampleIDs sampleIDs); 
 
     /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample  */
     funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (OntologyExpressionDataSampleMapping ontologyExpressionDataSampleMapping);
+
+    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs  */ 
+    funcdef get_expression_sample_ids_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
+        returns (SampleIDs sampleIDs); 
 
     /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: featureID->{sample_id->measurement}*/
     funcdef get_expression_data_by_feature_ids(FeatureIDs featureIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) 

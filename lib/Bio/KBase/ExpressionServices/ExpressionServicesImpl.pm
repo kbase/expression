@@ -494,7 +494,7 @@ Measurement is a float
 
 =item Description
 
-given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value}
+given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value}.  If features is an empty array [], all features with measurment values will be returned.
 
 =back
 
@@ -517,6 +517,7 @@ sub get_expression_data_by_samples_and_features
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($labelDataMapping);
     #BEGIN get_expression_data_by_samples_and_features
+    $labelDataMapping = {};
     if (0 == @{$sampleIDs}) 
     { 
 	my $msg = "get_expression_data_by_samples_and_features requires a list of valid sample ids.  Note that feature ids can be empty.  ".
@@ -738,13 +739,13 @@ sub get_expression_samples_data_by_series_ids
     my($seriesExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_series_ids
     $seriesExpressionDataSamplesMapping = {};
-    if (0 == @{$seriesIDs}) 
+    if (0 == @{$seriesIDs})
     { 
-        return $seriesExpressionDataSamplesMapping;
+        my $msg = "get_expression_samples_data_by_series_ids requires a list of valid series ids. "; 
+      Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_samples_data_by_series_ids');
     } 
-#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
-#                           { RaiseError => 1, ShowErrorStatement => 1 } 
-#        ); 
+
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
@@ -793,6 +794,110 @@ sub get_expression_samples_data_by_series_ids
 							       method_name => 'get_expression_samples_data_by_series_ids');
     }
     return($seriesExpressionDataSamplesMapping);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_series_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_series_ids($seriesIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seriesIDs is a SeriesIDs
+$sampleIDs is a SampleIDs
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seriesIDs is a SeriesIDs
+$sampleIDs is a SampleIDs
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a list of SeriesIDs returns a list of Sample IDs
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_series_ids
+{
+    my $self = shift;
+    my($seriesIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_series_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_series_ids
+    if (0 == @{$seriesIDs}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_series_ids requires a list of valid series ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+							     method_name => 'get_expression_sample_ids_by_series_ids'); 
+    } 
+
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+ 
+    my $get_sample_ids_by_series_ids_q = 
+        qq^select sam.id 
+           from Sample sam  
+           inner join SampleInSeries sis on sam.id = sis.from_link  
+           inner join Series ser on sis.to_link = ser.id  
+           where ser.id in (^. 
+	   join(",", ("?") x @{$seriesIDs}) . ") "; 
+    my $get_sample_ids_by_series_ids_qh = $dbh->prepare($get_sample_ids_by_series_ids_q) or die 
+                                                "Unable to prepare get_sample_ids_by_series_ids_q : ". 
+                                                $get_sample_ids_by_series_ids_q . " : " . dbh->errstr() . "\n\n"; 
+    $get_sample_ids_by_series_ids_qh->execute(@{$seriesIDs}) or die "Unable to execute get_sample_ids_by_series_ids_q : ". 
+	$get_sample_ids_by_series_ids_q . " : " . $get_sample_ids_by_series_ids_qh->errstr() . "\n\n"; 
+    my %sample_ids_hash; #hash to get unique sample_id_hash 
+    while (my ($sample_id) = $get_sample_ids_by_series_ids_qh->fetchrow_array()) 
+    { 
+	$sample_ids_hash{$sample_id} = 1;
+    } 
+    my @temp_arr = keys(%sample_ids_hash);
+    $sampleIDs = \@temp_arr;
+    #END get_expression_sample_ids_by_series_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_series_ids');
+    }
+    return($sampleIDs);
 }
 
 
@@ -973,13 +1078,13 @@ sub get_expression_samples_data_by_experimental_unit_ids
     my($experimentalUnitExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_experimental_unit_ids
     $experimentalUnitExpressionDataSamplesMapping = {};
-    if (0 == @{$experimentalUnitIDs})
+    if (0 == @{$experimentalUnitIDs}) 
     { 
-        return $experimentalUnitExpressionDataSamplesMapping; 
-    }
-#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
-#                           { RaiseError => 1, ShowErrorStatement => 1 } 
-#        ); 
+        my $msg = "get_expression_samples_data_by_experimental_unit_ids requires a list of valid experimental unit ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_samples_data_by_experimental_unit_ids'); 
+    } 
+
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	); 
@@ -1030,6 +1135,106 @@ sub get_expression_samples_data_by_experimental_unit_ids
 							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
     }
     return($experimentalUnitExpressionDataSamplesMapping);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_experimental_unit_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_experimental_unit_ids($experimentalUnitIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$experimentalUnitIDs is an ExperimentalUnitIDs
+$sampleIDs is a SampleIDs
+ExperimentalUnitIDs is a reference to a list where each element is an ExperimentalUnitID
+ExperimentalUnitID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$experimentalUnitIDs is an ExperimentalUnitIDs
+$sampleIDs is a SampleIDs
+ExperimentalUnitIDs is a reference to a list where each element is an ExperimentalUnitID
+ExperimentalUnitID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a list of ExperimentalUnitIDs returns a list of Sample IDs
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_experimental_unit_ids
+{
+    my $self = shift;
+    my($experimentalUnitIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($experimentalUnitIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentalUnitIDs\" (value was \"$experimentalUnitIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_experimental_unit_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_experimental_unit_ids
+    if (0 == @{$experimentalUnitIDs}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_experimental_unit_ids requires a list of valid experimental unit ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_sample_ids_by_experimental_unit_ids'); 
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+    my $get_sample_ids_by_experimental_unit_ids_q = 
+        qq^select distinct sam.id   
+           from  Sample sam  
+           inner join HasExpressionSample hes on sam.id = hes.to_link  
+           inner join ExperimentalUnit eu on hes.from_link = eu.id
+           where eu.id in (^. 
+           join(",", ("?") x @{$experimentalUnitIDs}) . ") "; 
+    my $get_sample_ids_by_experimental_unit_ids_qh = $dbh->prepare($get_sample_ids_by_experimental_unit_ids_q) or die 
+                                                              "Unable to prepare get_sample_ids_by_experimental_unit_ids_q : ". 
+                                                              $get_sample_ids_by_experimental_unit_ids_q . " : " . dbh->errstr() . "\n\n"; 
+    $get_sample_ids_by_experimental_unit_ids_qh->execute(@{$experimentalUnitIDs}) or die "Unable to execute get_sample_ids_by_experimental_unit_ids_q : ". 
+        $get_sample_ids_by_experimental_unit_ids_q . " : " . $get_sample_ids_by_experimental_unit_ids_qh->errstr() . "\n\n"; 
+    while (my ($sample_id) = $get_sample_ids_by_experimental_unit_ids_qh->fetchrow_array()) 
+    { 
+	push(@$sampleIDs,$sample_id);
+    } 
+    #END get_expression_sample_ids_by_experimental_unit_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_experimental_unit_ids');
+    }
+    return($sampleIDs);
 }
 
 
@@ -1214,11 +1419,10 @@ sub get_expression_samples_data_by_experiment_meta_ids
     $experimentMetaExpressionDataSamplesMapping = {}; 
     if (0 == @{$experimentMetaIDs}) 
     { 
-        return $experimentMetaExpressionDataSamplesMapping; 
+        my $msg = "get_expression_samples_data_by_experimental_meta_ids requires a list of valid experimental unit ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_samples_data_by_experiment_meta_ids'); 
     } 
-#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '',       
-#                          { RaiseError => 1, ShowErrorStatement => 1 }   
-#       );                                                                                                                              
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
@@ -1266,6 +1470,110 @@ sub get_expression_samples_data_by_experiment_meta_ids
 							       method_name => 'get_expression_samples_data_by_experiment_meta_ids');
     }
     return($experimentMetaExpressionDataSamplesMapping);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_experiment_meta_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_experiment_meta_ids($experimentMetaIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$experimentMetaIDs is an ExperimentMetaIDs
+$sampleIDs is a SampleIDs
+ExperimentMetaIDs is a reference to a list where each element is an ExperimentMetaID
+ExperimentMetaID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$experimentMetaIDs is an ExperimentMetaIDs
+$sampleIDs is a SampleIDs
+ExperimentMetaIDs is a reference to a list where each element is an ExperimentMetaID
+ExperimentMetaID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a list of ExperimentMetaIDs returns a list of Sample IDs
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_experiment_meta_ids
+{
+    my $self = shift;
+    my($experimentMetaIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($experimentMetaIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentMetaIDs\" (value was \"$experimentMetaIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_experiment_meta_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_experiment_meta_ids
+    $sampleIDs = [];
+    if (0 == @{$experimentMetaIDs}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_experimental_meta_ids requires a list of valid experimental unit ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_sample_ids_by_experiment_meta_ids'); 
+    } 
+
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+     my $get_experimental_unit_ids_by_experiment_meta_ids_q = 
+        qq^select distinct sam.id
+           from Sample sam   
+           inner join HasExpressionSample hes on sam.id = hes.to_link 
+           inner join ExperimentalUnit eu on hes.from_link = eu.id   
+           inner join HasExperimentalUnit heu on eu.id = heu.to_link  
+           inner join ExperimentMeta em on heu.from_link = em.id  
+           where em.id in (^. 
+	   join(",", ("?") x @{$experimentMetaIDs}) . ") "; 
+    my $get_experimental_unit_ids_by_experiment_meta_ids_qh = $dbh->prepare($get_experimental_unit_ids_by_experiment_meta_ids_q) or die 
+                                                              "Unable to prepare get_experimental_unit_ids_by_experiment_meta_ids_q : ". 
+							      $get_experimental_unit_ids_by_experiment_meta_ids_q . " : " . dbh->errstr() . "\n\n"; 
+    $get_experimental_unit_ids_by_experiment_meta_ids_qh->execute(@{$experimentMetaIDs}) or 
+                               die "Unable to execute get_experimental_unit_ids_by_experiment_meta_ids_q : ". 
+			       $get_experimental_unit_ids_by_experiment_meta_ids_q . " : " . $get_experimental_unit_ids_by_experiment_meta_ids_qh->errstr() . "\n\n"; 
+    while (my ($sample_id) = $get_experimental_unit_ids_by_experiment_meta_ids_qh->fetchrow_array()) 
+    { 
+	push(@$sampleIDs,$sample_id);
+    } 
+    #END get_expression_sample_ids_by_experiment_meta_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_experiment_meta_ids');
+    }
+    return($sampleIDs);
 }
 
 
@@ -1449,10 +1757,12 @@ sub get_expression_samples_data_by_strain_ids
     my($strainExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_strain_ids
     $strainExpressionDataSamplesMapping = {};
-    if(0 == @{$strainIDs})
-    {
-	return $strainExpressionDataSamplesMapping;
-    }
+    if (0 == @{$strainIDs}) 
+    { 
+        my $msg = "get_expression_samples_data_by_strain_ids requires a list of strain ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_samples_data_by_strain_ids'); 
+    } 
     my $sample_type_part = ""; 
     if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
     { 
@@ -1474,9 +1784,6 @@ sub get_expression_samples_data_by_strain_ids
     { 
         #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.                                                                                                                                                           
     } 
-#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
-#                           { RaiseError => 1, ShowErrorStatement => 1 } 
-#        ); 
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
@@ -1522,6 +1829,134 @@ sub get_expression_samples_data_by_strain_ids
 							       method_name => 'get_expression_samples_data_by_strain_ids');
     }
     return($strainExpressionDataSamplesMapping);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_strain_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_strain_ids($strainIDs, $sampleType)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$strainIDs is a StrainIDs
+$sampleType is a SampleType
+$sampleIDs is a SampleIDs
+StrainIDs is a reference to a list where each element is a StrainID
+StrainID is a string
+SampleType is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$strainIDs is a StrainIDs
+$sampleType is a SampleType
+$sampleIDs is a SampleIDs
+StrainIDs is a reference to a list where each element is a StrainID
+StrainID is a string
+SampleType is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a list of Strains, and a SampleType, it returns a list of Sample IDs
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_strain_ids
+{
+    my $self = shift;
+    my($strainIDs, $sampleType) = @_;
+
+    my @_bad_arguments;
+    (ref($strainIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"strainIDs\" (value was \"$strainIDs\")");
+    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_strain_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_strain_ids
+    $sampleIDs = [];
+    if (0 == @{$strainIDs}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_strain_ids requires a list of strain ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_sample_ids_by_strain_ids'); 
+    } 
+    my $sample_type_part = ""; 
+    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    { 
+        $sample_type_part = " and sam.type = 'RNA-Seq' "; 
+    } 
+    elsif(uc($sampleType) eq "QPCR") 
+    { 
+        $sample_type_part = " and sam.type = 'qPCR' "; 
+    } 
+    elsif(uc($sampleType) eq "MICROARRAY") 
+    { 
+        $sample_type_part = " and sam.type = 'microarray' "; 
+    } 
+    elsif(uc($sampleType) eq "PROTEOMICS") 
+    { 
+        $sample_type_part = " and sam.type = 'proteomics' "; 
+    } 
+    else 
+    { 
+        #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty. 
+    } 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+ 
+    my $get_sample_ids_by_strain_ids_q = 
+        qq^select distinct sam.id 
+           from Sample sam 
+           inner join StrainWithSample sws on sam.id = sws.to_link 
+           inner join Strain str on sws.from_link = str.id   
+           where str.id in (^. 
+	   join(",", ("?") x @{$strainIDs}) . ") ". 
+	   $sample_type_part; 
+    my $get_sample_ids_by_strain_ids_qh = $dbh->prepare($get_sample_ids_by_strain_ids_q) or die
+                                                              "Unable to prepare get_sample_ids_by_strain_ids_q : ".
+							      $get_sample_ids_by_strain_ids_q . " : " . dbh->errstr() . "\n\n";
+    $get_sample_ids_by_strain_ids_qh->execute(@{$strainIDs}) or die "Unable to execute get_sample_ids_by_strain_ids_q : ".
+	$get_sample_ids_by_strain_ids_q . " : " . $get_sample_ids_by_strain_ids_qh->errstr() . "\n\n";
+    while (my ($sample_id) = $get_sample_ids_by_strain_ids_qh->fetchrow_array()) 
+    { 
+	push(@$sampleIDs,$sample_id);
+    } 
+    #END get_expression_sample_ids_by_strain_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_strain_ids');
+    }
+    return($sampleIDs);
 }
 
 
@@ -1712,29 +2147,12 @@ sub get_expression_samples_data_by_genome_ids
     my($genomeExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_genome_ids
     $genomeExpressionDataSamplesMapping = {};
-    if (0 == @{$genomeIDs})
-    {
-	return $genomeExpressionDataSamplesMapping;
-    }
-
-#print "\nDBNAME : ".  $self->{dbName};
-#print "\nDBUSER : ".  $self->{dbUser}; 
-#print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
-
-#my $connect1 = 'DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost};
-#my $connect2 = $self->{dbUser};
-
-#print "CONNECT 1 &".$connect1."&\n";
-#print "CONNECT 2 &".$connect2."&\n";
-
-#    my $dbh = DBI->connect($connect1, $connect2, '', 
-#                           { RaiseError => 1, ShowErrorStatement => 1 } 
-#        ); 
-
-
-#    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
-#                           { RaiseError => 1, ShowErrorStatement => 1 } 
-#        ); 
+    if (0 == @{$genomeIDs}) 
+    { 
+        my $msg = "get_expression_samples_data_by_genome_ids requires a list of genome ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_samples_data_by_genome_ids'); 
+    } 
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
@@ -1810,6 +2228,147 @@ sub get_expression_samples_data_by_genome_ids
 							       method_name => 'get_expression_samples_data_by_genome_ids');
     }
     return($genomeExpressionDataSamplesMapping);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_genome_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_genome_ids($genomeIDs, $sampleType, $wildTypeOnly)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomeIDs is a GenomeIDs
+$sampleType is a SampleType
+$wildTypeOnly is a WildTypeOnly
+$sampleIDs is a SampleIDs
+GenomeIDs is a reference to a list where each element is a GenomeID
+GenomeID is a string
+SampleType is a string
+WildTypeOnly is an int
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomeIDs is a GenomeIDs
+$sampleType is a SampleType
+$wildTypeOnly is a WildTypeOnly
+$sampleIDs is a SampleIDs
+GenomeIDs is a reference to a list where each element is a GenomeID
+GenomeID is a string
+SampleType is a string
+WildTypeOnly is an int
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_genome_ids
+{
+    my $self = shift;
+    my($genomeIDs, $sampleType, $wildTypeOnly) = @_;
+
+    my @_bad_arguments;
+    (ref($genomeIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genomeIDs\" (value was \"$genomeIDs\")");
+    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
+    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_genome_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_genome_ids
+    $sampleIDs = [];
+    if (0 == @{$genomeIDs}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_genome_ids requires a list of genome ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_sample_ids_by_genome_ids'); 
+    } 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+ 
+    my $wild_type_part = ""; 
+    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
+    { 
+        $wild_type_part = " and str.wildType = 'Y' "; 
+    } 
+    my $sample_type_part = ""; 
+    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    { 
+        $sample_type_part = " and sam.type = 'RNA-Seq' "; 
+    } 
+    elsif(uc($sampleType) eq "QPCR") 
+    { 
+        $sample_type_part = " and sam.type = 'qPCR' "; 
+    } 
+    elsif(uc($sampleType) eq "MICROARRAY") 
+    { 
+        $sample_type_part = " and sam.type = 'microarray' "; 
+    } 
+    elsif(uc($sampleType) eq "PROTEOMICS") 
+    { 
+        $sample_type_part = " and sam.type = 'proteomics' "; 
+    } 
+    else 
+    { 
+        #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.   
+    } 
+    my $get_strain_ids_by_genome_ids_q = 
+        qq^select distinct sam.id  
+           from Sample sam 
+           inner join StrainWithSample sws on sam.id = sws.to_link 
+           inner join Strain str on sws.from_link = str.id 
+           inner join GenomeParentOf gpo on str.id = gpo.to_link 
+           inner join Genome gen on gpo.from_link = gen.id     
+           where gen.id in (^. 
+	   join(",", ("?") x @{$genomeIDs}). ") ". 
+           $wild_type_part . 
+	   $sample_type_part; 
+    my $get_strain_ids_by_genome_ids_qh = $dbh->prepare($get_strain_ids_by_genome_ids_q) or die
+	"Unable to prepare get_strain_ids_by_genome_ids_q : ".
+	$get_strain_ids_by_genome_ids_q . " : " . dbh->errstr() . "\n\n";
+    $get_strain_ids_by_genome_ids_qh->execute(@{$genomeIDs}) or die "Unable to execute get_strain_ids_by_genome_ids_q : ".
+	$get_strain_ids_by_genome_ids_q . " : " . $get_strain_ids_by_genome_ids_qh->errstr() . "\n\n";
+    while (my ($sample_id) = $get_strain_ids_by_genome_ids_qh->fetchrow_array())
+    {
+	push(@$sampleIDs,$sample_id);
+    }
+    #END get_expression_sample_ids_by_genome_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_genome_ids');
+    }
+    return($sampleIDs);
 }
 
 
@@ -2006,7 +2565,9 @@ sub get_expression_samples_data_by_ontology_ids
     $ontologyExpressionDataSampleMapping = {}; 
     if (0 == @{$ontologyIDs}) 
     { 
-        return $ontologyExpressionDataSampleMapping; 
+        my $msg = "get_expression_samples_data_by_ontology_ids requires a list of ontology ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+							       method_name => 'get_expression_samples_data_by_ontology_ids'); 
     } 
     if (uc($AndOr) eq 'AND')
     {
@@ -2139,6 +2700,204 @@ sub get_expression_samples_data_by_ontology_ids
 							       method_name => 'get_expression_samples_data_by_ontology_ids');
     }
     return($ontologyExpressionDataSampleMapping);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_ontology_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_ontology_ids($ontologyIDs, $AndOr, $genomeId, $sampleType, $wildTypeOnly)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ontologyIDs is an OntologyIDs
+$AndOr is a string
+$genomeId is a GenomeID
+$sampleType is a SampleType
+$wildTypeOnly is a WildTypeOnly
+$sampleIDs is a SampleIDs
+OntologyIDs is a reference to a list where each element is an OntologyID
+OntologyID is a string
+GenomeID is a string
+SampleType is a string
+WildTypeOnly is an int
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ontologyIDs is an OntologyIDs
+$AndOr is a string
+$genomeId is a GenomeID
+$sampleType is a SampleType
+$wildTypeOnly is a WildTypeOnly
+$sampleIDs is a SampleIDs
+OntologyIDs is a reference to a list where each element is an OntologyID
+OntologyID is a string
+GenomeID is a string
+SampleType is a string
+WildTypeOnly is an int
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_ontology_ids
+{
+    my $self = shift;
+    my($ontologyIDs, $AndOr, $genomeId, $sampleType, $wildTypeOnly) = @_;
+
+    my @_bad_arguments;
+    (ref($ontologyIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ontologyIDs\" (value was \"$ontologyIDs\")");
+    (!ref($AndOr)) or push(@_bad_arguments, "Invalid type for argument \"AndOr\" (value was \"$AndOr\")");
+    (!ref($genomeId)) or push(@_bad_arguments, "Invalid type for argument \"genomeId\" (value was \"$genomeId\")");
+    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
+    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_ontology_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_ontology_ids
+    $sampleIDs = [];
+    if (0 == @{$ontologyIDs})
+    { 
+        my $msg = "get_expression_sample_ids_by_ontology_ids requires a list of ontology ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							     method_name => 'get_expression_sample_ids_by_ontology_ids');
+    } 
+    if (uc($AndOr) eq 'AND')
+    { 
+        $AndOr = 'and'; 
+    } 
+    elsif (uc($AndOr) eq 'OR') 
+    { 
+        $AndOr = 'or'; 
+    } 
+    else  #DEFAULTS TO OR : Really should have a warning or error message, but this is undefined KBase wide.  Meantime will default.  
+    { 
+        $AndOr = 'or'; 
+    } 
+    my $wild_type_part = ""; 
+    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
+    { 
+        $wild_type_part = " and str.wildType = 'Y' "; 
+    } 
+    my $sample_type_part = ""; 
+    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    { 
+        $sample_type_part = " and sam.type = 'RNA-Seq' "; 
+    } 
+    elsif(uc($sampleType) eq "QPCR") 
+    { 
+        $sample_type_part = " and sam.type = 'qPCR' "; 
+    } 
+    elsif(uc($sampleType) eq "MICROARRAY")
+    {
+        $sample_type_part = " and sam.type = 'microarray' ";
+    } 
+    elsif(uc($sampleType) eq "PROTEOMICS") 
+    { 
+        $sample_type_part = " and sam.type = 'proteomics' "; 
+    } 
+    else 
+    { 
+        #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.         
+    } 
+    my %distinct_ontologies; 
+    foreach my $ont_id (@{$ontologyIDs}) 
+    { 
+        $distinct_ontologies{$ont_id} = 1; 
+    } 
+    my $distinct_ontology_count = scalar(keys(%distinct_ontologies)); 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_sample_ids_by_ontology_ids_q_p1 = qq^select distinct sam.id as samid ^;
+    my $get_sample_ids_by_ontology_ids_q_sub = ", ont.id as ontid "; 
+    my $get_sample_ids_by_ontology_ids_q_p2 =
+            qq^from Sample sam
+               inner join StrainWithSample sws on sam.id = sws.to_link  
+               inner join Strain str on sws.from_link = str.id               
+               inner join GenomeParentOf gpo on str.id = gpo.to_link    
+               inner join Genome gen on gpo.from_link = gen.id   
+               inner join SampleHasAnnotations sha on sha.from_link = sam.id  
+               inner join OntologyForSample ofs on ofs.to_link = sha.to_link  
+               inner join Ontology ont on ofs.from_link = ont.id  
+               where gen.id = ? ^.
+               $sample_type_part . 
+               $wild_type_part . 
+            qq^ and ont.id in ( ^. 
+            join(",", ("?") x $distinct_ontology_count). ") ";
+    if (($AndOr eq 'or') || ($distinct_ontology_count == 1)) 
+    { 
+	my $get_sample_ids_by_ontology_ids_q = $get_sample_ids_by_ontology_ids_q_p1 . $get_sample_ids_by_ontology_ids_q_p2;
+        my $get_sample_ids_by_ontology_ids_qh = $dbh->prepare($get_sample_ids_by_ontology_ids_q) or die 
+                                                              "Unable to prepare get_sample_ids_by_ontolgy_ids_q : ".
+                                                              $get_sample_ids_by_ontology_ids_q . " : " . dbh->errstr() . "\n\n";
+        $get_sample_ids_by_ontology_ids_qh->execute($genomeId, keys(%distinct_ontologies))
+            or die "Unable to execute get_sample_ids_by_ontology_ids_q : ". 
+            $get_sample_ids_by_ontology_ids_q . " : " . $get_sample_ids_by_ontology_ids_qh->errstr() . "\n\n";
+        while (my ($sample_id) = $get_sample_ids_by_ontology_ids_qh->fetchrow_array())
+        {
+            push(@$sampleIDs,$sample_id);
+        } 
+    }
+    elsif ($AndOr eq 'and') 
+    { 
+        my $get_sample_ids_by_ontology_ids_q = 
+            qq^select results.samid from ( ^. 
+	    $get_sample_ids_by_ontology_ids_q_p1 .
+	    $get_sample_ids_by_ontology_ids_q_sub . 
+	    $get_sample_ids_by_ontology_ids_q_p2.
+            qq^) results  
+               group by results.samid  
+               having count(results.ontid) = ^ . $distinct_ontology_count; 
+        #print "QUERY : " . $get_sample_ids_by_ontology_ids_q . "\n";  
+	my $get_sample_ids_by_ontology_ids_qh = $dbh->prepare($get_sample_ids_by_ontology_ids_q) or die 
+                                                              "Unable to prepare get_sample_ids_by_ontolgy_ids_q : ". 
+                                                              $get_sample_ids_by_ontology_ids_q . " : " . dbh->errstr() . "\n\n"; 
+        $get_sample_ids_by_ontology_ids_qh->execute($genomeId, keys(%distinct_ontologies)) 
+            or die "Unable to execute get_sample_ids_by_ontology_ids_q : ". 
+            $get_sample_ids_by_ontology_ids_q . " : " . $get_sample_ids_by_ontology_ids_qh->errstr() . "\n\n"; 
+        while (my ($sample_id) = $get_sample_ids_by_ontology_ids_qh->fetchrow_array()) 
+        { 
+            push(@$sampleIDs,$sample_id); 
+        } 
+    }
+    #END get_expression_sample_ids_by_ontology_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_ontology_ids');
+    }
+    return($sampleIDs);
 }
 
 

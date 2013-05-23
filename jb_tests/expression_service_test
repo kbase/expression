@@ -19,24 +19,39 @@ print "get_expression_samples_data()\n";
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
-$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'],
-								['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'],
+#					['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'], []); 
 #print Dumper($result) . "\n----------------------------\n";
-
 
 #get_expression_samples_data_by_series_ids\
 print "get_expression_samples_data_by_series_ids()\n";
 #$result = $client->get_expression_samples_data_by_series_ids(['kb|series.1','kb|series.0']);
 #print Dumper($result) . "\n----------------------------\n";
 
+#get_expression_sample_ids_by_series_ids\ 
+print "get_expression_sample_ids_by_series_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_series_ids(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
 #get_expression_samples_data_by_experimental_unit_ids
 print "get_expression_samples_data_by_experimental_unit_ids()\n";
 #$result = $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']);
 #print Dumper($result) . "\n----------------------------\n";
 
+#get_expression_sample_ids_by_experimental_unit_ids 
+print "get_expression_sample_ids_by_experimental_unit_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); 
+#print Dumper($result) . "\n----------------------------\n";
+
 #get_expression_samples_data_by_experiment_meta_ids 
-#print "get_expression_samples_data_by_experiment_meta_ids()\n"; 
+print "get_expression_samples_data_by_experiment_meta_ids()\n"; 
 #$result = $client->get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_experiment_meta_ids 
+print "get_expression_sample_ids_by_experiment_meta_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
 #print Dumper($result) . "\n----------------------------\n"; 
 
 #get_expression_samples_data_by_strain_ids
@@ -44,6 +59,11 @@ print "get_expression_samples_data_by_strain_ids()\n";
 #$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.7634','kb|str.999'],'microarray');
 #$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.999'],'microarray');
 #print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_sample_ids_by_strain_ids 
+print "get_expression_sample_ids_by_strain_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_strain_ids(['kb|str.7634','kb|str.999'],'microarray'); 
+#print Dumper($result) . "\n----------------------------\n"; 
 
 #get_expression_samples_data_by_genome_ids
 print "get_expression_samples_data_by_genome_ids()\n";
@@ -53,6 +73,11 @@ print "get_expression_samples_data_by_genome_ids()\n";
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.0'],'microarray','Y');
 #print Dumper($result) . "\n----------------------------\n";
  
+#get_expression_samples_data_by_genome_ids 
+print "get_expression_sample_ids_by_genome_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y'); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
 #get_expression_sample_data_by_ontology_ids 
 print "get_expression_samples_data_by_ontology_ids()\n"; 
 #$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y'); 
@@ -60,6 +85,15 @@ print "get_expression_samples_data_by_ontology_ids()\n";
 #$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y'); 
 #$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
 #print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_ontology_ids
+print "get_expression_sample_ids_by_ontology_ids()\n";
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y');
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y');
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y');
+$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
+#print Dumper($result) . "\n----------------------------\n";
+
 
 #get_expression_data_by_feature_ids
 print "get_expression_data_by_feature_ids()\n";
@@ -80,7 +114,7 @@ print "compare_samples()\n";
 #                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
 #                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2}, 
 #                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); 
-print Dumper($result) . "\n----------------------------\n";
+#print Dumper($result) . "\n----------------------------\n";
 
 #compare_samples_vs_default_controls 
 print "compare_samples_vs_default_controls()\n"; 
