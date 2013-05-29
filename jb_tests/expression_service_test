@@ -91,7 +91,7 @@ print "get_expression_sample_ids_by_ontology_ids()\n";
 #$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y');
 #$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y');
 #$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y');
-$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
 #print Dumper($result) . "\n----------------------------\n";
 
 
@@ -144,7 +144,57 @@ print "get_top_changers()\n";
 #$result = $client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'DOWN',10);
 #print Dumper($result) . "\n----------------------------\n";
 
+#get_expression_samples_titles
+print "get_expression_samples_titles()\n"; 
+#$result = $client->get_expression_samples_titles([]);
+#$result = $client->get_expression_samples_titles(['kb|sample.95']);
+#$result = $client->get_expression_samples_titles(['kb|sample.2','kb|sample.3']);
+#print Dumper($result) . "\n----------------------------\n";
 
+#get_expression_samples_descriptions 
+print "get_expression_samples_descriptions()\n"; 
+#$result = $client->get_expression_samples_descriptions(['kb|sample.2','kb|sample.3']);
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_samples_molecules
+print "get_expression_samples_molecules()\n";
+#$result = $client->get_expression_samples_molecules(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_types
+print "get_expression_samples_types()\n";
+#$result = $client->get_expression_samples_types(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_external_source_ids
+print "get_expression_samples_external_source_ids()\n";
+#$result = $client->get_expression_samples_external_source_ids(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_original_log2_medians
+print "get_expression_samples_original_log2_medians()\n";
+#$result = $client->get_expression_samples_original_log2_medians(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_series_titles\ 
+print "get_expression_series_titles()\n"; 
+#$result = $client->get_expression_series_titles(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_series_summaries\
+print "get_expression_series_summaries()\n"; 
+$result = $client->get_expression_series_summaries(['kb|series.1','kb|series.0']); 
+print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_series_designs\
+print "get_expression_series_designs()\n";
+$result = $client->get_expression_series_designs(['kb|series.1','kb|series.0']);
+print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_series_external_source_ids\
+print "get_expression_series_external_source_ids()\n"; 
+$result = $client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); 
+print Dumper($result) . "\n----------------------------\n"; 
 
 print "FINAL PRINT\n".Dumper($result) . "\n----------------------------\n";
 

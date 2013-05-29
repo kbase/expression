@@ -2757,7 +2757,7 @@ SampleID is a string
 
 =item Description
 
-given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs
+given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs
 
 =back
 
@@ -3744,6 +3744,907 @@ sub get_top_changers
 
 
 
+=head2 get_expression_samples_titles
+
+  $samplesTitlesMap = $obj->get_expression_samples_titles($sampleIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$samplesTitlesMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$samplesTitlesMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SampleIDs, returns a Hash (key : SampleID, value: Title of Sample)
+
+=back
+
+=cut
+
+sub get_expression_samples_titles
+{
+    my $self = shift;
+    my($sampleIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_samples_titles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_titles');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($samplesTitlesMap);
+    #BEGIN get_expression_samples_titles
+    $samplesTitlesMap = {}; 
+    if (0 == @{$sampleIDs}) 
+    { 
+        return $samplesTitlesMap; 
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+	); 
+    my $get_samples_titles_q = qq^select id, title from Sample where id in (^.
+				    join(",", ("?") x @{$sampleIDs}) . ") "; 
+    my $get_samples_titles_qh = $dbh->prepare($get_samples_titles_q) or die "Unable to prepare : get_samples_titles_q : ". 
+	$get_samples_titles_q . " : " .$dbh->errstr(); 
+    $get_samples_titles_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_titles_q : ".$get_samples_titles_qh->errstr(); 
+    while (my ($sample_id, $title) = $get_samples_titles_qh->fetchrow_array())
+    {
+	$samplesTitlesMap->{$sample_id} = $title;
+    }
+    #END get_expression_samples_titles
+    my @_bad_returns;
+    (ref($samplesTitlesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesTitlesMap\" (value was \"$samplesTitlesMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_samples_titles:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_titles');
+    }
+    return($samplesTitlesMap);
+}
+
+
+
+
+=head2 get_expression_samples_descriptions
+
+  $samplesDescriptionsMap = $obj->get_expression_samples_descriptions($sampleIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$samplesDescriptionsMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$samplesDescriptionsMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SampleIDs, returns a Hash (key : SampleID, value: Description of Sample)
+
+=back
+
+=cut
+
+sub get_expression_samples_descriptions
+{
+    my $self = shift;
+    my($sampleIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_samples_descriptions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_descriptions');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($samplesDescriptionsMap);
+    #BEGIN get_expression_samples_descriptions
+    $samplesDescriptionsMap = {}; 
+    if (0 == @{$sampleIDs})
+    { 
+        return $samplesDescriptionsMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_samples_descriptions_q = qq^select id, description from Sample where id in (^.
+	join(",", ("?") x @{$sampleIDs}) . ") "; 
+    my $get_samples_descriptions_qh = $dbh->prepare($get_samples_descriptions_q) or die "Unable to prepare : get_samples_descriptions_q : ".
+        $get_samples_descriptions_q . " : " .$dbh->errstr(); 
+    $get_samples_descriptions_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_descriptions_q : ".$get_samples_descriptions_qh->errstr();
+    while (my ($sample_id, $description) = $get_samples_descriptions_qh->fetchrow_array())
+    { 
+        $samplesDescriptionsMap->{$sample_id} = $description;
+    } 
+    #END get_expression_samples_descriptions
+    my @_bad_returns;
+    (ref($samplesDescriptionsMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesDescriptionsMap\" (value was \"$samplesDescriptionsMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_samples_descriptions:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_descriptions');
+    }
+    return($samplesDescriptionsMap);
+}
+
+
+
+
+=head2 get_expression_samples_molecules
+
+  $samplesMoleculesMap = $obj->get_expression_samples_molecules($sampleIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$samplesMoleculesMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$samplesMoleculesMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SampleIDs, returns a Hash (key : SampleID, value: Molecule of Sample)
+
+=back
+
+=cut
+
+sub get_expression_samples_molecules
+{
+    my $self = shift;
+    my($sampleIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_samples_molecules:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_molecules');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($samplesMoleculesMap);
+    #BEGIN get_expression_samples_molecules
+    $samplesMoleculesMap = {}; 
+    if (0 == @{$sampleIDs})
+    { 
+        return $samplesMoleculesMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_samples_molecules_q = qq^select id, molecule from Sample where id in (^.
+	join(",", ("?") x @{$sampleIDs}) . ") "; 
+    my $get_samples_molecules_qh = $dbh->prepare($get_samples_molecules_q) or die "Unable to prepare : get_samples_molecules_q : ".
+        $get_samples_molecules_q . " : " .$dbh->errstr(); 
+    $get_samples_molecules_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_molecules_q : ".$get_samples_molecules_qh->errstr();
+    while (my ($sample_id, $molecule) = $get_samples_molecules_qh->fetchrow_array())
+    { 
+        $samplesMoleculesMap->{$sample_id} = $molecule;
+    } 
+    #END get_expression_samples_molecules
+    my @_bad_returns;
+    (ref($samplesMoleculesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesMoleculesMap\" (value was \"$samplesMoleculesMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_samples_molecules:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_molecules');
+    }
+    return($samplesMoleculesMap);
+}
+
+
+
+
+=head2 get_expression_samples_types
+
+  $samplesTypesMap = $obj->get_expression_samples_types($sampleIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$samplesTypesMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$samplesTypesMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SampleIDs, returns a Hash (key : SampleID, value: Type of Sample)
+
+=back
+
+=cut
+
+sub get_expression_samples_types
+{
+    my $self = shift;
+    my($sampleIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_samples_types:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_types');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($samplesTypesMap);
+    #BEGIN get_expression_samples_types
+    $samplesTypesMap = {}; 
+    if (0 == @{$sampleIDs})
+    { 
+        return $samplesTypesMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_samples_types_q = qq^select id, type from Sample where id in (^.
+	join(",", ("?") x @{$sampleIDs}) . ") "; 
+    my $get_samples_types_qh = $dbh->prepare($get_samples_types_q) or die "Unable to prepare : get_samples_types_q : ".
+        $get_samples_types_q . " : " .$dbh->errstr(); 
+    $get_samples_types_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_types_q : ".$get_samples_types_qh->errstr();
+    while (my ($sample_id, $type) = $get_samples_types_qh->fetchrow_array())
+    { 
+        $samplesTypesMap->{$sample_id} = $type;
+    } 
+    #END get_expression_samples_types
+    my @_bad_returns;
+    (ref($samplesTypesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesTypesMap\" (value was \"$samplesTypesMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_samples_types:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_types');
+    }
+    return($samplesTypesMap);
+}
+
+
+
+
+=head2 get_expression_samples_external_source_ids
+
+  $samplesExternalSourceIdMap = $obj->get_expression_samples_external_source_ids($sampleIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$samplesExternalSourceIdMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$samplesExternalSourceIdMap is a SamplesStringMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SampleIDs, returns a Hash (key : SampleID, value: External_Source_ID of Sample (typically GSM))
+
+=back
+
+=cut
+
+sub get_expression_samples_external_source_ids
+{
+    my $self = shift;
+    my($sampleIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_samples_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_external_source_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($samplesExternalSourceIdMap);
+    #BEGIN get_expression_samples_external_source_ids
+    $samplesExternalSourceIdMap = {}; 
+    if (0 == @{$sampleIDs})
+    { 
+        return $samplesExternalSourceIdMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_samples_ex_id_q = qq^select id, externalSourceId from Sample where id in (^.
+	join(",", ("?") x @{$sampleIDs}) . ") "; 
+    my $get_samples_ex_id_qh = $dbh->prepare($get_samples_ex_id_q) or die "Unable to prepare : get_samples_ex_id_q : ".
+        $get_samples_ex_id_q . " : " .$dbh->errstr(); 
+    $get_samples_ex_id_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_ex_id_q : ".$get_samples_ex_id_qh->errstr();
+    while (my ($sample_id, $ex_id) = $get_samples_ex_id_qh->fetchrow_array())
+    { 
+        $samplesExternalSourceIdMap->{$sample_id} = $ex_id;
+    } 
+    #END get_expression_samples_external_source_ids
+    my @_bad_returns;
+    (ref($samplesExternalSourceIdMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesExternalSourceIdMap\" (value was \"$samplesExternalSourceIdMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_samples_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_external_source_ids');
+    }
+    return($samplesExternalSourceIdMap);
+}
+
+
+
+
+=head2 get_expression_samples_original_log2_medians
+
+  $samplesFloatMap = $obj->get_expression_samples_original_log2_medians($sampleIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sampleIDs is a SampleIDs
+$samplesFloatMap is a SamplesFloatMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesFloatMap is a reference to a hash where the key is a SampleID and the value is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$sampleIDs is a SampleIDs
+$samplesFloatMap is a SamplesFloatMap
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+SamplesFloatMap is a reference to a hash where the key is a SampleID and the value is a float
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SampleIDs, returns a Hash (key : SampleID, value: OriginalLog2Median of Sample)
+
+=back
+
+=cut
+
+sub get_expression_samples_original_log2_medians
+{
+    my $self = shift;
+    my($sampleIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_samples_original_log2_medians:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_original_log2_medians');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($samplesFloatMap);
+    #BEGIN get_expression_samples_original_log2_medians
+    $samplesFloatMap = {}; 
+    if (0 == @{$sampleIDs})
+    { 
+        return $samplesFloatMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_samples_olog2_q = qq^select id, originalLog2Median from Sample where id in (^.
+	join(",", ("?") x @{$sampleIDs}) . ") ";
+    my $get_samples_olog2_qh = $dbh->prepare($get_samples_olog2_q) or die "Unable to prepare : get_samples_olog2_q : ".
+        $get_samples_olog2_q . " : " .$dbh->errstr();
+    $get_samples_olog2_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_olog2_q : ".$get_samples_olog2_qh->errstr();
+    while (my ($sample_id, $olog2) = $get_samples_olog2_qh->fetchrow_array()) 
+    { 
+        $samplesFloatMap->{$sample_id} = $olog2; 
+    } 
+
+    #END get_expression_samples_original_log2_medians
+    my @_bad_returns;
+    (ref($samplesFloatMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesFloatMap\" (value was \"$samplesFloatMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_samples_original_log2_medians:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_samples_original_log2_medians');
+    }
+    return($samplesFloatMap);
+}
+
+
+
+
+=head2 get_expression_series_titles
+
+  $seriesStringMap = $obj->get_expression_series_titles($seriesIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Title of Series)
+
+=back
+
+=cut
+
+sub get_expression_series_titles
+{
+    my $self = shift;
+    my($seriesIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_series_titles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_titles');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($seriesStringMap);
+    #BEGIN get_expression_series_titles
+    $seriesStringMap = {}; 
+    if (0 == @{$seriesIDs})
+    { 
+        return $seriesStringMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_series_info_q = qq^select id, title from Series where id in (^.
+        join(",", ("?") x @{$seriesIDs}) . ") ";
+    my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
+        $get_series_info_q . " : " .$dbh->errstr();
+    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
+    { 
+        $seriesStringMap->{$series_id} = $info; 
+    } 
+    #END get_expression_series_titles
+    my @_bad_returns;
+    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_series_titles:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_titles');
+    }
+    return($seriesStringMap);
+}
+
+
+
+
+=head2 get_expression_series_summaries
+
+  $seriesStringMap = $obj->get_expression_series_summaries($seriesIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Summary of Series)
+
+=back
+
+=cut
+
+sub get_expression_series_summaries
+{
+    my $self = shift;
+    my($seriesIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_series_summaries:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_summaries');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($seriesStringMap);
+    #BEGIN get_expression_series_summaries
+    $seriesStringMap = {}; 
+    if (0 == @{$seriesIDs})
+    { 
+        return $seriesStringMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_series_info_q = qq^select id, summary from Series where id in (^.
+        join(",", ("?") x @{$seriesIDs}) . ") ";
+    my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
+        $get_series_info_q . " : " .$dbh->errstr();
+    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
+    { 
+        $seriesStringMap->{$series_id} = $info; 
+    } 
+    #END get_expression_series_summaries
+    my @_bad_returns;
+    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_series_summaries:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_summaries');
+    }
+    return($seriesStringMap);
+}
+
+
+
+
+=head2 get_expression_series_designs
+
+  $seriesStringMap = $obj->get_expression_series_designs($seriesIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Design of Series)
+
+=back
+
+=cut
+
+sub get_expression_series_designs
+{
+    my $self = shift;
+    my($seriesIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_series_designs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_designs');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($seriesStringMap);
+    #BEGIN get_expression_series_designs
+    $seriesStringMap = {}; 
+    if (0 == @{$seriesIDs})
+    { 
+        return $seriesStringMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_series_info_q = qq^select id, design from Series where id in (^.
+        join(",", ("?") x @{$seriesIDs}) . ") ";
+    my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
+        $get_series_info_q . " : " .$dbh->errstr();
+    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
+    { 
+        $seriesStringMap->{$series_id} = $info; 
+    } 
+    #END get_expression_series_designs
+    my @_bad_returns;
+    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_series_designs:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_designs');
+    }
+    return($seriesStringMap);
+}
+
+
+
+
+=head2 get_expression_series_external_source_ids
+
+  $seriesStringMap = $obj->get_expression_series_external_source_ids($seriesIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$seriesIDs is a SeriesIDs
+$seriesStringMap is a SeriesStringMap
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a List of SeriesIDs, returns a Hash (key : SeriesID, value: External_Source_ID of Series (typically GSE))
+
+=back
+
+=cut
+
+sub get_expression_series_external_source_ids
+{
+    my $self = shift;
+    my($seriesIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_external_source_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($seriesStringMap);
+    #BEGIN get_expression_series_external_source_ids
+    $seriesStringMap = {}; 
+    if (0 == @{$seriesIDs})
+    { 
+        return $seriesStringMap;
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_series_info_q = qq^select id, externalSourceId from Series where id in (^.
+        join(",", ("?") x @{$seriesIDs}) . ") ";
+    my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
+        $get_series_info_q . " : " .$dbh->errstr();
+    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
+    { 
+        $seriesStringMap->{$series_id} = $info; 
+    } 
+    #END get_expression_series_external_source_ids
+    my @_bad_returns;
+    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_external_source_ids');
+    }
+    return($seriesStringMap);
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
@@ -4147,6 +5048,99 @@ a reference to a list where each element is an ExperimentalUnitID
 =begin text
 
 a reference to a list where each element is an ExperimentalUnitID
+
+=end text
+
+=back
+
+
+
+=head2 SamplesStringMap
+
+=over 4
+
+
+
+=item Description
+
+Mapping between sample id and corresponding value.   Used as return for get_expression_samples_(titles,descriptions,molecules,types,external_source_ids)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a SampleID and the value is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a SampleID and the value is a string
+
+=end text
+
+=back
+
+
+
+=head2 SamplesFloatMap
+
+=over 4
+
+
+
+=item Description
+
+Mapping between sample id and corresponding value.   Used as return for get_expression_samples_original_log2_median
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a SampleID and the value is a float
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a SampleID and the value is a float
+
+=end text
+
+=back
+
+
+
+=head2 SeriesStringMap
+
+=over 4
+
+
+
+=item Description
+
+Mapping between sample id and corresponding value.   Used as return for get_series_(titles,summaries,designs,external_source_ids)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a SeriesID and the value is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a SeriesID and the value is a string
 
 =end text
 

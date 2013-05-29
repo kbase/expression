@@ -36,6 +36,15 @@ module ExpressionServices {
     /* list of KBase ExperimentUnitIDs */
     typedef list<ExperimentalUnitID> ExperimentalUnitIDs;
     
+    /* Mapping between sample id and corresponding value.   Used as return for get_expression_samples_(titles,descriptions,molecules,types,external_source_ids)*/
+    typedef mapping<SampleID sampleID, string value> SamplesStringMap;
+
+    /* Mapping between sample id and corresponding value.   Used as return for get_expression_samples_original_log2_median*/ 
+    typedef mapping<SampleID sampleID, float originalLog2Median> SamplesFloatMap;
+
+    /* Mapping between sample id and corresponding value.   Used as return for get_series_(titles,summaries,designs,external_source_ids)*/ 
+    typedef mapping<SeriesID seriesID, string value> SeriesStringMap; 
+
     /* mapping kbase feature id as the key and measurement as the value */
     typedef mapping<FeatureID featureID, Measurement measurement> DataExpressionLevelsForSample; 
 
@@ -213,7 +222,7 @@ module ExpressionServices {
     funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (OntologyExpressionDataSampleMapping ontologyExpressionDataSampleMapping);
 
-    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs  */ 
+    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs  */ 
     funcdef get_expression_sample_ids_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (SampleIDs sampleIDs); 
 
@@ -235,4 +244,36 @@ module ExpressionServices {
 
     /* Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction */
     funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, int count) returns (SampleComparisonMapping topChangersMappings);
+
+    /* given a List of SampleIDs, returns a Hash (key : SampleID, value: Title of Sample) */
+    funcdef get_expression_samples_titles(SampleIDs sampleIDs) returns (SamplesStringMap samplesTitlesMap);
+
+    /* given a List of SampleIDs, returns a Hash (key : SampleID, value: Description of Sample) */
+    funcdef get_expression_samples_descriptions(SampleIDs sampleIDs) returns (SamplesStringMap samplesDescriptionsMap);
+
+    /* given a List of SampleIDs, returns a Hash (key : SampleID, value: Molecule of Sample) */
+    funcdef get_expression_samples_molecules(SampleIDs sampleIDs) returns (SamplesStringMap samplesMoleculesMap);
+
+    /* given a List of SampleIDs, returns a Hash (key : SampleID, value: Type of Sample) */
+    funcdef get_expression_samples_types(SampleIDs sampleIDs) returns (SamplesStringMap samplesTypesMap);
+
+    /* given a List of SampleIDs, returns a Hash (key : SampleID, value: External_Source_ID of Sample (typically GSM)) */
+    funcdef get_expression_samples_external_source_ids(SampleIDs sampleIDs) returns (SamplesStringMap samplesExternalSourceIdMap);
+
+    /* given a List of SampleIDs, returns a Hash (key : SampleID, value: OriginalLog2Median of Sample) */ 
+    funcdef get_expression_samples_original_log2_medians(SampleIDs sampleIDs) returns (SamplesFloatMap samplesFloatMap);
+
+    /* given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Title of Series) */
+    funcdef get_expression_series_titles(SeriesIDs seriesIDs) returns (SeriesStringMap seriesStringMap);
+ 
+    /* given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Summary of Series) */
+    funcdef get_expression_series_summaries(SeriesIDs seriesIDs) returns (SeriesStringMap seriesStringMap);
+
+    /* given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Design of Series) */
+    funcdef get_expression_series_designs(SeriesIDs seriesIDs) returns (SeriesStringMap seriesStringMap);
+
+    /* given a List of SeriesIDs, returns a Hash (key : SeriesID, value: External_Source_ID of Series (typically GSE)) */
+    funcdef get_expression_series_external_source_ids(SeriesIDs seriesIDs) returns (SeriesStringMap seriesStringMap);
+
+
 }; 
