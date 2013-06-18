@@ -180,6 +180,107 @@ module ExpressionServices {
     /*mapping between FeatureIds and the mappings between samples and log2level mapping*/
     typedef mapping<FeatureID featureID, SampleMeasurementMapping sampleMeasurementMapping> FeatureSampleMeasurementMapping;
 
+    /*DATA STRUCTURES FOR GEO PARSING*/
+
+    /*Data structure for a GEO Platform */
+    typedef structure { 
+        string gplID;
+	string gplTitle;
+        string gplTechnology; 
+    } GPL; 
+     
+    /*Email for the GSM contact person*/
+    typedef string ContactEmail;
+ 
+    /*First Name of GSM contact person*/
+    typedef string ContactFirstName;
+
+    /*Last Name of GSM contact person*/
+    typedef string ContactLastName;
+
+    /*Institution of GSM contact person*/
+    typedef string ContactInstitution;
+
+    /*Data structure for GSM ContactPerson*/
+    typedef structure {
+	ContactFirstName contactFirstName;
+	ContactLastName contactLastName;
+	ContactInstitution contactInstitution;
+    } ContactPerson;
+
+    /*Mapping between key : ContactEmail and value : ContactPerson Data Structure*/
+    typedef mapping<ContactEmail contactEmail, ContactPerson contactPerson> ContactPeople;
+
+    /*Measurement data structure */
+    typedef structure { 
+        float value;
+        float N;
+        float stddev;
+	float Z_score;
+	float p_value;
+	float median;
+	float mean;
+    } FullMeasurement;
+    
+    /* mapping kbase feature id as the key and FullMeasurement Structure as the value */ 
+    typedef mapping<FeatureID featureID, FullMeasurement fullMeasurement> GsmData; 
+    
+    /* List of GSM level warnings */ 
+    typedef list<string> GsmWarnings;
+
+    /* List of GSE level warnings */
+    typedef list<string> GseWarnings;
+
+    /* List of GSM level errors */
+    typedef list<string> GsmErrors;
+
+    /* List of GSE level errors */
+    typedef list<string> GseErrors;
+
+    /* List of GSM Sample Characteristics from ch1 */
+    typedef list<string> GsmSampleCharacteristics;
+
+    /* GSM OBJECT */
+    typedef structure {
+	string gsmID;
+	string gsmTitle;
+	string gsmDescription;
+	string gsmMolecule;
+	string gsmSubmissionDate;
+	string gsmTaxID;
+	string gsmSampleOrganism;
+        GsmSampleCharacteristics gsmSampleCharacteristics;
+	string gsmProtocol;
+	string gsmValueType;
+	float gsmOriginalLog2Median;
+	GPL gsmPlatform;
+	ContactPeople gsmContactPeople;
+	GsmData gsmData;
+	string gsmFeatureMappingApproach;
+	GsmWarnings gsmWarning;
+	GsmErrors gsmErrors;
+    } GsmObject;
+
+    /* Mapping of Key GSMID to GSM Object */
+    typedef mapping<string gsmKeyId, GsmObject gsmObject> GseSamples;
+
+    /* GSE OBJECT */
+    typedef structure {
+	string gseID;
+	string gseTitle;
+	string gseSummary;
+	string gseDesign;
+	string gseSubmissionDate;
+	string pubMedID;
+	GseSamples gseSamples;
+	GseWarnings gseWarnings;
+	GseErrors gseErrors;
+    } GseObject;
+
+    /* Single integer 1= metaDataOnly, 0 means returns data */
+    typedef int MetaDataOnly; 
+
+
     /*FUNCTIONS*/
     
     /* core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure */
@@ -212,7 +313,7 @@ module ExpressionServices {
     /* given a list of Strains, and a SampleType, it returns a list of Sample IDs*/
     funcdef get_expression_sample_ids_by_strain_ids(StrainIDs strainIDs, SampleType sampleType) returns (SampleIDs sampleIDs); 
 
-    /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample*/
+    /* given a list of Genomes, a SampleType and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample*/
     funcdef get_expression_samples_data_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (GenomeExpressionDataSamplesMapping genomeExpressionDataSamplesMapping);
 
     /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs*/ 
@@ -275,5 +376,10 @@ module ExpressionServices {
     /* given a List of SeriesIDs, returns a Hash (key : SeriesID, value: External_Source_ID of Series (typically GSE)) */
     funcdef get_expression_series_external_source_ids(SeriesIDs seriesIDs) returns (SeriesStringMap seriesStringMap);
 
+    /* given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files*/
+    funcdef get_GEO_GSE(string gse_input_id, MetaDataOnly metaDataOnly) returns (GseObject gseObject);
+
+    /* given a GEO GSM ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files*/
+    funcdef get_GEO_GSM(string gsm_input_id, MetaDataOnly metaDataOnly) returns (GsmObject gsmObject);
 
 }; 

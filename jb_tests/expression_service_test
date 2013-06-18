@@ -15,7 +15,7 @@ my $result;
 print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data([]);
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
-#$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
+$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
@@ -183,18 +183,24 @@ print "get_expression_series_titles()\n";
 
 #get_expression_series_summaries\
 print "get_expression_series_summaries()\n"; 
-$result = $client->get_expression_series_summaries(['kb|series.1','kb|series.0']); 
-print Dumper($result) . "\n----------------------------\n"; 
+#$result = $client->get_expression_series_summaries(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
 
 #get_expression_series_designs\
 print "get_expression_series_designs()\n";
-$result = $client->get_expression_series_designs(['kb|series.1','kb|series.0']);
-print Dumper($result) . "\n----------------------------\n";
+#$result = $client->get_expression_series_designs(['kb|series.1','kb|series.0']);
+#print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_series_external_source_ids\
 print "get_expression_series_external_source_ids()\n"; 
-$result = $client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); 
-print Dumper($result) . "\n----------------------------\n"; 
+#$result = $client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_GEO_GSE\ 
+print "get_GEO_GSE()\n"; 
+$result = $client->get_GEO_GSE('GSE21782',1);
+#print Dumper($result) . "\n----------------------------\n"; 
+
 
 print "FINAL PRINT\n".Dumper($result) . "\n----------------------------\n";
 

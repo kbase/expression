@@ -20,6 +20,9 @@ use DBI;
 use Storable qw(dclone);
 use Config::Simple;
 use Data::Dumper; 
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
+use IO::File; 
+use LWP::Simple; 
 #END_HEADER
 
 sub new
@@ -2122,7 +2125,7 @@ Measurement is a float
 
 =item Description
 
-given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample
+given a list of Genomes, a SampleType and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample
 
 =back
 
@@ -4645,6 +4648,420 @@ sub get_expression_series_external_source_ids
 
 
 
+=head2 get_GEO_GSE
+
+  $gseObject = $obj->get_GEO_GSE($gse_input_id, $metaDataOnly)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$gse_input_id is a string
+$metaDataOnly is a MetaDataOnly
+$gseObject is a GseObject
+MetaDataOnly is an int
+GseObject is a reference to a hash where the following keys are defined:
+	gseID has a value which is a string
+	gseTitle has a value which is a string
+	gseSummary has a value which is a string
+	gseDesign has a value which is a string
+	gseSubmissionDate has a value which is a string
+	pubMedID has a value which is a string
+	gseSamples has a value which is a GseSamples
+	gseWarnings has a value which is a GseWarnings
+	gseErrors has a value which is a GseErrors
+GseSamples is a reference to a hash where the key is a string and the value is a GsmObject
+GsmObject is a reference to a hash where the following keys are defined:
+	gsmID has a value which is a string
+	gsmTitle has a value which is a string
+	gsmDescription has a value which is a string
+	gsmMolecule has a value which is a string
+	gsmSubmissionDate has a value which is a string
+	gsmTaxID has a value which is a string
+	gsmSampleOrganism has a value which is a string
+	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
+	gsmProtocol has a value which is a string
+	gsmValueType has a value which is a string
+	gsmOriginalLog2Median has a value which is a float
+	gsmPlatform has a value which is a GPL
+	gsmContactPeople has a value which is a ContactPeople
+	gsmData has a value which is a GsmData
+	gsmFeatureMappingApproach has a value which is a string
+	gsmWarning has a value which is a GsmWarnings
+	gsmErrors has a value which is a GsmErrors
+GsmSampleCharacteristics is a reference to a list where each element is a string
+GPL is a reference to a hash where the following keys are defined:
+	gplID has a value which is a string
+	gplTitle has a value which is a string
+	gplTechnology has a value which is a string
+ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+ContactEmail is a string
+ContactPerson is a reference to a hash where the following keys are defined:
+	contactFirstName has a value which is a ContactFirstName
+	contactLastName has a value which is a ContactLastName
+	contactInstitution has a value which is a ContactInstitution
+ContactFirstName is a string
+ContactLastName is a string
+ContactInstitution is a string
+GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+FeatureID is a string
+FullMeasurement is a reference to a hash where the following keys are defined:
+	value has a value which is a float
+	N has a value which is a float
+	stddev has a value which is a float
+	Z_score has a value which is a float
+	p_value has a value which is a float
+	median has a value which is a float
+	mean has a value which is a float
+GsmWarnings is a reference to a list where each element is a string
+GsmErrors is a reference to a list where each element is a string
+GseWarnings is a reference to a list where each element is a string
+GseErrors is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$gse_input_id is a string
+$metaDataOnly is a MetaDataOnly
+$gseObject is a GseObject
+MetaDataOnly is an int
+GseObject is a reference to a hash where the following keys are defined:
+	gseID has a value which is a string
+	gseTitle has a value which is a string
+	gseSummary has a value which is a string
+	gseDesign has a value which is a string
+	gseSubmissionDate has a value which is a string
+	pubMedID has a value which is a string
+	gseSamples has a value which is a GseSamples
+	gseWarnings has a value which is a GseWarnings
+	gseErrors has a value which is a GseErrors
+GseSamples is a reference to a hash where the key is a string and the value is a GsmObject
+GsmObject is a reference to a hash where the following keys are defined:
+	gsmID has a value which is a string
+	gsmTitle has a value which is a string
+	gsmDescription has a value which is a string
+	gsmMolecule has a value which is a string
+	gsmSubmissionDate has a value which is a string
+	gsmTaxID has a value which is a string
+	gsmSampleOrganism has a value which is a string
+	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
+	gsmProtocol has a value which is a string
+	gsmValueType has a value which is a string
+	gsmOriginalLog2Median has a value which is a float
+	gsmPlatform has a value which is a GPL
+	gsmContactPeople has a value which is a ContactPeople
+	gsmData has a value which is a GsmData
+	gsmFeatureMappingApproach has a value which is a string
+	gsmWarning has a value which is a GsmWarnings
+	gsmErrors has a value which is a GsmErrors
+GsmSampleCharacteristics is a reference to a list where each element is a string
+GPL is a reference to a hash where the following keys are defined:
+	gplID has a value which is a string
+	gplTitle has a value which is a string
+	gplTechnology has a value which is a string
+ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+ContactEmail is a string
+ContactPerson is a reference to a hash where the following keys are defined:
+	contactFirstName has a value which is a ContactFirstName
+	contactLastName has a value which is a ContactLastName
+	contactInstitution has a value which is a ContactInstitution
+ContactFirstName is a string
+ContactLastName is a string
+ContactInstitution is a string
+GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+FeatureID is a string
+FullMeasurement is a reference to a hash where the following keys are defined:
+	value has a value which is a float
+	N has a value which is a float
+	stddev has a value which is a float
+	Z_score has a value which is a float
+	p_value has a value which is a float
+	median has a value which is a float
+	mean has a value which is a float
+GsmWarnings is a reference to a list where each element is a string
+GsmErrors is a reference to a list where each element is a string
+GseWarnings is a reference to a list where each element is a string
+GseErrors is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files
+
+=back
+
+=cut
+
+sub get_GEO_GSE
+{
+    my $self = shift;
+    my($gse_input_id, $metaDataOnly) = @_;
+
+    my @_bad_arguments;
+    (!ref($gse_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gse_input_id\" (value was \"$gse_input_id\")");
+    (!ref($metaDataOnly)) or push(@_bad_arguments, "Invalid type for argument \"metaDataOnly\" (value was \"$metaDataOnly\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_GEO_GSE:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_GEO_GSE');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($gseObject);
+    #BEGIN get_GEO_GSE
+    $gseObject ={};
+ 
+    my $gse_input_id = 'GSE21782'; 
+    my $gse_url = 'ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SOFT/by_series/' . $gse_input_id . "/"; 
+    my $gzip_file_ls_line = get($gse_url); 
+    my @gse_file_records = split (/\n/,$gzip_file_ls_line); 
+    foreach my $gse_record (@gse_file_records) 
+    { 
+	if (scalar(@gse_file_records) > 1)
+	{
+	    $gse_object->{"gseErrors"}->[0] = "Error there appears to multiple GSE SOFT files associated with $gse_input_id :  ".
+		"These are the records listed ". join(","@gse_records).".";
+	    return($gseObject);
+	}
+
+	print "GSE RECORD : $gse_record \n"; 
+	my @line_segments = split (/GSE/,$gse_record); 
+	my $gzip_file = "GSE".$line_segments[-1]; 
+	print "GZIP FILE : $gzip_file \n"; 
+	chomp($gzip_file); 
+	my $gzip_url = $gse_url.$gzip_file; 
+	my $gzip_output = get($gzip_url); 
+ 
+	my $gse_output = new IO::Uncompress::Gunzip \$gzip_output 
+	    or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
+
+	
+        $expressionDataSamplesMap->{$sample_id}={"sampleID" => $sample_id, 
+                                                 "sourceID" => $sample_source_id,
+                                                 "sampleTitle" => $sample_title, 
+                                                 "sampleDescription" => $sample_description, 
+                                                 "molecule" => $sample_molecule, 
+                                                 "sampleType" => $sample_type, 
+                                                 "dataSource" => $sample_dataSource, 
+                                                 "externalSourceID" => $sample_externalSourceId, 
+                                                 "externalSourceDate" => $sample_externalSourceDate, 
+                                                 "kbaseSubmissionDate" => $sample_kbaseSubmissionDate, 
+                                                 "custom" => $sample_custom, 
+                                                 "originalLog2Median" => $sample_originalLog2Median, 
+                                                 "strainID" => $strain_id, 
+                                                 "referenceStrain" => $referenceStrain, 
+                                                 "wildtype" => $wildtype, 
+                                                 "strainDescription" => $strain_description, 
+                                                 "genomeID" => $genome_id, 
+                                                 "genomeScientificName" => $scientific_name, 
+                                                 "platformID" => $platform_id, 
+                                                 "platformTitle" => $platform_title, 
+                                                 "platformTechnology" => $platform_technology, 
+                                                 "experimentalUnitID" => $experimental_unit_id, 
+                                                 "experimentMetaID" => $experiment_meta_id, 
+                                                 "experimentTitle" => $experiment_meta_title, 
+                                                 "experimentDescription" => $experiment_meta_description, 
+                                                 "environmentID" => $environment_id, 
+                                                 "environmentDescription" => $environment_description, 
+                                                 "protocolID" => $protocol_id, 
+                                                 "protocolDescription" => $protocol_description, 
+                                                 "protocolName" => $protocol_name, 
+                                                 "sampleAnnotationIDs" => [], 
+                                                 "seriesIDs" => [], 
+                                                 "personIDs" => [], 
+                                                 "dataExpressionLevelsForSample" => {}}; 
+	
+ 
+	my $line_count = 0; 
+	while (my $gse_file_line=<$gse_output>) 
+	{ 
+	    $line_count++; 
+	} 
+	print "FINAL LINE COUNT $line_count \n"; 
+    } 
+    #END get_GEO_GSE
+    my @_bad_returns;
+    (ref($gseObject) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"gseObject\" (value was \"$gseObject\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_GEO_GSE:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_GEO_GSE');
+    }
+    return($gseObject);
+}
+
+
+
+
+=head2 get_GEO_GSM
+
+  $gsmObject = $obj->get_GEO_GSM($gsm_input_id, $metaDataOnly)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$gsm_input_id is a string
+$metaDataOnly is a MetaDataOnly
+$gsmObject is a GsmObject
+MetaDataOnly is an int
+GsmObject is a reference to a hash where the following keys are defined:
+	gsmID has a value which is a string
+	gsmTitle has a value which is a string
+	gsmDescription has a value which is a string
+	gsmMolecule has a value which is a string
+	gsmSubmissionDate has a value which is a string
+	gsmTaxID has a value which is a string
+	gsmSampleOrganism has a value which is a string
+	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
+	gsmProtocol has a value which is a string
+	gsmValueType has a value which is a string
+	gsmOriginalLog2Median has a value which is a float
+	gsmPlatform has a value which is a GPL
+	gsmContactPeople has a value which is a ContactPeople
+	gsmData has a value which is a GsmData
+	gsmFeatureMappingApproach has a value which is a string
+	gsmWarning has a value which is a GsmWarnings
+	gsmErrors has a value which is a GsmErrors
+GsmSampleCharacteristics is a reference to a list where each element is a string
+GPL is a reference to a hash where the following keys are defined:
+	gplID has a value which is a string
+	gplTitle has a value which is a string
+	gplTechnology has a value which is a string
+ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+ContactEmail is a string
+ContactPerson is a reference to a hash where the following keys are defined:
+	contactFirstName has a value which is a ContactFirstName
+	contactLastName has a value which is a ContactLastName
+	contactInstitution has a value which is a ContactInstitution
+ContactFirstName is a string
+ContactLastName is a string
+ContactInstitution is a string
+GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+FeatureID is a string
+FullMeasurement is a reference to a hash where the following keys are defined:
+	value has a value which is a float
+	N has a value which is a float
+	stddev has a value which is a float
+	Z_score has a value which is a float
+	p_value has a value which is a float
+	median has a value which is a float
+	mean has a value which is a float
+GsmWarnings is a reference to a list where each element is a string
+GsmErrors is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$gsm_input_id is a string
+$metaDataOnly is a MetaDataOnly
+$gsmObject is a GsmObject
+MetaDataOnly is an int
+GsmObject is a reference to a hash where the following keys are defined:
+	gsmID has a value which is a string
+	gsmTitle has a value which is a string
+	gsmDescription has a value which is a string
+	gsmMolecule has a value which is a string
+	gsmSubmissionDate has a value which is a string
+	gsmTaxID has a value which is a string
+	gsmSampleOrganism has a value which is a string
+	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
+	gsmProtocol has a value which is a string
+	gsmValueType has a value which is a string
+	gsmOriginalLog2Median has a value which is a float
+	gsmPlatform has a value which is a GPL
+	gsmContactPeople has a value which is a ContactPeople
+	gsmData has a value which is a GsmData
+	gsmFeatureMappingApproach has a value which is a string
+	gsmWarning has a value which is a GsmWarnings
+	gsmErrors has a value which is a GsmErrors
+GsmSampleCharacteristics is a reference to a list where each element is a string
+GPL is a reference to a hash where the following keys are defined:
+	gplID has a value which is a string
+	gplTitle has a value which is a string
+	gplTechnology has a value which is a string
+ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+ContactEmail is a string
+ContactPerson is a reference to a hash where the following keys are defined:
+	contactFirstName has a value which is a ContactFirstName
+	contactLastName has a value which is a ContactLastName
+	contactInstitution has a value which is a ContactInstitution
+ContactFirstName is a string
+ContactLastName is a string
+ContactInstitution is a string
+GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+FeatureID is a string
+FullMeasurement is a reference to a hash where the following keys are defined:
+	value has a value which is a float
+	N has a value which is a float
+	stddev has a value which is a float
+	Z_score has a value which is a float
+	p_value has a value which is a float
+	median has a value which is a float
+	mean has a value which is a float
+GsmWarnings is a reference to a list where each element is a string
+GsmErrors is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+given a GEO GSM ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files
+
+=back
+
+=cut
+
+sub get_GEO_GSM
+{
+    my $self = shift;
+    my($gsm_input_id, $metaDataOnly) = @_;
+
+    my @_bad_arguments;
+    (!ref($gsm_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gsm_input_id\" (value was \"$gsm_input_id\")");
+    (!ref($metaDataOnly)) or push(@_bad_arguments, "Invalid type for argument \"metaDataOnly\" (value was \"$metaDataOnly\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_GEO_GSM:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_GEO_GSM');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($gsmObject);
+    #BEGIN get_GEO_GSM
+    #END get_GEO_GSM
+    my @_bad_returns;
+    (ref($gsmObject) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"gsmObject\" (value was \"$gsmObject\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_GEO_GSM:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_GEO_GSM');
+    }
+    return($gsmObject);
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
@@ -6184,6 +6601,652 @@ a reference to a hash where the key is a FeatureID and the value is a SampleMeas
 =begin text
 
 a reference to a hash where the key is a FeatureID and the value is a SampleMeasurementMapping
+
+=end text
+
+=back
+
+
+
+=head2 GPL
+
+=over 4
+
+
+
+=item Description
+
+Data structure for a GEO Platform
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+gplID has a value which is a string
+gplTitle has a value which is a string
+gplTechnology has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+gplID has a value which is a string
+gplTitle has a value which is a string
+gplTechnology has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ContactEmail
+
+=over 4
+
+
+
+=item Description
+
+Email for the GSM contact person
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ContactFirstName
+
+=over 4
+
+
+
+=item Description
+
+First Name of GSM contact person
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ContactLastName
+
+=over 4
+
+
+
+=item Description
+
+Last Name of GSM contact person
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ContactInstitution
+
+=over 4
+
+
+
+=item Description
+
+Institution of GSM contact person
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ContactPerson
+
+=over 4
+
+
+
+=item Description
+
+Data structure for GSM ContactPerson
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+contactFirstName has a value which is a ContactFirstName
+contactLastName has a value which is a ContactLastName
+contactInstitution has a value which is a ContactInstitution
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+contactFirstName has a value which is a ContactFirstName
+contactLastName has a value which is a ContactLastName
+contactInstitution has a value which is a ContactInstitution
+
+
+=end text
+
+=back
+
+
+
+=head2 ContactPeople
+
+=over 4
+
+
+
+=item Description
+
+Mapping between key : ContactEmail and value : ContactPerson Data Structure
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+
+=end text
+
+=back
+
+
+
+=head2 FullMeasurement
+
+=over 4
+
+
+
+=item Description
+
+Measurement data structure
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+value has a value which is a float
+N has a value which is a float
+stddev has a value which is a float
+Z_score has a value which is a float
+p_value has a value which is a float
+median has a value which is a float
+mean has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+value has a value which is a float
+N has a value which is a float
+stddev has a value which is a float
+Z_score has a value which is a float
+p_value has a value which is a float
+median has a value which is a float
+mean has a value which is a float
+
+
+=end text
+
+=back
+
+
+
+=head2 GsmData
+
+=over 4
+
+
+
+=item Description
+
+mapping kbase feature id as the key and FullMeasurement Structure as the value
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+
+=end text
+
+=back
+
+
+
+=head2 GsmWarnings
+
+=over 4
+
+
+
+=item Description
+
+List of GSM level warnings
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 GseWarnings
+
+=over 4
+
+
+
+=item Description
+
+List of GSE level warnings
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 GsmErrors
+
+=over 4
+
+
+
+=item Description
+
+List of GSM level errors
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 GseErrors
+
+=over 4
+
+
+
+=item Description
+
+List of GSE level errors
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 GsmSampleCharacteristics
+
+=over 4
+
+
+
+=item Description
+
+List of GSM Sample Characteristics from ch1
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 GsmObject
+
+=over 4
+
+
+
+=item Description
+
+GSM OBJECT
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+gsmID has a value which is a string
+gsmTitle has a value which is a string
+gsmDescription has a value which is a string
+gsmMolecule has a value which is a string
+gsmSubmissionDate has a value which is a string
+gsmTaxID has a value which is a string
+gsmSampleOrganism has a value which is a string
+gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
+gsmProtocol has a value which is a string
+gsmValueType has a value which is a string
+gsmOriginalLog2Median has a value which is a float
+gsmPlatform has a value which is a GPL
+gsmContactPeople has a value which is a ContactPeople
+gsmData has a value which is a GsmData
+gsmFeatureMappingApproach has a value which is a string
+gsmWarning has a value which is a GsmWarnings
+gsmErrors has a value which is a GsmErrors
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+gsmID has a value which is a string
+gsmTitle has a value which is a string
+gsmDescription has a value which is a string
+gsmMolecule has a value which is a string
+gsmSubmissionDate has a value which is a string
+gsmTaxID has a value which is a string
+gsmSampleOrganism has a value which is a string
+gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
+gsmProtocol has a value which is a string
+gsmValueType has a value which is a string
+gsmOriginalLog2Median has a value which is a float
+gsmPlatform has a value which is a GPL
+gsmContactPeople has a value which is a ContactPeople
+gsmData has a value which is a GsmData
+gsmFeatureMappingApproach has a value which is a string
+gsmWarning has a value which is a GsmWarnings
+gsmErrors has a value which is a GsmErrors
+
+
+=end text
+
+=back
+
+
+
+=head2 GseSamples
+
+=over 4
+
+
+
+=item Description
+
+Mapping of Key GSMID to GSM Object
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a string and the value is a GsmObject
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a string and the value is a GsmObject
+
+=end text
+
+=back
+
+
+
+=head2 GseObject
+
+=over 4
+
+
+
+=item Description
+
+GSE OBJECT
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+gseID has a value which is a string
+gseTitle has a value which is a string
+gseSummary has a value which is a string
+gseDesign has a value which is a string
+gseSubmissionDate has a value which is a string
+pubMedID has a value which is a string
+gseSamples has a value which is a GseSamples
+gseWarnings has a value which is a GseWarnings
+gseErrors has a value which is a GseErrors
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+gseID has a value which is a string
+gseTitle has a value which is a string
+gseSummary has a value which is a string
+gseDesign has a value which is a string
+gseSubmissionDate has a value which is a string
+pubMedID has a value which is a string
+gseSamples has a value which is a GseSamples
+gseWarnings has a value which is a GseWarnings
+gseErrors has a value which is a GseErrors
+
+
+=end text
+
+=back
+
+
+
+=head2 MetaDataOnly
+
+=over 4
+
+
+
+=item Description
+
+Single integer 1= metaDataOnly, 0 means returns data
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
 
 =end text
 
