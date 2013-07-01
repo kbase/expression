@@ -230,6 +230,7 @@ compile-docs: build-libs
 # control repository (e.g., cvs, git). It also ensures that you always
 # have the most up-to-date libs and documentation if your compile-docs
 # target depends on the compiled libs.
+#		--scripts scripts \
 
 build-libs:
 	compile_typespec \
@@ -239,7 +240,6 @@ build-libs:
 		--client Bio::KBase::$(SERVICE_NAME)::ExpressionServicesClient \
 		--py biokbase/$(SERVICE_NAME)/ExpressionServicesClient \
 		--js javascript/$(SERVICE_NAME)/ExpressionServicesClient \
-		--scripts scripts \
 		$(SERVICE_SPEC) lib
 
 # creates start/stop/reboot scripts and copies them to the deployment target

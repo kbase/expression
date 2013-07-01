@@ -10,12 +10,13 @@ my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http
 #source /kb/deployment/user-env.sh
 #plackup --listen :9999 /kb/dev_container/modules/expression/lib/ExpressionServices.psgi 
 #my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999","deploy.cfg"); 
 
 my $result;
 print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data([]);
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
-$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
+#$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
@@ -118,7 +119,7 @@ print "compare_samples()\n";
 
 #compare_samples_vs_default_controls 
 print "compare_samples_vs_default_controls()\n"; 
-#$result = $client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); 
+$result = $client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); 
 #print Dumper($result) . "\n----------------------------\n"; 
 
 #compare_samples_vs_the_average
@@ -198,7 +199,7 @@ print "get_expression_series_external_source_ids()\n";
 
 #get_GEO_GSE\ 
 print "get_GEO_GSE()\n"; 
-$result = $client->get_GEO_GSE('GSE21782',1);
+#$result = $client->get_GEO_GSE('GSE21782',1);
 #print Dumper($result) . "\n----------------------------\n"; 
 
 

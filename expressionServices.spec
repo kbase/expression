@@ -14,6 +14,9 @@ module ExpressionServices {
     
     /* List of KBase Sample IDs */
     typedef list<SampleID> SampleIDs;
+
+    /* List of KBase Sample IDs thatt his sample was averaged from */
+    typedef list<SampleID> SampleIDsAveragedFrom;
     
     /* Sample type controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics */
     typedef string SampleType;
@@ -33,7 +36,7 @@ module ExpressionServices {
     /* Kbase ExperimentalUnitID */ 
     typedef string ExperimentalUnitID; 
     
-    /* list of KBase ExperimentUnitIDs */
+    /* list of KBase ExperimentalUnitIDs */
     typedef list<ExperimentalUnitID> ExperimentalUnitIDs;
     
     /* Mapping between sample id and corresponding value.   Used as return for get_expression_samples_(titles,descriptions,molecules,types,external_source_ids)*/
@@ -94,6 +97,12 @@ module ExpressionServices {
     /* list of Sample Annotations associated with the Sample */
     typedef list<SampleAnnotation> SampleAnnotations;
 
+    /* externalSourceId (could be for Platform, Sample or Series)(typically maps to a GPL, GSM or GSE from GEO) */
+    typedef string ExternalSourceID;
+
+    /* list of externalSourceIDs */
+    typedef list<ExternalSourceID> ExternalSourceIDs;
+
     /* Kbase Person ID */ 
     typedef string PersonID; 
     
@@ -115,7 +124,7 @@ module ExpressionServices {
     /* Single integer 1= WildTypeonly, 0 means all strains ok */
     typedef int WildTypeOnly;
     
-    /* Data structure for all the top level metadata and value data for an expression sample */
+    /* Data structure for all the top level metadata and value data for an expression sample.  Essentially a expression Sample object.*/
     typedef structure {
 	SampleID sampleID;
 	string sourceID;
@@ -150,6 +159,7 @@ module ExpressionServices {
 	SampleAnnotations sampleAnnotations;
 	SeriesIDs seriesIDs;
 	PersonIDs personIDs;
+	SampleIDsAveragedFrom sampleIDsAveragedFrom;
 	DataExpressionLevelsForSample dataExpressionLevelsForSample;
 	} ExpressionDataSample;
     
@@ -283,67 +293,82 @@ module ExpressionServices {
 
     /*FUNCTIONS*/
     
-    /* core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure */
+    /* core function used by many others.  Given a list of KBase SampleIds returns mapping of SampleId to expressionSampleDataStructure (essentially the core Expression Sample Object) : 
+    {sample_id -> expressionSampleDataStructure}*/
     funcdef get_expression_samples_data(SampleIDs sampleIDs) returns (ExpressionDataSamplesMap expressionDataSamplesMap);
 
-    /* given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value}.  If features is an empty array [], all features with measurment values will be returned. */
+    /* given a list of sample ids and feature ids it returns a LabelDataMapping {sampleID}->{featureId => value}}.  
+	If feature list is an empty array [], all features with measurment values will be returned. */
     funcdef get_expression_data_by_samples_and_features(SampleIDs sampleIDs, FeatureIDs featureIDs) returns (LabelDataMapping labelDataMapping);
 
-    /* given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples */
+    /* given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples : {series_id -> {sample_id -> expressionSampleDataStructure}}*/
     funcdef get_expression_samples_data_by_series_ids(SeriesIDs seriesIDs) returns (SeriesExpressionDataSamplesMapping seriesExpressionDataSamplesMapping);
 
     /* given a list of SeriesIDs returns a list of Sample IDs */
     funcdef get_expression_sample_ids_by_series_ids(SeriesIDs seriesIDs) returns (SampleIDs sampleIDs);
     
-    /* given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples */
+    /* given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples : {experimental_unit_id -> {sample_id -> expressionSampleDataStructure}}*/
     funcdef get_expression_samples_data_by_experimental_unit_ids(ExperimentalUnitIDs experimentalUnitIDs) returns (ExperimentalUnitExpressionDataSamplesMapping experimentalUnitExpressionDataSamplesMapping);
 
     /* given a list of ExperimentalUnitIDs returns a list of Sample IDs */
     funcdef get_expression_sample_ids_by_experimental_unit_ids(ExperimentalUnitIDs experimentalUnitIDs) returns (SampleIDs sampleIDs); 
     
-    /* given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping */ 
+    /* given a list of ExperimentMetaIDs returns mapping of {experimentMetaID -> {experimentalUnitId -> {sample_id -> expressionSampleDataStructure}}} */ 
     funcdef get_expression_samples_data_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (ExperimentMetaExpressionDataSamplesMapping experimentMetaExpressionDataSamplesMapping); 
 
     /* given a list of ExperimentMetaIDs returns a list of Sample IDs */ 
     funcdef get_expression_sample_ids_by_experiment_meta_ids(ExperimentMetaIDs experimentMetaIDs) returns (SampleIDs sampleIDs); 
     
-    /* given a list of Strains, and a SampleType, it returns a StrainExpressionDataSamplesMapping,  StrainId -> ExpressionDataSample*/
+    /* given a list of Strains, and a SampleType (controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) , it returns a StrainExpressionDataSamplesMapping,  
+    StrainId -> ExpressionSampleDataStructure {strain_id -> {sample_id -> expressionSampleDataStructure}}*/
     funcdef get_expression_samples_data_by_strain_ids(StrainIDs strainIDs, SampleType sampleType) returns (StrainExpressionDataSamplesMapping strainExpressionDataSamplesMapping);
 
     /* given a list of Strains, and a SampleType, it returns a list of Sample IDs*/
     funcdef get_expression_sample_ids_by_strain_ids(StrainIDs strainIDs, SampleType sampleType) returns (SampleIDs sampleIDs); 
 
-    /* given a list of Genomes, a SampleType and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample*/
+    /* given a list of Genomes, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
+    and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  
+    GenomeId -> StrainId -> ExpressionDataSample.  StrainId -> ExpressionSampleDataStructure {genome_id -> {strain_id -> {sample_id -> expressionSampleDataStructure}}}*/
     funcdef get_expression_samples_data_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (GenomeExpressionDataSamplesMapping genomeExpressionDataSamplesMapping);
 
-    /* given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs*/ 
+    /* given a list of GenomeIDs, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
+    and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs*/ 
     funcdef get_expression_sample_ids_by_genome_ids(GenomeIDs genomeIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) returns (SampleIDs sampleIDs); 
 
-    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample  */
+    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, 
+    SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics), wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample  */
     funcdef get_expression_samples_data_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (OntologyExpressionDataSampleMapping ontologyExpressionDataSampleMapping);
 
-    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs  */ 
+    /* given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, 
+    SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics), wildTypeOnly returns a list of SampleIDs  */ 
     funcdef get_expression_sample_ids_by_ontology_ids(OntologyIDs ontologyIDs, string AndOr, GenomeID genomeId, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (SampleIDs sampleIDs); 
 
-    /* given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: featureID->{sample_id->measurement}*/
+    /* given a list of FeatureIDs, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
+    and an int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: {featureID->{sample_id->measurement}}*/
     funcdef get_expression_data_by_feature_ids(FeatureIDs featureIDs, SampleType sampleType, WildTypeOnly wildTypeOnly) 
         returns (FeatureSampleMeasurementMapping featureSampleMeasurementMapping);
 
-    /* Compare samples takes two data structures labelDataMapping, the first is numerator, the 2nd is the denominator in the comparison. returns a SampleComparisonMapping */
+    /* Compare samples takes two data structures labelDataMapping  {sampleID or label}->{featureId or label => value}}, 
+    the first labelDataMapping is the numerator, the 2nd is the denominator in the comparison. returns a 
+    SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(or label)->{feature_id(or label) -> log2Ratio}}} */
     funcdef compare_samples(LabelDataMapping numeratorsDataMapping, LabelDataMapping denominatorsDataMapping) returns (SampleComparisonMapping sampleComparisonMapping);
 
-    /* Compares each sample vs its defined default control.  If the Default control is not specified for a sample, then nothing is returned for that sample */
+    /* Compares each sample vs its defined default control.  If the Default control is not specified for a sample, then nothing is returned for that sample .
+    Takes a list of sampleIDs returns SampleComparisonMapping {sample_id ->{denominator_default_control sample_id ->{feature_id -> log2Ratio}}} */
     funcdef compare_samples_vs_default_controls(SampleIDs numeratorSampleIDs) returns (SampleComparisonMapping sampleComparisonMapping);
 
-    /* Compares each numerator sample vs the average of all the denominator sampleIds*/
+    /* Compares each numerator sample vs the average of all the denominator sampleIds.  Take a list of numerator sample IDs and a list of samples Ids to average for the denominator.
+    returns SampleComparisonMapping {numerator_sample_id->{denominator_sample_id ->{feature_id -> log2Ratio}}} */
     funcdef compare_samples_vs_the_average(SampleIDs numeratorSampleIDs, SampleIDs denominatorSampleIDs) returns (SampleComparisonMapping sampleComparisonMapping);
 
-    /* Takes in comparison results.  If the value is >= on_threshold it is deemed on (1), if <= off_threshold it is off(-1), meets none then 0.  Thresholds normally set to zero */
+    /* Takes in comparison results.  If the value is >= on_threshold it is deemed on (1), if <= off_threshold it is off(-1), meets none then 0.  Thresholds normally set to zero.
+    returns SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(or label)->{feature_id(or label) -> on_off_call (possible values 0,-1,1)}}} */
     funcdef get_on_off_calls(SampleComparisonMapping sampleComparisonMapping, float off_threshold, float on_threshold) returns (SampleComparisonMapping onOffMappings);
 
-    /* Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction */
+    /* Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction.
+    returns SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(or label)->{feature_id(or label) -> log2Ratio (note that the features listed will be limited to the top changers)}}} */
     funcdef get_top_changers(SampleComparisonMapping sampleComparisonMapping, string direction, int count) returns (SampleComparisonMapping topChangersMappings);
 
     /* given a List of SampleIDs, returns a Hash (key : SampleID, value: Title of Sample) */
@@ -375,6 +400,15 @@ module ExpressionServices {
 
     /* given a List of SeriesIDs, returns a Hash (key : SeriesID, value: External_Source_ID of Series (typically GSE)) */
     funcdef get_expression_series_external_source_ids(SeriesIDs seriesIDs) returns (SeriesStringMap seriesStringMap);
+
+    /* get sample ids by the sample's external source id : Takes a list of sample external source ids, and returns a list of sample ids  */
+    funcdef get_expression_sample_ids_by_sample_external_source_ids(ExternalSourceIDs) returns (SampleIDs sampleIDs);
+
+    /* get sample ids by the platform's external source id : Takes a list of platform external source ids, and returns a list of sample ids  */   
+    funcdef get_expression_sample_ids_by_platform_external_source_ids(ExternalSourceIDs) returns (SampleIDs sampleIDs);   
+ 
+    /* get series ids by the series's external source id : Takes a list of series external source ids, and returns a list of series ids  */          
+    funcdef get_expression_series_ids_by_series_external_source_ids(ExternalSourceIDs) returns (SeriesIDs seriesIDs);  
 
     /* given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files*/
     funcdef get_GEO_GSE(string gse_input_id, MetaDataOnly metaDataOnly) returns (GseObject gseObject);

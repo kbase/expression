@@ -1,5 +1,37 @@
 use POSIX;
 use strict;
+use DBI; 
+
+my $deploy_file = "/kb/dev_container/modules/expression/deploy.cfg";
+open (DEPLOY,$deploy_file) or die "Unable to open deploy file : $deploy_file.\n\n"; 
+my @deploy_lines = (<DEPLOY>);
+close(DEPLOY);
+chomp(@deploy_lines);
+my $db_name = undef;
+my $db_host = undef;
+my $db_user = undef;
+foreach my $deploy_line (@deploy_lines)
+{
+	if ($deploy_line =~ m/^dbName/)
+	{
+		my @temp = split('=',$deploy_line);
+		$db_name = trim($temp[1]);
+	}
+	if ($deploy_line =~ m/^dbUser/) 
+        { 
+                my @temp = split('=',$deploy_line);
+                $db_user = trim($temp[1]);
+        } 
+        if ($deploy_line =~ m/^dbhost/) 
+        { 
+                my @temp = split('=',$deploy_line);
+                $db_host = trim($temp[1]);
+        } 
+}
+
+my $dbh = DBI->connect('DBI:mysql:'.$db_name.':'.$db_host, $db_user, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+    );
 
 my $dir = shift;	
 my $ls = `ls $dir`;	
@@ -11,6 +43,92 @@ foreach my $ls_output (@ls_array)
 	$ls_hash{$ls_output} = 1;
 }
 my $error_message = '';
+
+#SEE IF STRAIN FILE EXISTS, IF SO CHECK TO SEE IF ALL THE GENOMES EXIST IS IN THE CDM
+if (exists($ls_hash{'strain.tab'}))
+{ 
+  my $strain_file = $dir. "/strain.tab";
+  open (STRAIN_IN,$strain_file) or die "Unable to open the strain file : $strain_file .\n";
+  my @strain_lines = (<STRAIN_IN>);
+  close(STRAIN_IN);
+  chomp(@strain_lines);
+  for (my $i = 0; $i <  scalar(@strain_lines); $i++) 
+  {     
+  	$strain_lines[$i] =~ s/\r//;
+  } 
+  my %genome_id_hash;  #key genome_id ->value : array_ref to the lines that genome_id appears on 
+  my $strain_header_line = shift(@strain_lines);  #Must contain Genome-id column headers 
+  my @strain_header_columns = split(/\t/,$strain_header_line); 
+  my $genomeIdColIndex = undef; 
+  my $header_counter = 0; 
+  foreach my $header_column (@strain_header_columns) 
+  { 
+    $header_column = trim($header_column); 
+    $genomeIdColIndex = column_header_checker($header_column,'^Genome-id$',$genomeIdColIndex,$header_counter); 
+    $header_counter++; 
+  } 
+  unless (defined($genomeIdColIndex)) 
+  { 
+    $error_message .= "The strain.tab file must have a 'Genome-id' column headers.\n"; 
+  } 
+  if ($genomeIdColIndex eq "duplicate") 
+  {
+	$error_message .= "The strain.tab file has a duplicate column headers for 'Genome-id'.\n"; 
+  } 
+  if ($error_message ne '') 
+  { 
+        print $error_message; 
+        exit; 
+  }  
+  my $strain_line_counter = 2;
+  foreach my $strain_line (@strain_lines) 
+  { 
+        my @strain_elements = split("\t",$strain_line); 
+        if ($strain_elements[$genomeIdColIndex] eq '') 
+        { 
+                $error_message .= "One of the lines in the sample file does not contain a source_id\n"; 
+        } 
+        else #populate data_structure. 
+        { 
+                #populate the %feature_id_hash
+                if (exists($genome_id_hash{$strain_elements[$genomeIdColIndex]}))
+                { 
+                        #if exists add another line number to array
+                        push(@{$genome_id_hash{$strain_elements[$genomeIdColIndex]}},$strain_line_counter);
+                } 
+                else 
+                {
+                        #did not exist, initialize the feature with the first_line_number it existed.
+                        $genome_id_hash{$strain_elements[$genomeIdColIndex]}=[$strain_line_counter];
+                }
+	}
+	$strain_line_counter++;
+  }
+  #DETERMINE IF ANY OF GENOMES ARE NOT IN THE CDM
+  #Do query vs the DB vs all keys in %genome_id_hash
+  #If the genome_id_exists delete the key from the hash  delete $HASH{$key};
+  #After done with that and go through the remaining elements in the hash and report those Genomes that were not found in the DB.
+  #Throw the an error, exit before modifying any of the files.  
+  my $find_genomes_q = qq^ select id from kbase_sapling_v1.Genome where id in (^.
+       		       join(",", ("?") x scalar(keys(%genome_id_hash))) . ") ";
+  my $find_genomes_qh = $dbh->prepare($find_genomes_q) or die "Unable to prepare find_genomes_q : $find_genomes_q : ".$dbh->errstr();
+  $find_genomes_qh->execute(keys(%genome_id_hash)) or die "Unable to execute find_genomes_q : $find_genomes_q : ".$find_genomes_qh->errstr();
+  while (my ($db_genome_id) = $find_genomes_qh->fetchrow_array())
+  {
+	delete $genome_id_hash{$db_genome_id};
+  }
+  if (scalar(keys(%genome_id_hash)) > 0)
+  {
+	$error_message .= "\nThe following Genome IDs in the strain.tab file do not exist in the CDM.  ".
+		       	  "Line number in the strain tab record in '()'.\n";
+	foreach my $temp_genome_id (keys(%genome_id_hash))
+	{
+		$error_message .= "Genome ID : $temp_genome_id (".join (",",@{$genome_id_hash{$temp_genome_id}}).")\n";
+	}
+	$error_message .= "\n";
+  }
+}
+
 if (!exists($ls_hash{'sample.tab'}))
 {
 	$error_message .= "A sample.tab file was not found in $dir : This program requires a sample.tab file.\n";
@@ -120,6 +238,8 @@ if ($error_message ne '')
         exit; 
 } 
 my %measurement_lines_hash; #key {sample_source_id}->{feature_id}= array ref to the elements of the measurement_line 
+my %feature_id_hash; #key {feature_id} -> value pointer to array of line numbers that contain that feature.
+my $measurement_line_counter = 2;
 foreach my $measurement_line (@measurement_lines) 
 { 
         my $measurement_line_error_message = '';	
@@ -140,6 +260,20 @@ foreach my $measurement_line (@measurement_lines)
                   $measurement_line_error_message .= "The measurement record with the source-id ". 
 		  				  $measurement_elements[$measurementSourceIdColIndex] . " does not have a feature_id\n"; 
           } 
+	  else
+	  {
+		#populate the %feature_id_hash
+		if (exists($feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}))
+		{
+			#if exists add another line number to array
+			push(@{$feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}},$measurement_line_counter);	
+		}
+		else
+		{
+			#did not exist, initialize the feature with the first_line_number it existed.
+			$feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}=[$measurement_line_counter];
+		}
+	  }
           unless ($measurement_elements[$valueColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
           { 
                   $measurement_line_error_message .= "The measurement record with the source-id ". 
@@ -169,8 +303,38 @@ foreach my $measurement_line (@measurement_lines)
                 $measurement_lines_hash{$measurement_elements[$sampleIdColIndex]}->{$measurement_elements[$kbFeatureIdColIndex]} 
 						= \@measurement_elements; 
         } 
+	$measurement_line_counter++;
 } 
- 
+
+#DETERMINE IF ANY OF FEATURES ARE NOT IN THE CDM
+#Do query vs the DB vs all keys in %feature_id_hash
+#If the feature_id_exists delete the key from the hash  delete $HASH{$key};
+#After done with that and go through the remaining elements in the hash and report that those Features were not found in the DB.
+#Throw the an error, exit beofre modifying any of the files.
+my $find_features_q = qq^ select id from kbase_sapling_v1.Feature where id in (^.
+                       join(",", ("?") x scalar(keys(%feature_id_hash))) . ") ";
+my $find_features_qh = $dbh->prepare($find_features_q) or die "Unable to prepare find_features_q : $find_features_q : ".$dbh->errstr();
+$find_features_qh->execute(keys(%feature_id_hash)) or die "Unable to execute find_features_q : $find_features_q : ".
+						   $find_features_qh->errstr();
+while (my ($db_feature_id) = $find_features_qh->fetchrow_array())
+{
+        delete $feature_id_hash{$db_feature_id}; 
+} 
+if (scalar(keys(%feature_id_hash)) > 0) 
+{ 
+        $error_message .= "\nThe following Feature IDs in the measurement.tab file do not exist in the CDM.  ".
+                          "Line number in the measurement tab record in '()'.\n"; 
+        foreach my $temp_feature_id (keys(%feature_id_hash))
+        { 
+                $error_message .= "Feature ID : $temp_feature_id (".join (",",@{$feature_id_hash{$temp_feature_id}}).")\n";
+        } 
+        $error_message .= "\n";
+} 
+if ($error_message ne '') 
+{ 
+        print $error_message;
+        exit; 
+} 
 #print "ERROR MESSAGE:\n".$error_message."\n"; 
 
 #go through each sample and load all log2Levels into an array

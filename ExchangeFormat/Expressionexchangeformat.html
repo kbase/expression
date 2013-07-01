@@ -97,15 +97,13 @@ the uploader should do it themselves or run the log2level.tab and sample.tab fil
 The Prepreprocessor will adjust the log2levels for each sample so that the median is zero.  Additionally the preprocessor
 will update the originalLog2Median field for each sample in the sample file with what the originalLog2Median was for a given sample.
 This allows for original values to be obtained, but also puts the data in comparable space.</td></tr>
-<tr><td>custom</td><td>M</td><td>Boolean (true/false)</td><td>Custom refers to a sample being created from the averaging of existing samples, typically replicates.
-Always FALSE, as Custom operations will be done through a future web interface and 
-this exchange format does not support custom averagings.</td></tr>
 <tr><td>persons</td><td>O</td><td>See description</td><td>Comma separated list of source ids (from the person tab) of the contact people for the sample.</td></tr>
 <tr><td>strain-id</td><td>M</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Strain that the sample was for (refers to the strain tab).</td></tr>
 <tr><td>platform-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Platform that the sample was for.</td></tr>
 <tr><td>protocol-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source id of the protocol associated with the sample.</td></tr>
 <tr><td>experimentalUnit-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the Experimental unit that this sample is associated with.</td></tr>
 <tr><td>defaultControlSample-id</td><td>R</td><td>Source or KBase ID</td><td>The KBase identifier or source-id for the sample that should be used for this sample for default comparisons.</td></tr>
+<tr><td>averagedFromSamples</td><td>O</td><td>See description</td><td>Comma separated list of KBase identifiers or source-ids for the samples that were used to create this averaged sample.</td></tr>
 </table>
 
 <h4>Series</h4>
@@ -358,7 +356,7 @@ pairing. Each experimental unit belongs to a particular experiment.</p>
 <td>The Source ID of this ExperimentalUnit.</td></tr>
 <tr><td>Experiment-id</td><td>M</td><td>Source or KBase ID</td><td>The source or KBase ID of the ExperimentMeta entity to which the experimental
 unit belongs</td></tr>
-<tr><td>Environment-id</td><td>M</td><td>Source or KBase ID</td><td>The source or KBase ID of the environment used for the experimental unit.</td></tr>
+<tr><td>Environment-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the environment used for the experimental unit, can be null ".".</td></tr>
 <tr><td>Strain-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the strain in the experimental unit.  Leave this
 field empty to denote a control experimental unit without a strain.</td></tr>
 <tr><td>Group-id</td><td>O</td><td>Source or KBase ID</td><td>The source or KBase ID of the group this experimental unit belongs to.</td></tr>

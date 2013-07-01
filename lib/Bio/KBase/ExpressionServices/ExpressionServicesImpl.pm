@@ -32,37 +32,40 @@ sub new
     };
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
-foreach my $key (keys %ENV) { 
-print "$key = $ENV{$key}\n"; 
-} 
+#foreach my $key (keys %ENV) { 
+#print "$key = $ENV{$key}\n"; 
+#} 
     #Copied from M. Sneddon's TreeImpl.pm from trees.git f63b672dc14f4600329424bc6b404b507e9c2503   
     my($deploy) = @args; 
+#print "\nARGS : ".join("___",@args). "\n";
     if (! $deploy) { 
+#print "\nIN DEPLOY IF \n";
         # if not, then go to the config file defined by the deployment and import                                                                                                                      
         # the deployment settings   
 	my %params; 
+#print "DEPLOYMENT_CONFIG ". $ENV{KB_DEPLOYMENT_CONFIG} . "\n";
         if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) { 
-print "IN CONFIG IF\n"; 
-print "CONFIG FILE $e \n\n";
+#print "IN CONFIG IF\n"; 
+#print "CONFIG FILE $e \n\n";
             my $EXPRESSION_SERVICE_NAME = $ENV{KB_SERVICE_NAME}; 
             my $c = Config::Simple->new(); 
             $c->read($e); 
-print "CONFIG FILE C: $c \n\n";
+#print "CONFIG FILE C: $c \n\n";
 	    my %temp_hash = $c->vars();
-foreach my $c_key (keys(%temp_hash))
-{
-print "CKEY: $c_key : Val $temp_hash{$c_key} \n";
-}
+#foreach my $c_key (keys(%temp_hash))
+#{
+#print "CKEY: $c_key : Val $temp_hash{$c_key} \n";
+#}
             my @param_list = qw(dbName dbUser dbhost); 
-print "PAram list : ".join(":",@param_list)."\n";
+#print "PAram list : ".join(":",@param_list)."\n";
             for my $p (@param_list) 
             { 
-		print "$EXPRESSION_SERVICE_NAME.$p \n\n";
+#print "$EXPRESSION_SERVICE_NAME.$p \n\n";
                 my $v = $c->param("$EXPRESSION_SERVICE_NAME.$p"); 
-print "IN LOOP P: $p v $v \n";
+#print "IN LOOP P: $p v $v \n";
                 if ($v) 
                 { 
-print "IN V IF\n"; 
+#print "IN V IF\n"; 
                     $params{$p} = $v; 
                     $self->{$p} = $v; 
                 } 
@@ -70,28 +73,31 @@ print "IN V IF\n";
         } 
         else 
         { 
-            $self->{dbName} = 'CS_expression'; 
-            $self->{dbUser} = 'expressionSelect'; 
-            $self->{dbhost} = 'localhost'; 
-            print "IN CONFIG ELSE\n"; 
+            $self->{dbName} = 'expression'; 
+            $self->{dbUser} = 'expressionselect'; 
+            $self->{dbhost} = 'db1.chicago.kbase.us'; 
+#print "IN CONFIG ELSE\n"; 
         } 
         #Create a connection to the EXPRESSION (and print a logging debug mssg)              
 	if( 0 < scalar keys(%params) ) { 
             warn "Connection to Expression Service established with the following non-default parameters:\n"; 
             foreach my $key (sort keys %params) { warn "   $key => $params{$key} \n"; } 
         } else { warn "Connection to Expression established with all default parameters.\n"; } 
-	print "IN IF\n"; 
+#print "IN IF\n"; 
     } 
     else 
     { 
-        $self->{dbName} = 'CS_expression'; 
-        $self->{dbUser} = 'expressionSelect'; 
-        $self->{dbhost} = 'localhost'; 
-print "IN ELSE\n"; 
+#        $self->{dbName} = 'CS_expression'; 
+#        $self->{dbUser} = 'expressionSelect'; 
+#        $self->{dbhost} = 'localhost'; 
+         $self->{dbName} = 'expression'; 
+         $self->{dbUser} = 'expressionselect';
+         $self->{dbhost} = 'db1.chicago.kbase.us'; 
+#print "IN ELSE\n"; 
     } 
-print "\nDBNAME : ".  $self->{dbName}; 
-print "\nDBUSER : ".  $self->{dbUser}; 
-print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
+#print "\nDBNAME : ".  $self->{dbName}; 
+#print "\nDBUSER : ".  $self->{dbUser}; 
+#print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
@@ -155,6 +161,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -175,6 +182,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -224,6 +232,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -244,6 +253,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -255,7 +265,8 @@ Measurement is a float
 
 =item Description
 
-core function used by many others.  Given a list of SampleIds returns mapping of SampleId to SampleDataStructure
+core function used by many others.  Given a list of KBase SampleIds returns mapping of SampleId to expressionSampleDataStructure (essentially the core Expression Sample Object) : 
+{sample_id -> expressionSampleDataStructure}
 
 =back
 
@@ -278,10 +289,16 @@ sub get_expression_samples_data
     my($expressionDataSamplesMap);
     #BEGIN get_expression_samples_data
     $expressionDataSamplesMap = {};
-    if (0 == @{$sampleIDs})
-    {
-	return $expressionDataSamplesMap;
-    }
+    if (0 == @{$sampleIDs}) 
+    { 
+        my $msg = "get_expression_samples_data requires a list of valid sample ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_samples_data'); 
+    } 
+#    if (0 == @{$sampleIDs})
+#    {
+#	return $expressionDataSamplesMap;
+#    }
 
 #    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
 #                           { RaiseError => 1, ShowErrorStatement => 1 } 
@@ -304,7 +321,7 @@ sub get_expression_samples_data
                                     inner join StrainWithSample sws on sam.id = sws.to_link 
                                     inner join Strain str on sws.from_link = str.id 
                                     inner join GenomeParentOf gpo on str.id = gpo.to_link 
-                                    inner join Genome gen on gpo.from_link = gen.id 
+                                    inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id 
                                     left outer join PlatformWithSamples pws on sam.id = pws.to_link 
                                     left outer join Platform plt on pws.from_link = plt.id 
                                     left outer join HasExpressionSample hes on sam.id = hes.to_link 
@@ -359,6 +376,7 @@ sub get_expression_samples_data
 						 "protocolName" => $protocol_name,
 						 "sampleAnnotationIDs" => [],
 						 "seriesIDs" => [],
+						 "sampleIDsAveragedFrom" => [],
 						 "personIDs" => [],
 						 "dataExpressionLevelsForSample" => {}};
     }
@@ -404,6 +422,19 @@ sub get_expression_samples_data
     {
           push(@{$expressionDataSamplesMap->{$sample_id}->{"seriesIDs"}},$series_id);
     }
+
+    #SampleIDsAveragedFrom
+    my $get_sample_ids_averaged_from_q = qq^select saf.from_link, saf.to_link
+                                            from SampleAveragedFrom saf
+                                            where saf.to_link in (^. 
+                                         join(",", ("?") x @{$sampleIDs}) . ") "; 
+    my $get_sample_ids_averaged_from_qh = $dbh->prepare($get_sample_ids_averaged_from_q) or die "Unable to prepare : get_sample_ids_averaged_from_q : ". 
+        $get_sample_ids_averaged_from_q . " : " .$dbh->errstr(); 
+    $get_sample_ids_averaged_from_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_sample_ids_averaged_from_q : ".$get_sample_ids_averaged_from_qh->errstr(); 
+    while (my ($averaged_from_sample_id, $averaged_to_sample_id) = $get_sample_ids_averaged_from_qh->fetchrow_array()) 
+    { 
+          push(@{$expressionDataSamplesMap->{$averaged_to_sample_id}->{"sampleIDsAveragedFrom"}},$averaged_from_sample_id); 
+    } 
     
     #PersonIds     
     my $get_sample_person_ids_q = qq^select sam.id, per.id 
@@ -426,7 +457,7 @@ sub get_expression_samples_data
                               inner join SampleMeasurements sme on sam.id = sme.from_link
                               inner join Measurement mea on sme.to_link = mea.id
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link
-                              inner join Feature fea on fmb.from_link = fea.id
+                              inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id
                               where sam.id in (^. 
                            join(",", ("?") x @{$sampleIDs}) . ") ";  
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
@@ -497,7 +528,8 @@ Measurement is a float
 
 =item Description
 
-given a list of sample ids and feature ids it returns a LabelDataMapping ({sampleID}->{featureId => value}.  If features is an empty array [], all features with measurment values will be returned.
+given a list of sample ids and feature ids it returns a LabelDataMapping {sampleID}->{featureId => value}}.  
+If feature list is an empty array [], all features with measurment values will be returned.
 
 =back
 
@@ -538,7 +570,7 @@ sub get_expression_data_by_samples_and_features
                                      inner join SampleMeasurements sms on sam.id = sms.from_link      
                                      inner join Measurement mea on sms.to_link = mea.id       
                                      inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link      
-                                     inner join Feature fea on fmb.from_link = fea.id       
+                                     inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id       
                                      where sam.id in (^.
 				     join(",", ("?") x @{$sampleIDs}). ") ";
     if (scalar(@{$featureIDs}) > 0)
@@ -621,6 +653,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -639,6 +672,7 @@ OntologyName is a string
 OntologyDefinition is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -690,6 +724,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -708,6 +743,7 @@ OntologyName is a string
 OntologyDefinition is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -719,7 +755,7 @@ Measurement is a float
 
 =item Description
 
-given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples
+given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples : {series_id -> {sample_id -> expressionSampleDataStructure}}
 
 =back
 
@@ -745,7 +781,7 @@ sub get_expression_samples_data_by_series_ids
     if (0 == @{$seriesIDs})
     { 
         my $msg = "get_expression_samples_data_by_series_ids requires a list of valid series ids. "; 
-      Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
                                                              method_name => 'get_expression_samples_data_by_series_ids');
     } 
 
@@ -958,6 +994,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -977,6 +1014,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -1028,6 +1066,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -1047,6 +1086,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -1058,7 +1098,7 @@ Measurement is a float
 
 =item Description
 
-given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples
+given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to expressionDataSamples : {experimental_unit_id -> {sample_id -> expressionSampleDataStructure}}
 
 =back
 
@@ -1203,6 +1243,7 @@ sub get_expression_sample_ids_by_experimental_unit_ids
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($sampleIDs);
     #BEGIN get_expression_sample_ids_by_experimental_unit_ids
+    $sampleIDs = [];
     if (0 == @{$experimentalUnitIDs}) 
     { 
         my $msg = "get_expression_sample_ids_by_experimental_unit_ids requires a list of valid experimental unit ids. "; 
@@ -1297,6 +1338,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -1315,6 +1357,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -1368,6 +1411,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 SampleType is a string
 StrainID is a string
@@ -1386,6 +1430,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -1397,7 +1442,7 @@ Measurement is a float
 
 =item Description
 
-given a list of ExperimentMetaIDs returns mapping of ExperimentID to experimentalUnitExpressionDataSamplesMapping
+given a list of ExperimentMetaIDs returns mapping of {experimentMetaID -> {experimentalUnitId -> {sample_id -> expressionSampleDataStructure}}}
 
 =back
 
@@ -1636,6 +1681,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 GenomeID is a string
 ExperimentalUnitID is a string
@@ -1654,6 +1700,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -1707,6 +1754,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 GenomeID is a string
 ExperimentalUnitID is a string
@@ -1725,6 +1773,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -1736,7 +1785,8 @@ Measurement is a float
 
 =item Description
 
-given a list of Strains, and a SampleType, it returns a StrainExpressionDataSamplesMapping,  StrainId -> ExpressionDataSample
+given a list of Strains, and a SampleType (controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) , it returns a StrainExpressionDataSamplesMapping,  
+StrainId -> ExpressionSampleDataStructure {strain_id -> {sample_id -> expressionSampleDataStructure}}
 
 =back
 
@@ -1760,9 +1810,9 @@ sub get_expression_samples_data_by_strain_ids
     my($strainExpressionDataSamplesMapping);
     #BEGIN get_expression_samples_data_by_strain_ids
     $strainExpressionDataSamplesMapping = {};
-    if (0 == @{$strainIDs}) 
+    if (0 == scalar(@{$strainIDs})) 
     { 
-        my $msg = "get_expression_samples_data_by_strain_ids requires a list of strain ids. "; 
+        my $msg = "get_expression_samples_data_by_strain_ids requires a list of valid strain ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_samples_data_by_strain_ids'); 
     } 
@@ -1905,7 +1955,7 @@ sub get_expression_sample_ids_by_strain_ids
     $sampleIDs = [];
     if (0 == @{$strainIDs}) 
     { 
-        my $msg = "get_expression_sample_ids_by_strain_ids requires a list of strain ids. "; 
+        my $msg = "get_expression_sample_ids_by_strain_ids requires a list of valid strain ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_sample_ids_by_strain_ids'); 
     } 
@@ -2023,6 +2073,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 ExperimentalUnitID is a string
 ExperimentMetaID is a string
@@ -2040,6 +2091,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -2097,6 +2149,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 ExperimentalUnitID is a string
 ExperimentMetaID is a string
@@ -2114,6 +2167,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -2125,7 +2179,9 @@ Measurement is a float
 
 =item Description
 
-given a list of Genomes, a SampleType and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  Genome -> StrainId -> ExpressionDataSample
+given a list of Genomes, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
+and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping   ,  
+GenomeId -> StrainId -> ExpressionDataSample.  StrainId -> ExpressionSampleDataStructure {genome_id -> {strain_id -> {sample_id -> expressionSampleDataStructure}}}
 
 =back
 
@@ -2152,7 +2208,7 @@ sub get_expression_samples_data_by_genome_ids
     $genomeExpressionDataSamplesMapping = {};
     if (0 == @{$genomeIDs}) 
     { 
-        my $msg = "get_expression_samples_data_by_genome_ids requires a list of genome ids. "; 
+        my $msg = "get_expression_samples_data_by_genome_ids  requires a list of valid genome ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_samples_data_by_genome_ids'); 
     } 
@@ -2194,7 +2250,7 @@ sub get_expression_samples_data_by_genome_ids
            inner join StrainWithSample sws on sam.id = sws.to_link
            inner join Strain str on sws.from_link = str.id
            inner join GenomeParentOf gpo on str.id = gpo.to_link
-           inner join Genome gen on gpo.from_link = gen.id
+           inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id
            where gen.id in (^.
 	   join(",", ("?") x @{$genomeIDs}). ") ". 
 	   $wild_type_part . 
@@ -2282,7 +2338,8 @@ SampleID is a string
 
 =item Description
 
-given a list of Genomes, a SampleType and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs
+given a list of GenomeIDs, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
+and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of Sample IDs
 
 =back
 
@@ -2309,7 +2366,7 @@ sub get_expression_sample_ids_by_genome_ids
     $sampleIDs = [];
     if (0 == @{$genomeIDs}) 
     { 
-        my $msg = "get_expression_sample_ids_by_genome_ids requires a list of genome ids. "; 
+        my $msg = "get_expression_sample_ids_by_genome_ids requires a list of valid genome ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_sample_ids_by_genome_ids'); 
     } 
@@ -2349,7 +2406,7 @@ sub get_expression_sample_ids_by_genome_ids
            inner join StrainWithSample sws on sam.id = sws.to_link 
            inner join Strain str on sws.from_link = str.id 
            inner join GenomeParentOf gpo on str.id = gpo.to_link 
-           inner join Genome gen on gpo.from_link = gen.id     
+           inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id     
            where gen.id in (^. 
 	   join(",", ("?") x @{$genomeIDs}). ") ". 
            $wild_type_part . 
@@ -2436,6 +2493,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 StrainID is a string
 ExperimentalUnitID is a string
@@ -2453,6 +2511,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -2511,6 +2570,7 @@ ExpressionDataSample is a reference to a hash where the following keys are defin
 	sampleAnnotations has a value which is a SampleAnnotations
 	seriesIDs has a value which is a SeriesIDs
 	personIDs has a value which is a PersonIDs
+	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 StrainID is a string
 ExperimentalUnitID is a string
@@ -2528,6 +2588,7 @@ SeriesIDs is a reference to a list where each element is a SeriesID
 SeriesID is a string
 PersonIDs is a reference to a list where each element is a PersonID
 PersonID is a string
+SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
 FeatureID is a string
 Measurement is a float
@@ -2539,7 +2600,8 @@ Measurement is a float
 
 =item Description
 
-given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms, GenomeId, SampleType, wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample
+given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, 
+SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics), wildTypeOnly returns OntologyID(concatenated if Anded) -> ExpressionDataSample
 
 =back
 
@@ -2568,7 +2630,7 @@ sub get_expression_samples_data_by_ontology_ids
     $ontologyExpressionDataSampleMapping = {}; 
     if (0 == @{$ontologyIDs}) 
     { 
-        my $msg = "get_expression_samples_data_by_ontology_ids requires a list of ontology ids. "; 
+        my $msg = "get_expression_samples_data_by_ontology_ids requires a list of valid ontology ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
 							       method_name => 'get_expression_samples_data_by_ontology_ids'); 
     } 
@@ -2626,7 +2688,7 @@ sub get_expression_samples_data_by_ontology_ids
                inner join StrainWithSample sws on sam.id = sws.to_link 
                inner join Strain str on sws.from_link = str.id 
                inner join GenomeParentOf gpo on str.id = gpo.to_link 
-               inner join Genome gen on gpo.from_link = gen.id 
+               inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id 
                inner join SampleHasAnnotations sha on sha.from_link = sam.id
                inner join OntologyForSample ofs on ofs.to_link = sha.to_link
                inner join Ontology ont on ofs.from_link = ont.id
@@ -2760,7 +2822,8 @@ SampleID is a string
 
 =item Description
 
-given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, SampleType, wildTypeOnly returns a list of SampleIDs
+given a list of ontologyIDs, AndOr operator (and requires sample to have all ontology IDs, or sample has to have any of the terms), GenomeId, 
+SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics), wildTypeOnly returns a list of SampleIDs
 
 =back
 
@@ -2789,7 +2852,7 @@ sub get_expression_sample_ids_by_ontology_ids
     $sampleIDs = [];
     if (0 == @{$ontologyIDs})
     { 
-        my $msg = "get_expression_sample_ids_by_ontology_ids requires a list of ontology ids. ";
+        my $msg = "get_expression_sample_ids_by_ontology_ids requires a list of valid ontology ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							     method_name => 'get_expression_sample_ids_by_ontology_ids');
     } 
@@ -2847,7 +2910,7 @@ sub get_expression_sample_ids_by_ontology_ids
                inner join StrainWithSample sws on sam.id = sws.to_link  
                inner join Strain str on sws.from_link = str.id               
                inner join GenomeParentOf gpo on str.id = gpo.to_link    
-               inner join Genome gen on gpo.from_link = gen.id   
+               inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id   
                inner join SampleHasAnnotations sha on sha.from_link = sam.id  
                inner join OntologyForSample ofs on ofs.to_link = sha.to_link  
                inner join Ontology ont on ofs.from_link = ont.id  
@@ -2956,7 +3019,8 @@ Measurement is a float
 
 =item Description
 
-given a list of FeatureIDs, a SampleType and a int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: featureID->{sample_id->measurement}
+given a list of FeatureIDs, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
+and an int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampleMeasurementMapping: {featureID->{sample_id->measurement}}
 
 =back
 
@@ -2981,21 +3045,17 @@ sub get_expression_data_by_feature_ids
     my($featureSampleMeasurementMapping);
     #BEGIN get_expression_data_by_feature_ids
     $featureSampleMeasurementMapping = {};
-    if (0 == @{$featureIDs})
-    {
-	return $featureSampleMeasurementMapping; 
-    }
-
-#    print "\nDBNAME : ".  $self->{dbName};
-#    print "\nDBUSER : ".  $self->{dbUser}; 
-#    print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
+    if (0 == @{$featureIDs}) 
+    { 
+        my $msg = "get_expression_data_by_feature_ids requires a list of valid feature ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_data_by_feature_ids'); 
+    } 
 
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
-#    my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost', 'expressionSelect', '', 
-#                           { RaiseError => 1, ShowErrorStatement => 1 } 
-#        ); 
+
     my $wild_type_part = ""; 
     if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
     { 
@@ -3027,7 +3087,7 @@ sub get_expression_data_by_feature_ids
                                      inner join SampleMeasurements sms on sam.id = sms.from_link     
                                      inner join Measurement mea on sms.to_link = mea.id 
                                      inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link 
-                                     inner join Feature fea on fmb.from_link = fea.id 
+                                     inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id 
                                      inner join StrainWithSample sws on sam.id = sws.to_link 
                                      inner join Strain str on sws.from_link = str.id  
                                      where fea.id in (^.
@@ -3108,7 +3168,9 @@ Log2Ratio is a float
 
 =item Description
 
-Compare samples takes two data structures labelDataMapping, the first is numerator, the 2nd is the denominator in the comparison. returns a SampleComparisonMapping
+Compare samples takes two data structures labelDataMapping  {sampleID or label}->{featureId or label => value}}, 
+the first labelDataMapping is the numerator, the 2nd is the denominator in the comparison. returns a 
+SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(or label)->{feature_id(or label) -> log2Ratio}}}
 
 =back
 
@@ -3136,8 +3198,50 @@ sub compare_samples
     my @denominator_keys = keys(%{$denominatorsDataMapping});
     if ((0 == scalar(@numerator_keys)) || (0 == scalar(@denominator_keys)))
     { 
-        return $sampleComparisonMapping; 
+	my $msg = "The numerator and/or denominator keys passed to compare_samples are empty \n";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'compare_samples'); 
     } 
+    my %empty_numerator_keys;
+    my %empty_denominator_keys;
+    foreach my $numerator_key (@numerator_keys)
+    {
+	if(scalar(keys(%{$numeratorsDataMapping->{$numerator_key}})) == 0)
+	{
+	    $empty_numerator_keys{$numerator_key} = 1;
+	}
+    }
+    foreach my $denominator_key (@denominator_keys)
+    {
+        if(scalar(keys(%{$denominatorsDataMapping->{$denominator_key}})) == 0)
+        {
+            $empty_denominator_keys{$denominator_key} = 1;
+        }
+    }
+    if ((scalar(keys(%empty_numerator_keys)) > 0) ||
+	(scalar(keys(%empty_denominator_keys)) > 0))
+    {
+	my $msg = "The numerator and/or denominator keys passed had the following empty subhashes:\n";
+	if (scalar(keys(%empty_numerator_keys)) > 0)
+	{
+	    $msg .= "NUMERATOR SUBHASHES : \n";
+	    foreach my $numerator_key (keys(%empty_numerator_keys))
+	    {
+		$msg .= $numerator_key . "\n";
+	    }
+	}
+        if (scalar(keys(%empty_denominator_keys)) > 0)
+        {
+            $msg .= "DENOMINATOR SUBHASHES : \n";
+            foreach my $denominator_key (keys(%empty_denominator_keys))
+            {
+                $msg .= $denominator_key . "\n";
+            } 
+        }
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'compare_samples');
+    }
+
     #Create average of denominator_values
     my %denominator_average_hash;  #feature_id -> {running_total->val, count->val}
 
@@ -3245,7 +3349,8 @@ Log2Ratio is a float
 
 =item Description
 
-Compares each sample vs its defined default control.  If the Default control is not specified for a sample, then nothing is returned for that sample
+Compares each sample vs its defined default control.  If the Default control is not specified for a sample, then nothing is returned for that sample .
+Takes a list of sampleIDs returns SampleComparisonMapping {sample_id ->{denominator_default_control sample_id ->{feature_id -> log2Ratio}}}
 
 =back
 
@@ -3270,7 +3375,9 @@ sub compare_samples_vs_default_controls
     $sampleComparisonMapping = {};
     if (scalar(@{$numeratorSampleIDs} == 0)) 
     { 
-	return $sampleComparisonMapping;
+        my $msg = "compare_samples_vs_default_controls requires a list of valid sample ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'compare_samples_vs_default_controls'); 
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
@@ -3293,13 +3400,17 @@ sub compare_samples_vs_default_controls
 	$distinct_sample_ids_hash{$control_sample_id} = 1;
 	$numerator_control_mappings{$numerator_sample_id} = $control_sample_id;
     }
+    if (scalar(keys(%distinct_sample_ids_hash)) == 0)
+    {
+	return $sampleComparisonMapping;
+    }
     #log2Levels
     my $get_log2levels_q = qq^select sam.id, fea.id, mea.value
                               from Sample sam 
                               inner join SampleMeasurements sme on sam.id = sme.from_link 
                               inner join Measurement mea on sme.to_link = mea.id  
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link 
-                              inner join Feature fea on fmb.from_link = fea.id  
+                              inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id  
                               where sam.id in (^. 
 			      join(",", ("?") x scalar(keys(%distinct_sample_ids_hash))) . ") "; 
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
@@ -3383,7 +3494,8 @@ Log2Ratio is a float
 
 =item Description
 
-Compares each numerator sample vs the average of all the denominator sampleIds
+Compares each numerator sample vs the average of all the denominator sampleIds.  Take a list of numerator sample IDs and a list of samples Ids to average for the denominator.
+returns SampleComparisonMapping {numerator_sample_id->{denominator_sample_id ->{feature_id -> log2Ratio}}}
 
 =back
 
@@ -3408,7 +3520,9 @@ sub compare_samples_vs_the_average
     #BEGIN compare_samples_vs_the_average
     if((scalar(@{$numeratorSampleIDs}) == 0) || (scalar(@{$denominatorSampleIDs}) == 0))
     { 
-        return $sampleComparisonMapping; 
+	my $msg = "A list of valid sample ids must be present for both the numerator and denominator\n";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+							 method_name => 'compare_samples_vs_average');
     } 
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
                            { RaiseError => 1, ShowErrorStatement => 1 } 
@@ -3432,7 +3546,7 @@ sub compare_samples_vs_the_average
                               inner join SampleMeasurements sme on sam.id = sme.from_link       
                               inner join Measurement mea on sme.to_link = mea.id                         
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link              
-                              inner join Feature fea on fmb.from_link = fea.id                    
+                              inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id                    
                               where sam.id in (^. 
                               join(",", ("?") x scalar(keys(%distinct_sample_ids_hash))) . ") "; 
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ". 
@@ -3521,7 +3635,8 @@ Log2Ratio is a float
 
 =item Description
 
-Takes in comparison results.  If the value is >= on_threshold it is deemed on (1), if <= off_threshold it is off(-1), meets none then 0.  Thresholds normally set to zero
+Takes in comparison results.  If the value is >= on_threshold it is deemed on (1), if <= off_threshold it is off(-1), meets none then 0.  Thresholds normally set to zero.
+returns SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(or label)->{feature_id(or label) -> on_off_call (possible values 0,-1,1)}}}
 
 =back
 
@@ -3551,19 +3666,33 @@ sub get_on_off_calls
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
 							     method_name => 'get_on_off_calls'); 
     }
-    #Check that thresholds are numbers or empty    
-    if(!($on_threshold =~ m/^[-+]?[0-9]*\.?[0-9]+$/))
-    { 
-        my $msg = "The on threshold must be a valid number";
-        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
-                                                               method_name => 'get_on_off_calls');
-    } 
-    if(!($off_threshold =~ m/^[-+]?[0-9]*\.?[0-9]+$/))
+    #Check that thresholds are numbers or empty 
+    if ($on_threshold ne '')
     {
-        my $msg = "The off threshold must be a valid number";
-        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
-                                                               method_name => 'get_on_off_calls'); 
-    } 
+	if(!($on_threshold =~ m/^[-+]?[0-9]*\.?[0-9]+$/))
+	{ 
+	    my $msg = "The on threshold must be a valid number";
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+								   method_name => 'get_on_off_calls');
+	} 
+    }
+    else
+    {
+	$on_threshold = 0;
+    }
+    if ($off_threshold ne '')
+    {
+	if(!($off_threshold =~ m/^[-+]?[0-9]*\.?[0-9]+$/))
+	{
+	    my $msg = "The off threshold must be a valid number";
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+								   method_name => 'get_on_off_calls'); 
+	} 
+    }
+    else
+    {
+	$off_threshold = 0;
+    }
     if ($on_threshold < $off_threshold)
     {
         my $msg = "The on_threshold must >= the off_threshold"; 
@@ -3652,7 +3781,8 @@ Log2Ratio is a float
 
 =item Description
 
-Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction
+Takes in comparison results. Direction must equal 'up', 'down', or 'both'.  Count is the number of changers returned in each direction.
+returns SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(or label)->{feature_id(or label) -> log2Ratio (note that the features listed will be limited to the top changers)}}}
 
 =back
 
@@ -3808,9 +3938,11 @@ sub get_expression_samples_titles
     $samplesTitlesMap = {}; 
     if (0 == @{$sampleIDs}) 
     { 
-        return $samplesTitlesMap; 
+        my $msg = "get_expression_samples_titles requires a list of valid sample ids. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_samples_titles'); 
     } 
- 
+
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
                            { RaiseError => 1, ShowErrorStatement => 1 } 
 	); 
@@ -3898,7 +4030,9 @@ sub get_expression_samples_descriptions
     $samplesDescriptionsMap = {}; 
     if (0 == @{$sampleIDs})
     { 
-        return $samplesDescriptionsMap;
+        my $msg = "get_expression_samples_descriptions requires a list of valid sample ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_samples_descriptions');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
@@ -3988,7 +4122,9 @@ sub get_expression_samples_molecules
     $samplesMoleculesMap = {}; 
     if (0 == @{$sampleIDs})
     { 
-        return $samplesMoleculesMap;
+        my $msg = "get_expression_samples_molecules requires a list of valid sample ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_samples_molecules');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
@@ -4078,7 +4214,9 @@ sub get_expression_samples_types
     $samplesTypesMap = {}; 
     if (0 == @{$sampleIDs})
     { 
-        return $samplesTypesMap;
+        my $msg = "get_expression_samples_types requires a list of valid sample ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_samples_types');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
@@ -4168,7 +4306,9 @@ sub get_expression_samples_external_source_ids
     $samplesExternalSourceIdMap = {}; 
     if (0 == @{$sampleIDs})
     { 
-        return $samplesExternalSourceIdMap;
+        my $msg = "get_expression_samples_external_source_ids requires a list of valid sample ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_samples_external_source_ids');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
@@ -4258,7 +4398,9 @@ sub get_expression_samples_original_log2_medians
     $samplesFloatMap = {}; 
     if (0 == @{$sampleIDs})
     { 
-        return $samplesFloatMap;
+        my $msg = "get_expression_samples_original_log2_medians requires a list of valid sample ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_samples_original_log2_medians');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
@@ -4349,7 +4491,9 @@ sub get_expression_series_titles
     $seriesStringMap = {}; 
     if (0 == @{$seriesIDs})
     { 
-        return $seriesStringMap;
+        my $msg = "get_expression_series_titles requires a list of valid series ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_series_titles');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
@@ -4439,7 +4583,9 @@ sub get_expression_series_summaries
     $seriesStringMap = {}; 
     if (0 == @{$seriesIDs})
     { 
-        return $seriesStringMap;
+        my $msg = "get_expression_series_summaries requires a list of valid series ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_summaries');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
@@ -4529,7 +4675,9 @@ sub get_expression_series_designs
     $seriesStringMap = {}; 
     if (0 == @{$seriesIDs})
     { 
-        return $seriesStringMap;
+        my $msg = "get_expression_series_designs requires a list of valid series ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_designs');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
@@ -4619,7 +4767,9 @@ sub get_expression_series_external_source_ids
     $seriesStringMap = {}; 
     if (0 == @{$seriesIDs})
     { 
-        return $seriesStringMap;
+        my $msg = "get_expression_series_external_source_ids requires a list of valid series ids. ";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_external_source_ids');
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
@@ -4643,6 +4793,228 @@ sub get_expression_series_external_source_ids
 							       method_name => 'get_expression_series_external_source_ids');
     }
     return($seriesStringMap);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_sample_external_source_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_sample_external_source_ids($ExternalSourceIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ExternalSourceIDs is an ExternalSourceIDs
+$sampleIDs is a SampleIDs
+ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
+ExternalSourceID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ExternalSourceIDs is an ExternalSourceIDs
+$sampleIDs is a SampleIDs
+ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
+ExternalSourceID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+get sample ids by the sample's external source id : Takes a list of sample external source ids, and returns a list of sample ids
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_sample_external_source_ids
+{
+    my $self = shift;
+    my($ExternalSourceIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($ExternalSourceIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ExternalSourceIDs\" (value was \"$ExternalSourceIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_sample_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_sample_external_source_ids
+    #END get_expression_sample_ids_by_sample_external_source_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_sample_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
+    }
+    return($sampleIDs);
+}
+
+
+
+
+=head2 get_expression_sample_ids_by_platform_external_source_ids
+
+  $sampleIDs = $obj->get_expression_sample_ids_by_platform_external_source_ids($ExternalSourceIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ExternalSourceIDs is an ExternalSourceIDs
+$sampleIDs is a SampleIDs
+ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
+ExternalSourceID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ExternalSourceIDs is an ExternalSourceIDs
+$sampleIDs is a SampleIDs
+ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
+ExternalSourceID is a string
+SampleIDs is a reference to a list where each element is a SampleID
+SampleID is a string
+
+
+=end text
+
+
+
+=item Description
+
+get sample ids by the platform's external source id : Takes a list of platform external source ids, and returns a list of sample ids
+
+=back
+
+=cut
+
+sub get_expression_sample_ids_by_platform_external_source_ids
+{
+    my $self = shift;
+    my($ExternalSourceIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($ExternalSourceIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ExternalSourceIDs\" (value was \"$ExternalSourceIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_platform_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_platform_external_source_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($sampleIDs);
+    #BEGIN get_expression_sample_ids_by_platform_external_source_ids
+    #END get_expression_sample_ids_by_platform_external_source_ids
+    my @_bad_returns;
+    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample_ids_by_platform_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample_ids_by_platform_external_source_ids');
+    }
+    return($sampleIDs);
+}
+
+
+
+
+=head2 get_expression_series_ids_by_series_external_source_ids
+
+  $seriesIDs = $obj->get_expression_series_ids_by_series_external_source_ids($ExternalSourceIDs)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$ExternalSourceIDs is an ExternalSourceIDs
+$seriesIDs is a SeriesIDs
+ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
+ExternalSourceID is a string
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$ExternalSourceIDs is an ExternalSourceIDs
+$seriesIDs is a SeriesIDs
+ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
+ExternalSourceID is a string
+SeriesIDs is a reference to a list where each element is a SeriesID
+SeriesID is a string
+
+
+=end text
+
+
+
+=item Description
+
+get series ids by the series's external source id : Takes a list of series external source ids, and returns a list of series ids
+
+=back
+
+=cut
+
+sub get_expression_series_ids_by_series_external_source_ids
+{
+    my $self = shift;
+    my($ExternalSourceIDs) = @_;
+
+    my @_bad_arguments;
+    (ref($ExternalSourceIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ExternalSourceIDs\" (value was \"$ExternalSourceIDs\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_series_ids_by_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_ids_by_series_external_source_ids');
+    }
+
+    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my($seriesIDs);
+    #BEGIN get_expression_series_ids_by_series_external_source_ids
+    #END get_expression_series_ids_by_series_external_source_ids
+    my @_bad_returns;
+    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"seriesIDs\" (value was \"$seriesIDs\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_series_ids_by_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series_ids_by_series_external_source_ids');
+    }
+    return($seriesIDs);
 }
 
 
@@ -4829,8 +5201,8 @@ sub get_GEO_GSE
     { 
 	if (scalar(@gse_file_records) > 1)
 	{
-	    $gse_object->{"gseErrors"}->[0] = "Error there appears to multiple GSE SOFT files associated with $gse_input_id :  ".
-		"These are the records listed ". join(","@gse_records).".";
+	    $gseObject->{"gseErrors"}->[0] = "Error there appears to multiple GSE SOFT files associated with $gse_input_id :  ".
+		"These are the records listed ". join(",",@gse_file_records).".";
 	    return($gseObject);
 	}
 
@@ -4846,41 +5218,41 @@ sub get_GEO_GSE
 	    or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
 
 	
-        $expressionDataSamplesMap->{$sample_id}={"sampleID" => $sample_id, 
-                                                 "sourceID" => $sample_source_id,
-                                                 "sampleTitle" => $sample_title, 
-                                                 "sampleDescription" => $sample_description, 
-                                                 "molecule" => $sample_molecule, 
-                                                 "sampleType" => $sample_type, 
-                                                 "dataSource" => $sample_dataSource, 
-                                                 "externalSourceID" => $sample_externalSourceId, 
-                                                 "externalSourceDate" => $sample_externalSourceDate, 
-                                                 "kbaseSubmissionDate" => $sample_kbaseSubmissionDate, 
-                                                 "custom" => $sample_custom, 
-                                                 "originalLog2Median" => $sample_originalLog2Median, 
-                                                 "strainID" => $strain_id, 
-                                                 "referenceStrain" => $referenceStrain, 
-                                                 "wildtype" => $wildtype, 
-                                                 "strainDescription" => $strain_description, 
-                                                 "genomeID" => $genome_id, 
-                                                 "genomeScientificName" => $scientific_name, 
-                                                 "platformID" => $platform_id, 
-                                                 "platformTitle" => $platform_title, 
-                                                 "platformTechnology" => $platform_technology, 
-                                                 "experimentalUnitID" => $experimental_unit_id, 
-                                                 "experimentMetaID" => $experiment_meta_id, 
-                                                 "experimentTitle" => $experiment_meta_title, 
-                                                 "experimentDescription" => $experiment_meta_description, 
-                                                 "environmentID" => $environment_id, 
-                                                 "environmentDescription" => $environment_description, 
-                                                 "protocolID" => $protocol_id, 
-                                                 "protocolDescription" => $protocol_description, 
-                                                 "protocolName" => $protocol_name, 
-                                                 "sampleAnnotationIDs" => [], 
-                                                 "seriesIDs" => [], 
-                                                 "personIDs" => [], 
-                                                 "dataExpressionLevelsForSample" => {}}; 
-	
+#        my $expressionDataSamplesMap->{$sample_id}={"sampleID" => $sample_id, 
+#						    "sourceID" => $sample_source_id,
+#						    "sampleTitle" => $sample_title, 
+#						    "sampleDescription" => $sample_description, 
+#						    "molecule" => $sample_molecule, 
+#						    "sampleType" => $sample_type, 
+#						    "dataSource" => $sample_dataSource, 
+#						    "externalSourceID" => $sample_externalSourceId, 
+#						    "externalSourceDate" => $sample_externalSourceDate, 
+#						    "kbaseSubmissionDate" => $sample_kbaseSubmissionDate, 
+#						    "custom" => $sample_custom, 
+#						    "originalLog2Median" => $sample_originalLog2Median, 
+#						    "strainID" => $strain_id, 
+#						    "referenceStrain" => $referenceStrain, 
+#						    "wildtype" => $wildtype, 
+#						    "strainDescription" => $strain_description, 
+#						    "genomeID" => $genome_id, 
+#						    "genomeScientificName" => $scientific_name, 
+#						    "platformID" => $platform_id, 
+#						    "platformTitle" => $platform_title, 
+#						    "platformTechnology" => $platform_technology, 
+#						    "experimentalUnitID" => $experimental_unit_id, 
+#						    "experimentMetaID" => $experiment_meta_id, 
+#						    "experimentTitle" => $experiment_meta_title, 
+#						    "experimentDescription" => $experiment_meta_description, 
+#						    "environmentID" => $environment_id, 
+#						    "environmentDescription" => $environment_description, 
+#						    "protocolID" => $protocol_id, 
+#						    "protocolDescription" => $protocol_description, 
+#						    "protocolName" => $protocol_name, 
+#						    "sampleAnnotationIDs" => [], 
+#						    "seriesIDs" => [], 
+#						    "personIDs" => [], 
+#						    "dataExpressionLevelsForSample" => {}}; 
+#
  
 	my $line_count = 0; 
 	while (my $gse_file_line=<$gse_output>) 
@@ -5255,6 +5627,37 @@ a reference to a list where each element is a SampleID
 
 
 
+=head2 SampleIDsAveragedFrom
+
+=over 4
+
+
+
+=item Description
+
+List of KBase Sample IDs thatt his sample was averaged from
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a SampleID
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a SampleID
+
+=end text
+
+=back
+
+
+
 =head2 SampleType
 
 =over 4
@@ -5449,7 +5852,7 @@ a string
 
 =item Description
 
-list of KBase ExperimentUnitIDs
+list of KBase ExperimentalUnitIDs
 
 
 =item Definition
@@ -6011,6 +6414,68 @@ a reference to a list where each element is a SampleAnnotation
 
 
 
+=head2 ExternalSourceID
+
+=over 4
+
+
+
+=item Description
+
+externalSourceId (could be for Platform, Sample or Series)(typically maps to a GPL, GSM or GSE from GEO)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 ExternalSourceIDs
+
+=over 4
+
+
+
+=item Description
+
+list of externalSourceIDs
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ExternalSourceID
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ExternalSourceID
+
+=end text
+
+=back
+
+
+
 =head2 PersonID
 
 =over 4
@@ -6236,7 +6701,7 @@ an int
 
 =item Description
 
-Data structure for all the top level metadata and value data for an expression sample
+Data structure for all the top level metadata and value data for an expression sample.  Essentially a expression Sample object.
 
 
 =item Definition
@@ -6278,6 +6743,7 @@ protocolName has a value which is a string
 sampleAnnotations has a value which is a SampleAnnotations
 seriesIDs has a value which is a SeriesIDs
 personIDs has a value which is a PersonIDs
+sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 
 </pre>
@@ -6320,6 +6786,7 @@ protocolName has a value which is a string
 sampleAnnotations has a value which is a SampleAnnotations
 seriesIDs has a value which is a SeriesIDs
 personIDs has a value which is a PersonIDs
+sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
 dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
 
 

@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from biokbase.cdmi.client import ServerError as CDMIServerError
 from biokbase.exchangeformatsupport.reader import pickreader
 from biokbase.exchangeformatsupport.userfeedback import TerminalFeedback
-from biokbase.experiment.exchangeformat.processor import ExperimentProcessor
+from biokbase.exchangeformatsupport.processor import ExchangeFormatProcessor
 from biokbase.exchangeformatsupport.exceptions import ExchangeFormatReaderError
 from biokbase.idserver.client import ServerError as IDServerError
 import sys
@@ -16,7 +16,7 @@ from biokbase.exchangeformatsupport.reader import ExcelReader
 
 CDMI = 'http://kbase.us/services/cdmi_api'
 IDSERVER = 'http://kbase.us/services/idserver'
-EXPERIMENT = 'http://kbase.us/services/experiment'
+EXPERIMENT = 'http://kbase.us/services/experiment' 
 
 desc = 'Validate exchange format input data for ' + EXCHANGE_FORMAT.name + \
     ' data.'
@@ -41,20 +41,22 @@ def parseArgs():
     parser.add_argument('-e', '--experiment', default=EXPERIMENT, 
                         help='The url of the experiment server, default ' + EXPERIMENT) 
     args = parser.parse_args()
-    return args.directory, args.experiment, args.cdmi, args.idserver, args.trans
+    return args.directory, args.cdmi, args.idserver, args.trans
 
 
 def respondToErr(err, errtype):
     print '\nThere was a ' + errtype + ' error while processing the data. ' + \
             'The reported error was:\n' + str(err)
+    print err
     sys.exit(1)
 
 
 if __name__ == '__main__':
 
-    dirc, experiment_url, cdmi, idserver, trans = parseArgs()
+    dirc, cdmi, idserver, trans = parseArgs()
 
-    u = TerminalFeedback(sys.stderr)
+#    u = TerminalFeedback(sys.stderr)
+    u = TerminalFeedback(sys.stdout) 
 
     try:
         r = pickreader([DelimReader, ExcelReader],
@@ -68,7 +70,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     try:
-        ExperimentProcessor(r, experiment_url, cdmi, idserver, u, translatesourceids=trans)
+        ExchangeFormatProcessor(r, cdmi, idserver, u, translatesourceids=trans)
     # add better error handling at some point
     except IOError as err:
         respondToErr(err, 'I/O')

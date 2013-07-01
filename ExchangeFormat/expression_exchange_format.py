@@ -116,16 +116,13 @@ the uploader should do it themselves or run the log2level.tab and sample.tab fil
 The Prepreprocessor will adjust the log2levels for each sample so that the median is zero.  Additionally the preprocessor
 will update the originalLog2Median field for each sample in the sample file with what the originalLog2Median was for a given sample.
 This allows for original values to be obtained, but also puts the data in comparable space.'''
-docs['sam']['custom'] = '''
-Custom refers to a sample being created from the averaging of existing samples, typically replicates.
-Always FALSE, as Custom operations will be done through a future web interface and 
-this exchange format does not support custom averagings.'''
 docs['sam']['persons'] = 'Comma separated list of source ids (from the person tab) of the contact people for the sample.'
 docs['sam']['strain'] = 'The KBase identifier or source-id for the Strain that the sample was for (refers to the strain tab).'
 docs['sam']['platform'] = 'The KBase identifier or source-id for the Platform that the sample was for.'
 docs['sam']['protocol'] = 'The KBase identifier or source id of the protocol associated with the sample.'
 docs['sam']['experimentalUnit'] = 'The KBase identifier or source-id for the Experimental unit that this sample is associated with.'
 docs['sam']['defaultControlSampleId'] = 'The KBase identifier or source-id for the sample that should be used for this sample for default comparisons.'
+docs['sam']['averagedFromSamples'] = 'Comma separated list of KBase identifiers or source-ids for the samples that were used to create this averaged sample.'
 
 
 # SERIES TABLE - 2
@@ -361,7 +358,7 @@ docs['eu']['exp'] = '''
 The source or KBase ID of the ExperimentMeta entity to which the experimental
 unit belongs'''
 docs['eu']['env'] = '''
-The source or KBase ID of the environment used for the experimental unit.'''
+The source or KBase ID of the environment used for the experimental unit, can be null ".".'''
 docs['eu']['str'] = '''
 The source or KBase ID of the strain in the experimental unit.  Leave this
 field empty to denote a control experimental unit without a strain.'''
@@ -472,6 +469,8 @@ PersonRelSample = _create_m2m_relclass('PersonRelSample', _SourceOrKBID_Argument
 
 SampleSeriesRel = _create_m2m_relclass('SampleSeriesRel', _SourceOrKBID_Argument, 'Sample')
 
+SampleAveragedFromRel = _create_m2m_relclass('SampleAveragedFromRel', _SourceOrKBID_Argument, 'Sample')
+
 
 ###########################################
 #
@@ -517,7 +516,6 @@ class Sample(_ExchangeFormatEntity):
                                                 cdsname='externalSourceDate', noentryok = 'O',unique=False),
             'originalLog2Median': _FloatArgument('originalLog2Median', docs=docs['sam']['originalLog2Median'], cdsname='originalLog2Median',
                                                  noentryok='R', unique=False),
-            'custom': _SemiBooleanArgument('custom', docs=docs['sam']['custom'], cdsname='custom', unique=False),
             'persons': _ManyToManyArgument('persons', PersonRelSample, _PERSONSAMPLE_ROW_SEP, 
                                            _RelInfo('SampleContactPerson',reverse=True), docs=docs['sam']['persons'], 
                                            noentryok ='O', unique=False),
@@ -530,19 +528,27 @@ class Sample(_ExchangeFormatEntity):
             'experimentalUnit': _SourceOrKBID_Argument('experimentalUnit-id', 'ExperimentalUnit', _RelInfo('HasExpressionSample'),
                                                        docs=docs['sam']['experimentalUnit'], noentryok='R', unique=False),
             'defaultControlSampleId': _SourceOrKBID_Argument('defaultControlSample-id', 'Sample', _RelInfo('DefaultControlSample'), 
-                                                       docs=docs['sam']['defaultControlSampleId'], noentryok='R', unique=False), 
+                                                       docs=docs['sam']['defaultControlSampleId'], noentryok='R', unique=False),
+            'averagedFromSamples':  _ManyToManyArgument('averagedFromSamples', SampleAveragedFromRel, _SAMPLE_ROW_SEP, _RelInfo('SampleAveragedFrom'), 
+                                                          docs=docs['sam']['averagedFromSamples'], noentryok='O', unique=False), 
+            'custom': _SemiBooleanArgument(None, cdsname='custom', unique=False),
             'dataQualityLevel': _IntArgument(None, cdsname='dataQualityLevel', unique = False), 
           }
 
     def __init__(self, sourceID, title, description, molecule, type, externalSourceId, 
-                 dataSource, kbaseSubmissionDate, externalSourceDate, originalLog2Median, custom,
-                         persons, strain, platform, protocol, experimentalUnit, defaultControlSampleId):
+                 dataSource, kbaseSubmissionDate, externalSourceDate, originalLog2Median, 
+                         persons, strain, platform, protocol, experimentalUnit, defaultControlSampleId, averagedFromSamples):
         if kbaseSubmissionDate in ('', None, self.NO_ENTRY_SYM):
             kbaseSubmissionDate = str(datetime.datetime.now())
+        if averagedFromSamples in ('', None, self.NO_ENTRY_SYM): 
+            custom = False
+        else :
+            custom = True
         dataQualityLevel = 1
         super(Sample, self).__init__(sourceID, title, description, molecule, type, externalSourceId, 
-                 dataSource, kbaseSubmissionDate, externalSourceDate, originalLog2Median, custom,
-                         persons, strain, platform, protocol, experimentalUnit, defaultControlSampleId, dataQualityLevel)
+                 dataSource, kbaseSubmissionDate, externalSourceDate, originalLog2Median, 
+                         persons, strain, platform, protocol, experimentalUnit, defaultControlSampleId, averagedFromSamples, 
+                                     custom, dataQualityLevel)
 
 
 # Series - 2
@@ -931,36 +937,46 @@ class ExperimentalUnit(_ExchangeFormatEntity):
     ORDER = ['experimentID', 'environmentID', 'strainID', 'groupID',
              'location', 'groupmeta', 'timeseriesID', 'time', 'timemeta']
 
+    # NOTE THE UNIQUE = FALSE SHOULD PROBABLY BE REMOVED FROM EXPERIMENTAL_UNIT DEFS below once moved to the CDM.
     DEF = {'experimentID': _SourceOrKBID_Argument(
                                'Experiment-id', 'ExperimentMeta',
                                _RelInfo('HasExperimentalUnit'),
+                               unique=False,
                                docs=docs['eu']['exp']),
            'environmentID': _SourceOrKBID_Argument(
                                 'Environment-id', 'Environment',
                                 _RelInfo('IsContextOf'),
-                                docs=docs['eu']['env']),
+                                unique=False,
+                                docs=docs['eu']['env'], noentryok='O'),
            'strainID': _SourceOrKBID_Argument(
                            'Strain-id', 'Strain', _RelInfo('EvaluatedIn'),
+                           unique=False,
                            docs=docs['eu']['str'], noentryok='O'),
            'groupID': _SourceOrKBID_Argument(
                           'Group-id', 'ExperimentalUnitGroup',
                           _RelInfo('ContainsExperimentalUnit',
                                    ('location', 'groupmeta')),
+                          unique=False,
                           docs=docs['eu']['grp'], noentryok='O'),
            'location': _StringArgument('Location', cdsname='location',
+                                       unique=False,
                                        docs=docs['eu']['loc'], noentryok='O'),
            'groupmeta': _SemiBooleanArgument(
                             'Group-meta', docs=docs['eu']['gmet'],
+                            unique=False,
                             cdsname='groupMeta'),
            'timeseriesID': _SourceOrKBID_Argument(
                                'Timeseries-id', 'TimeSeries',
                                _RelInfo('OrdersExperimentalUnit',
                                         ('time', 'timemeta')),
+                               unique=False,
                                docs=docs['eu']['ts'], noentryok='O'),
            'time': _FloatArgument('Time', docs=docs['eu']['time'],
+                                  unique=False,
                                   cdsname='time', noentryok='C'),
            'timemeta': _SemiBooleanArgument('Time-meta',
                                             docs=docs['eu']['tsmet'],
+                                            unique=False,
                                             cdsname='timeMeta'),
            }
 
