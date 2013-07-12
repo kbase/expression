@@ -23,6 +23,466 @@ use Data::Dumper;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 use IO::File; 
 use LWP::Simple; 
+
+sub trim($)
+{
+    #removes beginning and trailing white space
+    my $string = shift;
+    if (defined($string))
+    {
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+    }
+    return $string;
+}
+
+sub parse_gse_series_portion
+{
+    my $lines_array_ref = shift;
+    my $gse_object = shift;
+    my @lines = @{$lines_array_ref};
+
+    my $gseID = undef;
+    my $gseTitle = undef;
+    my $gseSummary = undef;
+    my $gseDesign = undef;
+    my $gseSubmissionDate = undef;
+    my $gsePubMedID = undef;
+    my @gseErrors = ();
+    my @gseWarnings = ();
+    my %listed_gsm_hash;
+
+    foreach my $line (@lines)
+    {
+	if ($line =~ m/\!Series_sample_id = /)
+	{
+	    my @temp_arr = split(/\s*=\s*/,$line);
+	    $listed_gsm_hash{trim($temp_arr[1])} = 0;
+	}
+	if ($line =~ m/^\^SERIES = /)
+	{
+	    my @temp_arr = split(/\s*=\s*/,$line);
+	    $gseID = trim($temp_arr[1]);
+	}
+        if ($line =~ m/^\!Series_title =/)
+        {
+            my @temp_arr = split(/\s*=\s*/,$line); 
+            $gseTitle = trim($temp_arr[1]);
+        }
+	if ($line =~ m/^\!Series_summary = /) 
+	{ 
+	    my @temp_arr = split(/\s*=\s*/,$line);
+	    if (defined($gseSummary))
+	    {
+		$gseSummary .= " :: " . trim($temp_arr[1]);
+	    }
+	    else
+	    {
+		$gseSummary = trim($temp_arr[1]);
+	    }
+	}
+        if ($line =~ m/^\!Series_overall_design = /) 
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line); 
+            $gseDesign = trim($temp_arr[1]);
+        } 
+        if ($line =~ m/^\!Series_submission_date = /) 
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line); 
+            $gseSubmissionDate = trim($temp_arr[1]);
+        } 
+	if ($line =~ m/^\!Series_pubmed_id = /)
+	{
+	    my @temp_arr = split(/\s*=\s*/,$line);
+	    $gsePubMedID = trim($temp_arr[1]);
+	}
+    }
+    if (!(defined($gseID)))
+    {
+	push(@gseErrors,"No GEO Series ID found");
+    }
+    $gse_object={"gseID" => $gseID,
+		  "gseTitle" => $gseTitle,
+		  "gseSummary" => $gseSummary,
+		  "gseDesign" => $gseDesign,
+		  "gseSubmissionDate" => $gseSubmissionDate,
+		  "gsePubMedID" => $gsePubMedID,
+		  "gseErrors" => \@gseErrors,
+		  "gseWarnings" => \@gseWarnings};
+    return ($gse_object,\%listed_gsm_hash);
+}
+
+
+sub parse_gse_platform_portion
+{ 
+    my $platform_hash_ref = shift;
+    my %platform_hash = %{$platform_hash_ref};
+    my $metaDataOnly = shift;
+    my $lines_array_ref = shift; 
+    my @lines = @{$lines_array_ref};
+
+    my @temp_arr = split(/\s*=\s*/,shift(@lines));
+    my $gplID = trim($temp_arr[1]);
+    my $gplTitle = undef;
+    my $gplTechnology = undef;
+    my $gplTaxID = undef;
+    my $gplManufacturer = undef;
+
+    $platform_hash{$gplID}->{"warnings"}=[];
+    $platform_hash{$gplID}->{"errors"}=[];
+    my $platform_table_start = undef;
+    my $platform_line_counter = 0;
+
+    foreach my $line (@lines)
+    {
+	if ($line =~ m/^\!Platform_title =/) 
+	{ 
+	    my @temp_arr = split(/\s*=\s*/,$line); 
+	    $gplTitle = trim($temp_arr[1]); 
+	} 
+        if ($line =~ m/^\!Platform_technology =/) 
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line); 
+            $gplTechnology = trim($temp_arr[1]);
+        } 
+        if ($line =~ m/^\!Platform_taxid =/)
+        {
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gplTaxID = trim($temp_arr[1]);
+        }
+        if ($line =~ m/^\!Platform_manufacturer =/)
+        {
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gplManufacturer = trim($temp_arr[1]);
+        }
+	if ($line =~ m/^\!platform_table_begin/)
+	{
+	    $platform_table_start = $platform_line_counter;
+	    last;
+	}
+	$platform_line_counter++;
+    }
+    unless(defined($gplTitle))
+    {
+	push(@{$platform_hash{$gplID}->{"warnings"}},"The platform has no title");
+    }
+    $platform_hash{$gplID}->{"gplTitle"}=$gplTitle;
+
+    unless(defined($gplTaxID))
+    {
+	push(@{$platform_hash{$gplID}->{"warnings"}},"The platform has no taxID");
+    } 
+    $platform_hash{$gplID}->{"gplTaxID"}=$gplTaxID;
+    
+    if(defined($gplTechnology))
+    {
+	if (defined($gplManufacturer))
+	{
+	    $gplTechnology .= " :: ". $gplManufacturer; 
+	}
+    }
+    else
+    {
+	if (defined($gplManufacturer))
+	{
+	    $gplTechnology = "Unknown :: ". $gplManufacturer;
+	} 
+    }
+    $platform_hash{$gplID}->{"gplTechnology"}=$gplTechnology;
+    if ($metaDataOnly == 0)
+    {
+	push(@{$platform_hash{$gplID}->{"errors"}},"THIS CURRENTLY ONLY SUPPORTS METADATA ONLY!");
+	#ADD ALL SORTS OF MAPPING (by sequence or gene aliases) OF PROBES TO FEATURES LOGIC IN HERE
+	#PLATFORM TABLE is located in @lines[$platform_table_start..(scalar(@lines))]
+	#Will populate the     $platform_hash{$gplID}->{"id_to_feature_mappings"}={id from Platform section mapped to the feature_id};
+	#Will populate the     $platform_hash{$gplID}->{"mapping_approach"}=text "sequence" or "alias";
+    }
+    $platform_hash{$gplID}->{"processed"}=1; 
+    return \%platform_hash;
+}
+
+
+sub parse_gse_sample_portion
+{
+    my $metaDataOnly = shift;
+    my $platform_hash_ref = shift;
+    my $lines_array_ref = shift;
+    my @lines = @{$lines_array_ref};
+
+    my %gsm_hash;
+    my $gsm_id = undef;
+    my $gsm_title = undef;
+    my $gsm_description = undef;
+    my %gsm_molecule_hash;
+    my $gsm_molecule = undef;
+    my $gsm_submission_date = undef;
+    my $gsm_tax_id = undef;
+    my $gsm_sample_organism = undef;
+    my @gsm_sample_characteristics = ();
+    my @gsm_protocols_array = ();
+    my $gsm_value_type = undef;
+    my $gsm_original_log2_median = undef;
+    my $gsm_contact_email = undef;
+    my $gsm_contact_first_name = undef;
+    my $gsm_contact_last_name = undef;
+    my $gsm_contact_institution = undef;
+
+    my $gpl_id = undef;
+
+    my $sample_table_start = undef;
+    my $sample_line_counter = 0;
+
+    #print "\nPlatform hash : ". Dumper($platform_hash_ref)."\n";
+
+    foreach my $line (@lines)
+    { 
+        if ($line =~ m/^\^SAMPLE = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line); 
+            $gsm_id = trim($temp_arr[1]);
+        } 
+        if ($line =~ m/^\!Sample_title = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_title = trim($temp_arr[1]); 
+        }
+        if ($line =~ m/^\!Sample_description = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_description = trim($temp_arr[1]); 
+        }
+        if ($line =~ m/^\!Sample_molecule_ch. = /)
+        {
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_molecule_hash{trim($temp_arr[0])} = trim($temp_arr[1]);
+        } 
+        if ($line =~ m/^\!Sample_submission_date = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_submission_date = trim($temp_arr[1]); 
+        }
+        if ($line =~ m/^\!Sample_taxid_ch1 = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_tax_id = trim($temp_arr[1]); 
+        }
+        if ($line =~ m/^\!Sample_characteristics_ch1 = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            push(@gsm_sample_characteristics,trim($temp_arr[1])); 
+        }
+        if (($line =~ m/^\!Sample_treatment_protocol_ch1 = /) ||
+	    ($line =~ m/^\!Sample_growth_protocol_ch1 = /))
+	{
+	    push(@gsm_protocols_array,$line);
+	}
+	if ($line =~ m/^\!Sample_organism_ch1 = /)
+	{
+	    my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_sample_organism = trim($temp_arr[1]);
+	}
+        if ($line =~ m/^\!Sample_contact_email = /) 
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_contact_email = trim($temp_arr[1]);
+        } 
+        if ($line =~ m/^\!Sample_contact_name = /) 
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+	    my @temp_arr2 = split(/\,/,trim($temp_arr[1]));
+	    $gsm_contact_first_name = trim($temp_arr2[0]);
+	    if (scalar(@temp_arr2) == 2)
+	    {
+		$gsm_contact_last_name = trim($temp_arr2[1]);
+	    }
+            if (scalar(@temp_arr2) == 3)
+            {
+                $gsm_contact_last_name = trim($temp_arr2[2]); 
+            }
+        } 
+        if ($line =~ m/^\!Sample_contact_institute = /)
+        {
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_contact_institution = trim($temp_arr[1]);
+        } 
+        if ($line =~ m/^\#VALUE = /) 
+        {
+            my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_value_type = trim($temp_arr[1]);
+        } 
+	if ($line =~ m/^\!Sample_platform_id = /)
+	{ 
+	    my @temp_arr = split(/\s*=\s*/,$line);
+	    $gpl_id = trim($temp_arr[1]);
+	}
+#IF DATA try to see if pvalue or Zscore present
+        if ($line =~ m/^\!sample_table_begin/)
+        { 
+            $sample_table_start = $sample_line_counter;
+            last; 
+        } 
+	$sample_line_counter++;
+    }
+
+    unless(defined($gsm_id))
+    {
+        $gsm_hash{"UNKNOWN GSM ID"}->{"errors"} = ["COULD NOT FIND THE GSM ID"];
+	return \%gsm_hash;
+    }
+    else
+    {
+	my @emp_array;
+	$gsm_hash{$gsm_id}->{"warnings"}=[]; 
+	$gsm_hash{$gsm_id}->{"errors"}=[]; 
+	$gsm_hash{$gsm_id}->{"gsmID"}=$gsm_id;
+    }
+
+    #check for metadata only warnings errors
+    unless(defined($gsm_title)) 
+    { 
+        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The sample has no title");
+    } 
+    $gsm_hash{$gsm_id}->{"gsmTitle"}=$gsm_title;
+    unless(defined($gsm_description))
+    {
+	$gsm_description = $gsm_title;
+    }
+    $gsm_hash{$gsm_id}->{"gsmDescription"}=$gsm_description;
+
+    #NEED TO ADD SOME LOGIC FOR MOLECULE TYPE (some will not be allowed - logratio )
+    #Sample Molecules
+    #Possible values for each channel: total RNA, polyA RNA, cytoplasmic RNA, nuclear RNA, genomic DNA, protein, or other
+    #Only can process 
+    #LOG LEVEL: Total RNA / Genomic DNA
+    #PolyA RNA / Genomic DNA
+    #Cytoplasmic RNA / Genomic DNA
+    #Total RNA
+    #Genomic DNA
+    #PolyA RNA
+    #Cytoplasmic RNA
+    my %accepted_molecule_hash = ('total rna' => 1, 
+				  'polyA rna' =>1,
+				  'cytoplasmic rna' => 1,
+				  'nuclear rna' => 1, 
+				  'genomic dna' => 1, 
+				  'protein' => 1);
+
+    if (scalar(keys(%gsm_molecule_hash)) > 2)
+    {
+        push(@{$gsm_hash{$gsm_id}->{"errors"}},"The sample has more than 2 molecule types.");
+    }
+    elsif ((scalar(keys(%gsm_molecule_hash)) == 1) || (scalar(keys(%gsm_molecule_hash)) == 2)) 
+    { 
+        if (defined($gsm_molecule_hash{"!Sample_molecule_ch1"}))
+        { 
+            if (lc($gsm_molecule_hash{"!Sample_molecule_ch1"}) eq 'genomic dna')
+            { 
+                push(@{$gsm_hash{$gsm_id}->{"errors"}}, 
+                     "This is sample has Genomic DNA in channel 1.");
+            } 
+            elsif(defined($accepted_molecule_hash{lc($gsm_molecule_hash{"!Sample_molecule_ch1"})}))
+            { 
+                $gsm_molecule = $gsm_molecule_hash{"!Sample_molecule_ch1"};
+            } 
+            else
+            { 
+                push(@{$gsm_hash{$gsm_id}->{"errors"}}, 
+                     "The molecule type in channel 1 is not an accepted type.");
+            }
+        } 
+	else 
+	{ 
+	    push(@{$gsm_hash{$gsm_id}->{"errors"}}, 
+		 "The molecule type has 1 or 2 entries, but none map to channel 1."); 
+	} 
+    } 
+    #print "\nMOLECULE HASH : \n".Dumper(\%gsm_molecule_hash)."\n";
+    if (scalar(keys(%gsm_molecule_hash)) == 2)
+    {
+        if (defined($gsm_molecule_hash{"!Sample_molecule_ch2"}))
+        {
+	    if ($gsm_molecule_hash{"!Sample_molecule_ch2"} ne "Genomic DNA")
+	    {
+		push(@{$gsm_hash{$gsm_id}->{"errors"}},
+		     "This is a 2 channel array with the 2nd array not being Genomic DNA.  This suggests log ratio and not log level values.");
+	    }
+	    else
+	    {
+		$gsm_molecule .= " / " . $gsm_molecule_hash{"!Sample_molecule_ch2"};
+	    }
+        }
+        else 
+        { 
+            push(@{$gsm_hash{$gsm_id}->{"errors"}}, 
+                 "The molecule type has 2 entries, but none map to channel 2.");
+        } 
+    }
+    $gsm_hash{$gsm_id}->{"gsmMolecule"}=$gsm_molecule; 
+    $gsm_hash{$gsm_id}->{"gsmSubmissionDate"}=$gsm_submission_date; 
+    unless(defined($gsm_tax_id))
+    { 
+        push(@{$gsm_hash{$gsm_id}->{"errors"}},"The sample has no tax id.  Will not be able to get feature ids for this.");
+    } 
+    $gsm_hash{$gsm_id}->{"gsmTaxID"}=$gsm_tax_id; 
+    $gsm_hash{$gsm_id}->{"gsmSampleOrganism"}=$gsm_sample_organism;
+    $gsm_hash{$gsm_id}->{"gsmSampleCharacteristics"}=\@gsm_sample_characteristics;
+    my $gsm_protocol = join(' :: ',sort(@gsm_protocols_array));
+    $gsm_hash{$gsm_id}->{"gsmProtocol"}=$gsm_protocol;
+
+    #Get Value type
+    if ($metaDataOnly eq '0')
+    {
+	$gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type;
+    }
+
+    #GET Platform Info (propogate platfrom warnings and errors)
+    if(!(defined($gpl_id)))
+    {
+        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The sample does not have a platform");
+    }
+    elsif(!defined($platform_hash_ref->{$gpl_id}))
+    {
+        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The platform $gpl_id was not found in the platform hash");
+    }
+    else
+    {
+	my @we_types = ("warnings","errors");
+	foreach my $we_type (@we_types)
+	{
+	    foreach my $we_msg (@{$platform_hash_ref->{$gpl_id}->{$we_type}})
+	    {
+		push(@{$gsm_hash{$gsm_id}->{$we_type}},$we_msg);
+	    }
+	}
+	my %gpl_hash = ("gplID" => $gpl_id,
+		     "gplTitle" => $platform_hash_ref->{$gpl_id}->{"gplTitle"},
+		     "gplTaxID" => $platform_hash_ref->{$gpl_id}->{"gplTaxID"},
+		     "gplTechnology" => $platform_hash_ref->{$gpl_id}->{"gplTechnology"});
+	$gsm_hash{$gsm_id}->{"gsmPlatform"}=\%gpl_hash;
+    }
+
+
+    #Get Contact person info
+    unless(defined($gsm_contact_email))
+    {
+	push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The sample has no contact email.");
+    }
+    my %contact_hash = ($gsm_contact_email => {"contactFirstName" => $gsm_contact_first_name,
+					       "contactLastName" => $gsm_contact_last_name,
+					       "contactInstitution" => $gsm_contact_institution});
+    $gsm_hash{$gsm_id}->{"contactPeople"}=\%contact_hash;
+
+
+    #DATA (only if metadata only = 0)(original median).
+    #FEATURE MAPPING APPROACH (only if metadata only = 0).
+    #only populate value if not metadata only
+
+    #If not metadata only check for warnings/errors (intensity type, value ranges, reasonable number of mapped genes)
+    #map to values to features average across all probes that hit that feature.
+    
+    return \%gsm_hash;
+}
+
 #END_HEADER
 
 sub new
@@ -40,7 +500,7 @@ sub new
 #print "\nARGS : ".join("___",@args). "\n";
     if (! $deploy) { 
 #print "\nIN DEPLOY IF \n";
-        # if not, then go to the config file defined by the deployment and import                                                                                                                      
+        # if not, then go to the config file defined by the deployment and import                                                      
         # the deployment settings   
 	my %params; 
 #print "DEPLOYMENT_CONFIG ". $ENV{KB_DEPLOYMENT_CONFIG} . "\n";
@@ -5069,6 +5529,7 @@ GPL is a reference to a hash where the following keys are defined:
 	gplID has a value which is a string
 	gplTitle has a value which is a string
 	gplTechnology has a value which is a string
+	gplTaxID has a value which is a string
 ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
 ContactEmail is a string
 ContactPerson is a reference to a hash where the following keys are defined:
@@ -5137,6 +5598,7 @@ GPL is a reference to a hash where the following keys are defined:
 	gplID has a value which is a string
 	gplTitle has a value which is a string
 	gplTechnology has a value which is a string
+	gplTaxID has a value which is a string
 ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
 ContactEmail is a string
 ContactPerson is a reference to a hash where the following keys are defined:
@@ -5192,8 +5654,16 @@ sub get_GEO_GSE
     my($gseObject);
     #BEGIN get_GEO_GSE
     $gseObject ={};
+
+    if (($metaDataOnly eq "1") || (uc($metaDataOnly) eq "Y") || (uc($metaDataOnly) eq "TRUE")) 
+    { 
+        $metaDataOnly = 1;
+    } 
+    else
+    {
+        $metaDataOnly = 0;
+    }
  
-    my $gse_input_id = 'GSE21782'; 
     my $gse_url = 'ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SOFT/by_series/' . $gse_input_id . "/"; 
     my $gzip_file_ls_line = get($gse_url); 
     my @gse_file_records = split (/\n/,$gzip_file_ls_line); 
@@ -5206,60 +5676,128 @@ sub get_GEO_GSE
 	    return($gseObject);
 	}
 
-	print "GSE RECORD : $gse_record \n"; 
+	#print "GSE RECORD : $gse_record \n"; 
 	my @line_segments = split (/GSE/,$gse_record); 
 	my $gzip_file = "GSE".$line_segments[-1]; 
-	print "GZIP FILE : $gzip_file \n"; 
+	#print "GZIP FILE : $gzip_file \n"; 
 	chomp($gzip_file); 
 	my $gzip_url = $gse_url.$gzip_file; 
 	my $gzip_output = get($gzip_url); 
  
 	my $gse_output = new IO::Uncompress::Gunzip \$gzip_output 
 	    or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
-
-	
-#        my $expressionDataSamplesMap->{$sample_id}={"sampleID" => $sample_id, 
-#						    "sourceID" => $sample_source_id,
-#						    "sampleTitle" => $sample_title, 
-#						    "sampleDescription" => $sample_description, 
-#						    "molecule" => $sample_molecule, 
-#						    "sampleType" => $sample_type, 
-#						    "dataSource" => $sample_dataSource, 
-#						    "externalSourceID" => $sample_externalSourceId, 
-#						    "externalSourceDate" => $sample_externalSourceDate, 
-#						    "kbaseSubmissionDate" => $sample_kbaseSubmissionDate, 
-#						    "custom" => $sample_custom, 
-#						    "originalLog2Median" => $sample_originalLog2Median, 
-#						    "strainID" => $strain_id, 
-#						    "referenceStrain" => $referenceStrain, 
-#						    "wildtype" => $wildtype, 
-#						    "strainDescription" => $strain_description, 
-#						    "genomeID" => $genome_id, 
-#						    "genomeScientificName" => $scientific_name, 
-#						    "platformID" => $platform_id, 
-#						    "platformTitle" => $platform_title, 
-#						    "platformTechnology" => $platform_technology, 
-#						    "experimentalUnitID" => $experimental_unit_id, 
-#						    "experimentMetaID" => $experiment_meta_id, 
-#						    "experimentTitle" => $experiment_meta_title, 
-#						    "experimentDescription" => $experiment_meta_description, 
-#						    "environmentID" => $environment_id, 
-#						    "environmentDescription" => $environment_description, 
-#						    "protocolID" => $protocol_id, 
-#						    "protocolDescription" => $protocol_description, 
-#						    "protocolName" => $protocol_name, 
-#						    "sampleAnnotationIDs" => [], 
-#						    "seriesIDs" => [], 
-#						    "personIDs" => [], 
-#						    "dataExpressionLevelsForSample" => {}}; 
-#
  
-	my $line_count = 0; 
-	while (my $gse_file_line=<$gse_output>) 
+	my $line_count = 0;
+
+	my @gse_lines = <$gse_output>;
+
+	#series vars 
+	my $gse_series_line_start = undef;
+	my $gse_series_line_end = undef;
+	my $gse_series_section_parsed = 0;
+	my $listed_gsm_hash_ref;
+
+	#platform vars
+	my @platform_start_lines; #start lines for each platform in the platforms section
+	my @platform_end_lines; #start lines for each platform in the platforms section
+	my %platform_hash; #key is the platform name
+
+        #sample vars  
+        my @sample_start_lines; #start lines for each sample in the samples section  
+        my @sample_end_lines; #start lines for each sample in the samples section 
+	my %GSMs_hash; #key gsmID -> value Hash (essentially for GSM object)
+
+	foreach my $gse_line (@gse_lines)
 	{ 
+	    #SERIES SECTION OF GSE
+	    if ($gse_line =~ m/^\^SERIES = /)
+	    {
+		$gse_series_line_start = $line_count;
+	    }
+	    if ($gse_line =~ m/^\^PLATFORM = /)
+	    {
+		$gse_series_line_end = $line_count -1;
+	    }
+	    if (defined($gse_series_line_start) && defined($gse_series_line_end) && $gse_series_section_parsed == 0)
+	    {
+		#need to process SERIES PORTION OF GSE
+		$gse_series_section_parsed = 1;
+		my @gse_portion_lines = @gse_lines[$gse_series_line_start..$gse_series_line_end];
+		($gseObject,$listed_gsm_hash_ref) = parse_gse_series_portion(\@gse_portion_lines,$gseObject);
+	    }
+
+	    #PLATFORM(S) SECTION OF GSE
+            if ($gse_line =~ m/^\^PLATFORM = /)
+            { 
+                push(@platform_start_lines,$line_count);
+		my @temp_arr = split(/\s*=\s*/,$gse_line);
+		my $gplID = trim($temp_arr[1]);
+		$platform_hash{$gplID}={"processed" => 0}; 
+            } 
+	    if ($gse_line =~ m/^\!platform_table_end/)
+	    {
+		push(@platform_end_lines,$line_count);
+	    }
+            if (($gse_line =~ m/^\^SAMPLE = /)  && ($platform_end_lines[-1] == ($line_count - 1)))
+	    {
+		#need to process platform section of GSE
+		if (scalar(@platform_start_lines) != scalar(@platform_end_lines))
+		{
+		    push(@{$gseObject->{"gseErrors"}},"The platforms do not have the same number of start positions (" . 
+			 scalar(@platform_start_lines) . 
+			 ") as end positions (" . scalar(@platform_end_lines) . ")");
+		}
+		else
+		{
+		    for (my $platform_counter = 0; $platform_counter < scalar(@platform_start_lines); $platform_counter++) 
+		    {
+			my @gse_platform_lines = @gse_lines[$platform_start_lines[$platform_counter]..$platform_end_lines[$platform_counter]];
+			%platform_hash = %{parse_gse_platform_portion(\%platform_hash,$metaDataOnly,\@gse_platform_lines)};
+		    }
+		}
+		foreach my $temp_gpl_id (keys(%platform_hash))
+		{
+		    if ($platform_hash{$temp_gpl_id} == 0)
+		    {
+			push(@{$gseObject->{"gseErrors"}},"GEO Platform $temp_gpl_id was not able to processed");
+		    }
+		}
+	    }
+            if ($gse_line =~ m/^\^SAMPLE = /)
+	    {
+		push(@sample_start_lines,$line_count);
+	    }
+	    if ($gse_line =~ m/^\!sample_table_end/)
+	    {
+		push(@sample_end_lines,$line_count);
+	    }
 	    $line_count++; 
+	}
+
+	#LOOP Through each sample and parse.
+	if (scalar(@sample_start_lines) != scalar(@sample_end_lines)) 
+	{ 
+	    push(@{$gseObject->{"gseErrors"}},"The samples do not have the same number of start positions (" . 
+		 scalar(@sample_start_lines) . 
+		 ") as end positions (" . scalar(@sample_end_lines) . ")"); 
 	} 
-	print "FINAL LINE COUNT $line_count \n"; 
+	else 
+	{
+	    for (my $sample_counter = 0; $sample_counter < scalar(@sample_start_lines); $sample_counter++) 
+	    { 
+		my @gse_sample_lines = @gse_lines[$sample_start_lines[$sample_counter]..$sample_end_lines[$sample_counter]]; 
+		my %sample_hash = %{parse_gse_sample_portion($metaDataOnly,\%platform_hash,\@gse_sample_lines)}; 
+		my ($gsm_id) = keys(%sample_hash);
+		$gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash{$gsm_id};
+		delete $listed_gsm_hash_ref->{$gsm_id};
+	    } 
+	    foreach my $not_parsed_gsm (keys(%{$listed_gsm_hash_ref}))
+	    {
+		push(@{$gseObject->{"gseErrors"}},"The sample $not_parsed_gsm was in the series header but the sample was not found in the body"); 
+	    }
+	}
+	#print "FINAL LINE COUNT $line_count \n"; 
+	#print "GSM LISTED HASH : \n".Dumper($listed_gsm_hash_ref);
     } 
     #END get_GEO_GSE
     my @_bad_returns;
@@ -5313,6 +5851,7 @@ GPL is a reference to a hash where the following keys are defined:
 	gplID has a value which is a string
 	gplTitle has a value which is a string
 	gplTechnology has a value which is a string
+	gplTaxID has a value which is a string
 ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
 ContactEmail is a string
 ContactPerson is a reference to a hash where the following keys are defined:
@@ -5368,6 +5907,7 @@ GPL is a reference to a hash where the following keys are defined:
 	gplID has a value which is a string
 	gplTitle has a value which is a string
 	gplTechnology has a value which is a string
+	gplTaxID has a value which is a string
 ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
 ContactEmail is a string
 ContactPerson is a reference to a hash where the following keys are defined:
@@ -7095,6 +7635,7 @@ a reference to a hash where the following keys are defined:
 gplID has a value which is a string
 gplTitle has a value which is a string
 gplTechnology has a value which is a string
+gplTaxID has a value which is a string
 
 </pre>
 
@@ -7106,6 +7647,7 @@ a reference to a hash where the following keys are defined:
 gplID has a value which is a string
 gplTitle has a value which is a string
 gplTechnology has a value which is a string
+gplTaxID has a value which is a string
 
 
 =end text
