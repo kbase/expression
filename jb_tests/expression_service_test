@@ -1,16 +1,24 @@
 use strict;
 use Data::Dumper;
 use Bio::KBase::ExpressionServices::ExpressionServicesClient;
+#FOLLOWING TWO LINES IF WANT TO TEST DIRECTLY IN OTHER WAYS
+#use Bio::KBase::ExpressionServices::ExpressionServicesImpl;
+#use Bio::KBase::ExpressionServices::FunctionsForGEO; 
+
+
 #FOR STARMAN
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
 #FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
 #(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
 #Log into your instance
 #sudo su
 #source /kb/deployment/user-env.sh
 #plackup --listen :9999 /kb/dev_container/modules/expression/lib/ExpressionServices.psgi 
-#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
-#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999","deploy.cfg"); 
+my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
+
+
+#For testing the IMP directly
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesImpl->new("http://localhost:9999"); 
 
 my $result;
 print "get_expression_samples_data()\n";
@@ -23,7 +31,7 @@ print "get_expression_data_by_sample_and_features()\n";
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'],
 #					['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'], []); 
-#print Dumper($result) . "\n----------------------------\n";
+print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\
 print "get_expression_samples_data_by_series_ids()\n";
@@ -115,11 +123,14 @@ print "compare_samples()\n";
 #                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
 #                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2}, 
 #                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); 
+#$result = $client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2}}, 
+#                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2}, 
+#                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); 
 #print Dumper($result) . "\n----------------------------\n";
 
 #compare_samples_vs_default_controls 
 print "compare_samples_vs_default_controls()\n"; 
-$result = $client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); 
+#$result = $client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); 
 #print Dumper($result) . "\n----------------------------\n"; 
 
 #compare_samples_vs_the_average
@@ -200,7 +211,16 @@ print "get_expression_series_external_source_ids()\n";
 #get_GEO_GSE\ 
 print "get_GEO_GSE()\n"; 
 #$result = $client->get_GEO_GSE('GSE21782',1);
+#$result = $client->get_GEO_GSE('GSE21782',0);
+#$result = $client->get_GEO_GSE('GSE39462',0);
+$result = $client->get_GEO_GSE('GSE31535',1);
 #print Dumper($result) . "\n----------------------------\n"; 
+
+
+#my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new(); 
+#print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO); 
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',1); 
+#print "GSE OBJECT ". Dumper($gseObject);
 
 
 print "FINAL PRINT\n".Dumper($result) . "\n----------------------------\n";

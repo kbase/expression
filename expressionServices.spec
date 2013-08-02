@@ -198,6 +198,7 @@ module ExpressionServices {
 	string gplTitle;
         string gplTechnology; 
 	string gplTaxID;
+	string gplOrganism;
     } GPL; 
      
     /*Email for the GSM contact person*/

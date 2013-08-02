@@ -1,0 +1,12 @@
+use strict; 
+use Data::Dumper; 
+#use Bio::KBase::ExpressionServices::ExpressionServicesClient; 
+#FOLLOWING TWO LINES IF WANT TO TEST DIRECTLY IN OTHER WAYS 
+#use Bio::KBase::ExpressionServices::ExpressionServicesImpl; 
+use Bio::KBase::ExpressionServices::FunctionsForGEO; 
+
+my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
+print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
+my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',1);
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',0);
+print "GSE OBJECT ". Dumper($gseObject);
