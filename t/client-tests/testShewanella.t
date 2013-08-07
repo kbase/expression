@@ -3,6 +3,11 @@ use Data::Dumper;
 use Test::More;
 use Bio::KBase::ExpressionServices::ExpressionServicesClient;
 
+# this test suite instantiates a client against the localhost expression service.
+# it loads expression samples from the Morgan/Deutschbauer Shewanella data on db1,
+# and performs comparisons between two samples, one for growth on acetate,
+# the other for growth on lactate
+
 my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
 my $n_tests = 0;
 
