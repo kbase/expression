@@ -8,7 +8,7 @@ fetchexprdata.pl - extracts expresion values for each sample from old plant expr
 
 =head1 SYNOPSIS
 
- fetchexprdata.pl [--? --m] --p --l --v --g
+ fetchexprdata.pl [--? --m] --p --l --v
    --p <provider identifier: data loader's email address e.g. kumari@cshl.edu>
    --l <load space identifier: e.g. PlantExprAffyPipeline>
    --v <version number: positive integet starting from 1>
@@ -16,13 +16,13 @@ fetchexprdata.pl - extracts expresion values for each sample from old plant expr
 =head1 DESCRIPTION
 
 This scripts extracts each sample's expression values from old plant expression
-database (devdb1.newyork.kbase.us/kbase_plant) and outputs them in a single file
-that is identified by the GSE# corresponding to the samples. The output files
-are KBase plant expression exchange format ready for further processing by the
-expression DB loading script. Note, the output files follow the log2Level_<GSE#>.tab
-naming convention. The database loading script relying strictly on the exchange
-format naming conventions may have to drop the _<GSE#> portion from the file names
-before processing these files.
+database (devdb1.newyork.kbase.us/kbase_plant OR db1.chicago.kbase.us) and outputs
+them in a single file that is identified by the GSE# corresponding to the samples.
+The output files are KBase plant expression exchange format ready for further 
+processing by the expression DB loading script. Note, the output files follow the 
+measurement_<GSE#>.tab naming convention. The database loading script relying 
+strictly on the exchange format naming conventions may have to drop the _<GSE#> 
+portion from the file names before processing these files.
 
 =head1 OPTIONS
 
@@ -114,15 +114,19 @@ while(my $ref = $sth->fetchrow_arrayref()) {
 	push(@gses, $$ref[0]);
 }
 $sth->finish();
+my $numgses = $#gses+1;
 
 # extract expression values for each sample in the input list of GSEs
 $sth = $dbh->prepare("select a.at as ext_gene_id, c.signal as log2Level, b.ci as sample_id, a.fid as 'feature-id' from at2id_int a, ci2id b, expression_org c, eid2cid d where d.eid=? and d.cid=b.ci and a.id=c.geneID and b.id=c.sampleID");
-for(my $i = 0; $i < 2; $i++) {
-	open(F, ">log2level_$gses[$i].tab");
+$|++;  # Turn off STDOUT buffering; $|-- will enable the buffering again.
+for(my $i = 0; $i < $numgses; $i++) {
+	print "\rProcessing $gses[$i] (".($i+1)." of $numgses) ...";
+	open(F, ">measurement_$gses[$i].tab");
 	$sth->execute($gses[$i]);
 	my $names = $sth->{'NAME'};
 	my $cols = $sth->{'NUM_OF_FIELDS'};
-	print F "source-id\tlog2Level\tstdDev\tnumberOfMeasurements\tconfidenceScore\tconfidenceType\tsample-id\tfeature-id\n";
+	#print F "source-id\tlog2Level\tstdDev\tnumberOfMeasurements\tconfidenceScore\tconfidenceType\tsample-id\tfeature-id\n";
+	print F "source-id\tsample-id\tmeasurement-description-id\tKB-feature-id\tvalue\tmean\tmedian\tstandard-deviation\tN\tp-value\tZ-score\n";
 #	for(my $j = 0; $j < $cols; $j++) {
 #		print F $$names[$j];
 #		if($j != $cols-1) {
@@ -132,7 +136,8 @@ for(my $i = 0; $i < 2; $i++) {
 #		}
 #	}
 	while(my $rowref = $sth->fetchrow_arrayref) {
-		print F "$sourceIdBase".$$rowref[0]."\t".$$rowref[1]."\t.\t.\t.\tnull\t$sourceIdBase".$$rowref[2]."\t".$$rowref[3]."\n";
+		#print F "$sourceIdBase".$$rowref[0]."\t".$$rowref[1]."\t.\t.\t.\tnull\t$sourceIdBase".$$rowref[2]."\t".$$rowref[3]."\n";
+		print F "$sourceIdBase".$$rowref[0]."\t$sourceIdBase".$$rowref[2]."\tkb|measdesc.6\t".$$rowref[3]."\t".$$rowref[1]."\t.\t.\t.\t.\t.\t.\n";
 #		for(my $k = 0; $k < $cols; $k++) {
 #			print F $$rowref[$k];
 #			if($k != $cols-1) {
@@ -144,6 +149,8 @@ for(my $i = 0; $i < 2; $i++) {
 	}
 	close(F);
 }
+print "\n";
+$|--; # enable STDOUT buffering again
 
 #close statement
 $sth->finish();
