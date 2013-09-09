@@ -1,0 +1,4 @@
+This is a file that will allow me to commit the parent directory.
+This folder is for Parsing GEO files where the platform section contains a sequence column and 
+BLAT is able to be run of the platform sequences vs the CDS sequences for the genome.
+The program is set to clean up after itself once it is done with the contents of the files.
