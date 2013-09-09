@@ -6,7 +6,33 @@ use Data::Dumper;
 use Bio::KBase::ExpressionServices::FunctionsForGEO; 
 
 my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
-print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
-my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',1);
+#print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
+
+#Shewanella sequence (in wrong space need to set intensity and log2 in FunctionsForGEO to work.
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',1);
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',0);
+
+#MORGAN'S FILE
+my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',0);
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE10039',1);
+#GSE100039 good for all failures test
+
+#Bug cases that Sunita found.  They have been fixed.
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE10247',1);
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE13641',1);
+
 print "GSE OBJECT ". Dumper($gseObject);
+
+
+#my $blat_results_file = '/kb/dev_container/modules/expression/blat_files/GPL14177_g.20848_blat_results.psl';
+#my $blat_results_file = '/kb/dev_container/modules/expression/blat_files/GPL14177_g.372_blat_results.psl';
+#my $blat_results_file = '/kb/dev_container/modules/expression/blat_files/GPL14177_g.371_blat_results.psl';
+#my %probe_mappings = Bio::KBase::ExpressionServices::FunctionsForGEO::parse_blat_results($blat_results_file); 
+#print "Probe Mappings ". Dumper(\%probe_mappings); 
+#print "NUMBER of probes hit : ". scalar(keys(%probe_mappings)) . "\n";
+#my %unique_genes;
+#foreach my $temp_key (keys(%probe_mappings))
+#{
+#	$unique_genes{$probe_mappings{$temp_key}} = 1;
+#}
+#print "NUMBER of unique genes : ". scalar(keys(%unique_genes)) . "\n";
