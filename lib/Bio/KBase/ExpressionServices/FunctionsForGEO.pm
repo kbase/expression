@@ -1141,7 +1141,7 @@ sub parse_gse_sample_portion
 	    }
 	    else
 	    {
-		$gsm_molecule .= " / " . $gsm_molecule_hash{"!Sample_molecule_ch2"};
+		$gsm_molecule .= "/" . $gsm_molecule_hash{"!Sample_molecule_ch2"};
 	    }
         }
         else 
