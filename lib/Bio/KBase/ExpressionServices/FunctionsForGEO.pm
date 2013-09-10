@@ -1011,7 +1011,7 @@ sub parse_gse_sample_portion
         if (($line =~ m/^\!Sample_treatment_protocol_ch1 = /) ||
 	    ($line =~ m/^\!Sample_growth_protocol_ch1 = /))
 	{
-	    push(@gsm_protocols_array,$line);
+	    push(@gsm_protocols_array,trim($line));
 	}
 	if ($line =~ m/^\!Sample_organism_ch1 = /)
 	{
