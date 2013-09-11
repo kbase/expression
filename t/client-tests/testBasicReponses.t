@@ -82,6 +82,9 @@ my $func_calls = {
 		get_expression_series_summaries=>[['kb|series.1','kb|series.0']],
 		get_expression_series_designs=>[['kb|series.1','kb|series.0']], 
 		get_expression_series_external_source_ids=>[['kb|series.1','kb|series.0']], 
+		get_expression_sample_ids_by_sample_external_source_ids=>[['GSM969611','GSM969635','GSM969619','GSM969620']],
+		get_expression_sample_ids_by_platform_external_source_ids=>[['GPL15821']],
+		get_expression_series_ids_by_series_external_source_ids=>[['GSE39462']],
 };
 ###########################################################################     
 my $n_tests = (scalar(keys %$func_calls)+3); # set this to be the number of function calls + 3;   

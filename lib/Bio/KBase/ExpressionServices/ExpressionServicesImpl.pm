@@ -4874,6 +4874,28 @@ sub get_expression_sample_ids_by_sample_external_source_ids
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($sampleIDs);
     #BEGIN get_expression_sample_ids_by_sample_external_source_ids
+    my $external_source_ids = $ExternalSourceIDs;
+    $sampleIDs = []; 
+    if (0 == @{$external_source_ids}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_sample_external_source_ids requires a list of valid external source ids for the sample.  ".
+	    "These are typically GSM numbers. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							     method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
+    }
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+                           { RaiseError => 1, ShowErrorStatement => 1 }
+        ); 
+    my $get_samples_q = qq^select id from Sample where externalSourceId in (^.
+        join(",", ("?") x @{$external_source_ids}) . ") ";
+    my $get_samples_qh = $dbh->prepare($get_samples_q) or die "Unable to prepare : get_samples_q : ". 
+        $get_samples_q . " : " .$dbh->errstr(); 
+    $get_samples_qh->execute(@{$external_source_ids}) or die "Unable to execute : get_samples_q : ".$get_samples_qh->errstr(); 
+    while (my ($sample_id) = $get_samples_qh->fetchrow_array())
+    {
+	push(@{$sampleIDs},$sample_id);
+    } 
     #END get_expression_sample_ids_by_sample_external_source_ids
     my @_bad_returns;
     (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
@@ -4948,6 +4970,29 @@ sub get_expression_sample_ids_by_platform_external_source_ids
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($sampleIDs);
     #BEGIN get_expression_sample_ids_by_platform_external_source_ids
+    my $external_source_ids = $ExternalSourceIDs; 
+    $sampleIDs = []; 
+    if (0 == @{$external_source_ids}) 
+    { 
+        my $msg = "get_expression_sample_ids_by_platform_external_source_ids requires a list of valid external source ids for the platform.  ". 
+            "These are typically GPL numbers. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_sample_ids_by_platform_external_source_ids'); 
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+    my $get_samples_q = qq^select s.id from Sample s inner join PlatformWithSamples ps on s.id = ps.to_link ^.
+	                qq^inner join Platform p on p.id = ps.from_link where p.externalSourceId in (^. 
+        join(",", ("?") x @{$external_source_ids}) . ") "; 
+    my $get_samples_qh = $dbh->prepare($get_samples_q) or die "Unable to prepare : get_samples_q : ". 
+        $get_samples_q . " : " .$dbh->errstr(); 
+    $get_samples_qh->execute(@{$external_source_ids}) or die "Unable to execute : get_samples_q : ".$get_samples_qh->errstr(); 
+    while (my ($sample_id) = $get_samples_qh->fetchrow_array()) 
+    { 
+        push(@{$sampleIDs},$sample_id); 
+    } 
     #END get_expression_sample_ids_by_platform_external_source_ids
     my @_bad_returns;
     (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
@@ -5022,6 +5067,28 @@ sub get_expression_series_ids_by_series_external_source_ids
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
     my($seriesIDs);
     #BEGIN get_expression_series_ids_by_series_external_source_ids
+    my $external_source_ids = $ExternalSourceIDs; 
+    $seriesIDs = []; 
+    if (0 == @{$external_source_ids}) 
+    { 
+        my $msg = "get_expression_series_ids_by_series_external_source_ids requires a list of valid external source ids for the series.  ".
+            "These are typically GSE numbers. ";
+      Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_series_ids_by_series_external_source_ids');
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+    my $get_series_q = qq^select s.id from Series s where s.externalSourceId in (^.
+			join(",", ("?") x @{$external_source_ids}) . ") ";
+    my $get_series_qh = $dbh->prepare($get_series_q) or die "Unable to prepare : get_series_q : ".
+        $get_series_q . " : " .$dbh->errstr(); 
+    $get_series_qh->execute(@{$external_source_ids}) or die "Unable to execute : get_series_q : ".$get_series_qh->errstr(); 
+    while (my ($series_id) = $get_series_qh->fetchrow_array()) 
+    { 
+        push(@{$seriesIDs},$series_id); 
+    } 
     #END get_expression_series_ids_by_series_external_source_ids
     my @_bad_returns;
     (ref($seriesIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"seriesIDs\" (value was \"$seriesIDs\")");

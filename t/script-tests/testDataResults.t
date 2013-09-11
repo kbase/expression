@@ -62,14 +62,18 @@ print "NOTE THIS TEST SCRIPT HAS AN OPTION TO PASS ADDITIONAL INTEGER ARGUMENTS 
 "22- client->get_expression_samples_types(['kb|sample.2','kb|sample.3']); \n".
 "23- client->get_expression_samples_external_source_ids(['kb|sample.2','kb|sample.3']); \n".
 "24- client->get_expression_sample_original_log2_medians(['kb|sample.2','kb|sample.3']); \n". 
-"25- client->client->get_expression_series_titles(['kb|series.1','kb|series.0']); \n".
-"26- client->client->get_expression_series_summaries(['kb|series.1','kb|series.0']); \n".
-"27- client->client->get_expression_series_designs(['kb|series.1','kb|series.0']); \n".
-"28- client->client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); \n".
+"25- client->get_expression_series_titles(['kb|series.1','kb|series.0']); \n".
+"26- client->get_expression_series_summaries(['kb|series.1','kb|series.0']); \n".
+"27- client->get_expression_series_designs(['kb|series.1','kb|series.0']); \n".
+"28- client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); \n".
+"29- client->get_expression_sample_ids_by_sample_external_source_ids(['GSM969611','GSM969635','GSM969619','GSM969620']); \n".
+"30- client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821']); \n".
+"31- client->get_expression_series_ids_by_series_external_source_ids(['GSE39462']); \n".
+
 
 "**********************************************************************************************************************************\n";
 
-my $n_tests = 188; 
+my $n_tests = 203; 
 
 # MAKE SURE WE LOCALLY HAVE JSON RPC LIBS
 #--
@@ -640,7 +644,7 @@ $result = undef;
 eval { 
     $result = $client->get_expression_sample_ids_by_genome_ids(['Not A real ID','kb|not Real'],'microarray','N');
 }; 
-ok(scalar(@{$result}) == 0,"get_expression_sample_ids_by_genome_ids(['Not A real ID','kb|not Real'],'microarray') throws exception properly because fake genome_ids will not have strain_ids associated with them.");
+ok(scalar(@{$result}) == 0,"get_expression_sample_ids_by_genome_ids(['Not A real ID','kb|not Real'],'microarray') properly returns an empty array because fake genome_ids will not have strain_ids associated with them.");
 $result = undef;
 eval {
     $result = $client->get_expression_sample_ids_by_genome_ids(['kb|g.20848'],'microarray','N');
@@ -665,7 +669,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_sample_titles(['Not A real ID','kb|not Real']);
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_sample_titles(['Not A real ID','kb|not Real']) throws exception properly because fake sample_ids will not have titles associated with them."); 
+ok(scalar(keys(%{$result})) == 0,"get_expression_sample_titles(['Not A real ID','kb|not Real']) properly returns an empty hash because fake sample_ids will not have titles associated with them."); 
+$result = undef; 
 eval {
     $result = $client->get_expression_samples_titles(['kb|sample.2','kb|sample.3']);
 };
@@ -689,7 +694,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_sample_descriptions(['Not A real ID','kb|not Real']);
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_sample_descriptions(['Not A real ID','kb|not Real']) throws exception properly because fake sample_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_sample_descriptions(['Not A real ID','kb|not Real']) properly returns an empty hash because fake sample_ids will not have data associated with them.");
+$result = undef; 
 eval {
     $result = $client->get_expression_samples_descriptions(['kb|sample.2','kb|sample.3']); 
 }; 
@@ -713,7 +719,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_sample_molecules(['Not A real ID','kb|not Real']); 
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_sample_molecules(['Not A real ID','kb|not Real']) throws exception properly because fake sample_ids will not have data associated with them."); 
+ok(scalar(keys(%{$result})) == 0,"get_expression_sample_molecules(['Not A real ID','kb|not Real']) properly returns an empty hash because fake sample_ids will not have data associated with them."); 
+$result = undef; 
 eval { 
     $result = $client->get_expression_samples_molecules(['kb|sample.2','kb|sample.3']); 
 }; 
@@ -738,7 +745,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_sample_types(['Not A real ID','kb|not Real']);
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_sample_types(['Not A real ID','kb|not Real']) throws exception properly because fake sample_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_sample_types(['Not A real ID','kb|not Real']) properly returns and empty hash because fake sample_ids will not have data associated with them.");
+$result = undef; 
 eval { 
     $result = $client->get_expression_samples_types(['kb|sample.2','kb|sample.3']);
 };
@@ -763,7 +771,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_sample_external_source_ids(['Not A real ID','kb|not Real']);
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_sample_external_source_ids(['Not A real ID','kb|not Real']) throws exception properly because fake sample_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_sample_external_source_ids(['Not A real ID','kb|not Real']) properly returns and empty hash because fake sample_ids will not have data associated with them.");
+$result = undef; 
 eval { 
     $result = $client->get_expression_samples_external_source_ids(['kb|sample.2','kb|sample.3']);
 };
@@ -788,7 +797,8 @@ $result = undef;
 eval {
     $result = $client->get_expression_sample_original_log2_medians(['Not A real ID','kb|not Real']);
 };
-ok(scalar(keys(%{$result})) == 0,"get_expression_sample_original_log2_medians(['Not A real ID','kb|not Real']) throws exception properly because fake sample_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_sample_original_log2_medians(['Not A real ID','kb|not Real']) properly returns an empty hash because fake sample_ids will not have data associated with them.");
+$result = undef; 
 eval {
     $result = $client->get_expression_samples_original_log2_medians(['kb|sample.2','kb|sample.3']);
 }; 
@@ -812,7 +822,8 @@ $result = undef;
 eval {
     $result = $client->get_expression_series_titles(['Not A real ID','kb|not Real']);
 };
-ok(scalar(keys(%{$result})) == 0,"get_expression_series_titles(['Not A real ID','kb|not Real']) throws exception properly because fake series_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_series_titles(['Not A real ID','kb|not Real']) properly returns an empty hash because fake series_ids will not have data associated with them.");
+$result = undef; 
 eval {
     $result = $client->get_expression_series_titles(['kb|series.1','kb|series.0']);
 };
@@ -836,7 +847,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_series_summaries(['Not A real ID','kb|not Real']);
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_series_summaries(['Not A real ID','kb|not Real']) throws exception properly because fake series_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_series_summaries(['Not A real ID','kb|not Real']) properly returns and empty hash because fake series_ids will not have data associated with them.");
+$result = undef; 
 eval { 
     $result = $client->get_expression_series_summaries(['kb|series.1','kb|series.0']);
 }; 
@@ -862,7 +874,8 @@ $result = undef;
 eval {
     $result = $client->get_expression_series_designs(['Not A real ID','kb|not Real']);
 };
-ok(scalar(keys(%{$result})) == 0,"get_expression_series_designs(['Not A real ID','kb|not Real']) throws exception properly because fake series_ids will not have data associated with them.");
+ok(scalar(keys(%{$result})) == 0,"get_expression_series_designs(['Not A real ID','kb|not Real'])  properly returns an empty hash because fake series_ids will not have data associated with them.");
+$result = undef; 
 eval {
     $result = $client->get_expression_series_designs(['kb|series.1','kb|series.0']);
 };
@@ -886,7 +899,8 @@ $result = undef;
 eval { 
     $result = $client->get_expression_series_external_source_ids(['Not A real ID','kb|not Real']); 
 }; 
-ok(scalar(keys(%{$result})) == 0,"get_expression_series_external_source_ids(['Not A real ID','kb|not Real']) throws exception properly because fake series_ids will not have data associated with them."); 
+ok(scalar(keys(%{$result})) == 0,"get_expression_series_external_source_ids(['Not A real ID','kb|not Real']) properly returns an empty hashbecause fake series_ids will not have data associated with them."); 
+$result = undef; 
 eval { 
     $result = $client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); 
 }; 
@@ -898,8 +912,85 @@ if (exists($print_hash{28}))
     print Dumper($result); 
 } 
 
+#Test get_expression_sample_ids_by_sample_external_source_ids
+#Test 189 - 193
+print "\n#get_expression_sample_ids_by_sample_external_source_ids portion \n";
+$result = undef;
+eval {
+    $result = $client->get_expression_sample_ids_by_sample_external_source_ids([]);
+};
+ok($@ =~ /requires a list of valid/,"get_expression_sample_ids_by_sample_external_source_ids([]) without sample external ids throws exception properly");
+$result = undef;
+eval {
+    $result = $client->get_expression_sample_ids_by_sample_external_source_ids(['NOT REAL IDS','kb|not_real']);
+};
+ok(scalar(@{$result}) == 0,"get_expression_sample_ids_by_sample_external_source_ids(['Not A real ID','kb|not Real']) ".
+   "properly returns an empty array because fake sample external source ids will not have data associated with them."); 
+$result = undef; 
+eval {
+    $result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM969611','GSM969635','GSM969619','GSM969620']);
+};
+ok($@ eq '',"get_expression_sample_ids_by_sample_external_source_ids call ". $@);
+ok($result,"get_expression_sample_ids_by_sample_external_source_ids(['GSM969611','GSM969635','GSM969619','GSM969620']); returned"); 
+ok(scalar(@{$result}) > 3, "get_expression_sample_ids_by_sample_external_source_ids([['GSM969611','GSM969635','GSM969619','GSM969620']); appropriately has entries"); 
+if (exists($print_hash{29})) 
+{ 
+    print Dumper($result);
+} 
 
 
+#Test get_expression_sample_ids_by_platform_external_source_ids   
+#Test 194 - 198      
+print "\n#get_expression_sample_ids_by_platform_external_source_ids portion \n";
+$result = undef; 
+eval {
+    $result = $client->get_expression_sample_ids_by_platform_external_source_ids([]); 
+}; 
+ok($@ =~ /requires a list of valid/,"get_expression_sample_ids_by_platform_external_source_ids([]) without sample external ids throws exception properly");
+$result = undef;
+eval { 
+    $result = $client->get_expression_sample_ids_by_platform_external_source_ids(['NOT REAL IDS','kb|not_real']);
+}; 
+ok(scalar(@{$result}) == 0,"get_expression_sample_ids_by_platform_external_source_ids(['Not A real ID','kb|not Real']) ".
+   "properly returns an empty array because fake platform external source ids will not have data associated with them."); 
+$result = undef;
+eval {
+    $result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821']); 
+}; 
+ok($@ eq '',"get_expression_sample_ids_by_platform_external_source_ids call ". $@);
+ok($result,"get_expression_sample_ids_by_platform_external_source_ids(['GPL15821']); returned"); 
+ok(scalar(@{$result}) > 35, "get_expression_sample_ids_by_platform_external_source_ids([['GPL15821']); appropriately has entries");
+if (exists($print_hash{30}))
+{ 
+    print Dumper($result); 
+} 
+
+
+#Test get_expression_sample_ids_by_platform_external_source_ids  
+#Test 199 - 203    
+print "\n#get_expression_series_ids_by_series_external_source_ids portion \n";
+$result = undef; 
+eval {
+    $result = $client->get_expression_series_ids_by_series_external_source_ids([]);
+}; 
+ok($@ =~ /requires a list of valid/,"get_expression_series_ids_by_series_external_source_ids([]) without sample external ids throws exception properly");
+$result = undef;
+eval { 
+    $result = $client->get_expression_series_ids_by_series_external_source_ids(['NOT REAL IDS','kb|not_real']);
+}; 
+ok(scalar(@{$result}) == 0,"get_expression_series_ids_by_series_external_source_ids(['Not A real ID','kb|not Real']) ".
+   "properly returns an empty array because fake series external source ids will not have data associated with them.");
+$result = undef; 
+eval { 
+    $result = $client->get_expression_series_ids_by_series_external_source_ids(['GSE39462']);
+}; 
+ok($@ eq '',"get_expression_series_ids_by_series_external_source_ids call ". $@);
+ok($result,"get_expression_series_ids_by_series_external_source_ids(['GSE39462']); returned");
+ok(scalar(@{$result}) > 3, "get_expression_series_ids_by_series_external_source_ids([['GSE39462']); appropriately has entries");
+if (exists($print_hash{31}))
+{ 
+    print Dumper($result); 
+} 
 
 
 Server::stop($pid);

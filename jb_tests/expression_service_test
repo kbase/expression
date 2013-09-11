@@ -7,14 +7,14 @@ use Bio::KBase::ExpressionServices::ExpressionServicesClient;
 
 
 #FOR STARMAN
-#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
+my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:7075");
 #FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
 #(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
 #Log into your instance
 #sudo su
 #source /kb/deployment/user-env.sh
 #plackup --listen :9999 /kb/dev_container/modules/expression/lib/ExpressionServices.psgi 
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
+#my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http://localhost:9999"); 
 
 
 #For testing the IMP directly
@@ -24,14 +24,15 @@ my $result;
 print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data([]);
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
-#$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
+$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'],
 #					['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'], []); 
-print Dumper($result) . "\n----------------------------\n";
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.8'], []); 
+#print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\
 print "get_expression_samples_data_by_series_ids()\n";
@@ -208,12 +209,34 @@ print "get_expression_series_external_source_ids()\n";
 #$result = $client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); 
 #print Dumper($result) . "\n----------------------------\n"; 
 
+#get_expression_sample_ids_by_sample_external_source_ids
+print "get_expression_sample_ids_by_sample_external_source_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM969611','GSM969635','GSM969619','GSM969620']); 
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids([]);
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM9696A11','GSM969635','GSM969619','GSM969620']);  
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM9696A11']);  
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_platform_external_source_ids
+print "get_expression_sample_ids_by_platform_external_source_ids()\n";
+#$result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821']);
+$result = $client->get_expression_sample_ids_by_platform_external_source_ids([]); 
+#$result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821AA']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_series_ids_by_series_external_source_ids
+print "get_expression_series_ids_by_series_external_source_ids()\n";
+#$result = $client->get_expression_series_ids_by_series_external_source_ids(['GSE39462']); 
+#$result = $client->get_expression_series_ids_by_series_external_source_ids([]);
+#$result = $client->get_expression_series_ids_by_series_external_source_ids(['GSE39462AA']);
+#print Dumper($result) . "\n----------------------------\n";
+
 #get_GEO_GSE\ 
 print "get_GEO_GSE()\n"; 
 #$result = $client->get_GEO_GSE('GSE21782',1);
 #$result = $client->get_GEO_GSE('GSE21782',0);
 #$result = $client->get_GEO_GSE('GSE39462',0);
-$result = $client->get_GEO_GSE('GSE31535',1);
+#$result = $client->get_GEO_GSE('GSE31535',1);
 #print Dumper($result) . "\n----------------------------\n"; 
 
 
