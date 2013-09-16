@@ -77,6 +77,7 @@ use Pod::Usage;
 use strict;
 use warnings;
 use DBI;
+use DateTime;
 
 #------------------------------------------------------------------------------#
 # Boiler plate code for extracting command-line options & displaying help/man  #
@@ -99,6 +100,7 @@ my $providerId = $opts{'p'} || die pod2usage(1); #"kumari\@cshl.edu";
 my $loadId = $opts{'l'} || die pod2usage(1);     #"PlantExprAffyPipeline";
 my $ver = $opts{'v'} || die pod2usage(1);        #1;
 my $sourceIdBase = "$providerId:$loadId.$ver|";
+my $dt = DateTime->now->ymd;
 
 my $dbh = DBI->connect('DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us', 'networks_pdev', '', {'RaiseError' => 1}) || die "Can't open database connection\n";
 
@@ -113,7 +115,7 @@ print "\rProcessing PO ...";
 my $sth = $dbh->prepare('select sid_extern as GSM, poid_extern as PO from sample a, smpl_po b, po c where a.sid=b.sid and b.poid=c.poid');
 $sth->execute();
 while(my $ref = $sth->fetchrow_arrayref()) {
-	print SA "$sourceIdBase".$$ref[1]."\t".$$ref[1]."\t.\t.\t$sourceIdBase".$$ref[0]."\n";
+	print SA "$sourceIdBase".$$ref[0]."_".$$ref[1]."\t".$$ref[1]."\t$dt\t.\t$sourceIdBase".$$ref[0]."\n";
 }
 $sth->finish();
 
@@ -122,7 +124,7 @@ print "\rProcessing EO ...";
 $sth = $dbh->prepare('select sid_extern as GSM, eoid_extern as EO from sample a, smpl_eo b, eo c where a.sid=b.sid and b.eoid=c.eoid');
 $sth->execute();
 while(my $ref = $sth->fetchrow_arrayref()) {
-	print SA "$sourceIdBase".$$ref[1]."\t".$$ref[1]."\t.\t.\t$sourceIdBase".$$ref[0]."\n";
+	print SA "$sourceIdBase".$$ref[0]."_".$$ref[1]."\t".$$ref[1]."\t$dt\t.\t$sourceIdBase".$$ref[0]."\n";
 }
 $sth->finish();
 

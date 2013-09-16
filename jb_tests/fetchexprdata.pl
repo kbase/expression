@@ -104,7 +104,7 @@ my $loadId = $opts{'l'} || die pod2usage(1);     #"PlantExprAffyPipeline";
 my $ver = $opts{'v'} || die pod2usage(1);        #1;
 my $sourceIdBase = "$providerId:$loadId.$ver|";
 
-my $dbh = DBI->connect('DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us', 'networks_pdev', '', {'RaiseError' => 1}) || die "Can't open database connection\n";
+my $dbh = DBI->connect('DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us', 'networks_pdev', '', {'RaiseError' => 1, 'ShowErrorStatement' = > 1}) || die "Can't open database connection\n";
 
 # Obtain list of all distinct GSEs from the old plant expression database.
 my $sth = $dbh->prepare('SELECT distinct eid from eid2cid');
@@ -137,7 +137,7 @@ for(my $i = 0; $i < $numgses; $i++) {
 #	}
 	while(my $rowref = $sth->fetchrow_arrayref) {
 		#print F "$sourceIdBase".$$rowref[0]."\t".$$rowref[1]."\t.\t.\t.\tnull\t$sourceIdBase".$$rowref[2]."\t".$$rowref[3]."\n";
-		print F "$sourceIdBase".$$rowref[0]."\t$sourceIdBase".$$rowref[2]."\tkb|measdesc.6\t".$$rowref[3]."\t".$$rowref[1]."\t.\t.\t.\t.\t.\t.\n";
+		print F "$sourceIdBase".$$rowref[0]."\t$sourceIdBase".$$rowref[2]."\tkb|measdesc.6\t".$$rowref[3]."\t".$$rowref[1]."\t.\t.\t.\t1\t.\t.\n";
 #		for(my $k = 0; $k < $cols; $k++) {
 #			print F $$rowref[$k];
 #			if($k != $cols-1) {
