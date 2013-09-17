@@ -45,7 +45,7 @@ DESCRIPTION
         Measurement is a float
 
 EXAMPLES
-    perl get_expression_data_by_feature_ids.pl -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687' -sampleType='microarray' -wildTypeOnly='Y'
+    perl expr-get-expression-data-by-feature-ids.pl -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687' -sampleType='microarray' -wildTypeOnly='Y'
 
 AUTHORS
     Jason Baumohl (jkbaumohl\@lbl.gov)
@@ -74,9 +74,7 @@ if (defined($h) || defined($help) || defined($man)) {
 }
 if (scalar(@featureID) < 1 )
 {
-    print "NOTE This requires FeatureIDs to passed in.\n    
-          Ex: perl get_expression_data_by_feature_ids.pl -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687' 
-          -sampleType='microarray' -wildTypeOnly='Y' ".
+    print "NOTE This requires FeatureIDs to passed in.\n    ".
 	  $DESCRIPTION;
     exit 1;
 }

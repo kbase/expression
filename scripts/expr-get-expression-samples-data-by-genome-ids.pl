@@ -104,7 +104,7 @@ DESCRIPTION
         Measurement is a float
 
 EXAMPLES
-    perl get_expression_samples_data_by_genome_ids.pl -genomeID='kb|g.20848' -genomeID='kb|g.0' -sampleType='microarray' -wildTypeOnly='Y'
+    perl expr-get-expression-samples-data-by-genome-ids.pl -genomeID='kb|g.20848' -genomeID='kb|g.0' -sampleType='microarray' -wildTypeOnly='Y'
 
 AUTHORS
     Jason Baumohl (jkbaumohl\@lbl.gov)
@@ -133,8 +133,7 @@ if (defined($h) || defined($help) || defined($man)) {
 }
 if (scalar(@genomeID) < 1 )
 {
-    print "NOTE This requires genomeIDs to passed in.\n    
-           Ex: perl get_expression_samples_data_by_genome_ids.pl -genomeID='kb|g.20848' -genomeID='kb|g.0' -sampleType='microarray' -wildTypeOnly='Y' \n".
+    print "NOTE This requires genomeIDs to passed in.\n    ".
 	  $DESCRIPTION;
     exit 1;
 }

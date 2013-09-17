@@ -41,8 +41,8 @@ DESCRIPTION
         Measurement is a float
 
 EXAMPLES
-    perl get_expression_data_by_samples_and_features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3' -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687'
-	   OR perl get_expression_data_by_samples_and_features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3'  (if you want all features with measurments) 
+    perl expr-get-expression-data-by-samples-and-features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3' -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687'
+	   OR perl expr-get-expression-data-by-samples-and-features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3'  (if you want all features with measurments) 
 
 AUTHORS
     Jason Baumohl (jkbaumohl\@lbl.gov)
