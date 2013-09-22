@@ -92,6 +92,7 @@ use DateTime;
 use Data::Dumper;
 use Bio::KBase::ExpressionServices::ExpressionServicesClient;
 use DBI;
+use Digest::MD5 qw(md5 md5_hex md5_base64);
 
 #------------------------------------------------------------------------------#
 # Boiler plate code for extracting command-line options & displaying help/man  #
@@ -130,19 +131,26 @@ open(SER, ">$odir/series.tab");
 open(SAM, ">$odir/sample.tab");
 open(PER, ">$odir/person.tab");
 open(PRO, ">$odir/protocol.tab");
-open(PLA, ">$odir/platform.tab");
-open(STR, ">$odir/strain.tab");
+#open(PLA, ">$odir/platform.tab");
+#open(STR, ">$odir/strain.tab");
 open(PUB, ">$odir/publication.tab");
+open(LOG, ">$odir/plexpr.log");
+open(PAS, ">$odir/Good_GSE_GSM");
 
 # write header line for each .tab file
 print SER "source-id\texternalSourceId\tkbaseSubmissionDate\texternalSourceDate\tpublicationIds\tsamples\ttitle\tsummary\tdesign\n";
-print SAM "source-id\tmolecule\ttype\texternalSourceId\tdataSource\tkbaseSubmissionDate\texternalSourceDate\toriginalLog2Median\tpersons\tstrain-id\tplatform-id\tprotocol-id\texperimentalUnit-id\tdefaultControlSample-id\taveragedFromSamples\ttitle\tdescription\n";
+print SAM "source-id\ttitle\tdescription\tmolecule\ttype\texternalSourceId\tdataSource\tkbaseSubmissionDate\texternalSourceDate\toriginalLog2Median\tpersons\tstrain-id\tplatform-id\tprotocol-id\texperimentalUnit-id\tdefaultControlSample-id\taveragedFromSamples\n";
 print PER "source-id\tContact-Email\tFirst-Name\tLast-Name\tInstitution\n";
 print PRO "source-id\tPublication\tName\tDescription\n";
 print PUB "source-id\tPubdate\tTitle\n";
-print PLA "source-id\tstrain-id\ttype\ttechnology\texternalSourceId\ttitle\n";
-print STR "source-id\tAggregateData\tName\tReference-strain\tParent-strain-id\tGenome-id\tKnockouts\tWildtype\tDescsription\n";
-          # M          M               R     M                  O                 M           O        M         R
+#print PLA "source-id\tstrain-id\ttype\ttechnology\texternalSourceId\ttitle\n";
+#print STR "source-id\tAggregateData\tName\tReference-strain\tParent-strain-id\tGenome-id\tKnockouts\tWildtype\tDescription\n";
+
+# HARD CODED KB|IDs ... this code needs to be refactored after initial load (19-Sep-2013)
+my $athStrId = "kb|str.18125";
+my $ptrStrId = "kb|str.18126";
+my $athPlaId = "kb|platform.1";
+my $ptrPlaId = "kb|platform.2";
 
 # Common Data Fields: source-id base string and today's date
 my $providerId = $opts{'p'} || die pod2usage(1); #"kumari\@cshl.edu";
@@ -152,8 +160,11 @@ my $sourceIdBase = "$providerId:$loadId.$ver|";
 my $dt = DateTime->now;   # Store current date and time as datetime object
 my $d  = $dt->ymd;        # Retrieve date as in 'yyyy-mm-dd' format
 # get input list of GSEs
-my $db1h = DBI->connect('DBI:mysql:expression:db1.chicago.kbase.us','expressionselect',{ RaiseError => 1, ShowErrorStatement => 1});
-my $sth = $db1h->prepare("select id as genomeid from kbase_sapling_v1.Genome where scientific_name=?");
+my $db1h = DBI->connect('DBI:mysql:expression;host=db1.chicago.kbase.us','expressionselect','',{ RaiseError => 1, ShowErrorStatement => 1});
+my $strainIdQuery = "select s.id from Strain s inner join  GenomeParentOf g where s.refe.wildtype='Y' and g.from_link=?"; #Ath='kb|g.3899'; Ptr='kb|g.3907'
+my $platformIdQuery = "";
+my $genomeIdQuery = "select id as genomeid from kbase_sapling_v1.Genome where scientific_name=?";
+my $sth = $db1h->prepare($genomeIdQuery);
 
 my $gsefile = $opts{'g'} || die pod2usage(1);
 my @gses;
@@ -168,13 +179,13 @@ my $cnt = 0;
 # turn off STDOUT buffering i.e. flush immediately
 $| = 1;
 
-my $unk = 1;  # counter for creating unquite "unknown" as a data value
+#my $unk = 1;  # counter for creating unquite "unknown" as a data value
 my %persons = ();
-my %platforms = ();
+#my %platforms = ();
 my %publication = ();
-my %strain = ();
-open(ERR, ">$odir/gse_error_log");
-open(WAR, ">$odir/gse_warning_log");
+#my %strain = ();
+open(ERR, ">$odir/plexpr_erro.log");
+open(WAR, ">$odir/plexpr_warn.log");
 
 foreach my $gse (@gses) {
 	++$cnt;
@@ -205,14 +216,16 @@ foreach my $gse (@gses) {
 	if(!defined($gsePubMedID)) {
 		$gsePubMedID = ".";
 	} else {
-		$publication{$gsePubMedID} = "pubmed|".$gsePubMedID;
+		$gsePubMedID =~ s/\s+/_/g;
+		$gsePubMedID = "pubmed|$gsePubMedID";
+		$publication{$gsePubMedID} = $gseSubmissionDate;
 	}
 	my $gsmref = $href->{'gseSamples'};
 	my $gsm = "";
-	foreach my $k (keys(%{$gsmref})) {
-		$gsm .= "$sourceIdBase$k,";
-	}
-	$gsm =~ s/,$//;
+	#foreach my $k (keys(%{$gsmref})) {
+	#	$gsm .= "$sourceIdBase$k,";
+	#}
+	#$gsm =~ s/,$//;
 	my $title = $href->{'gseTitle'};
 	$title = substr($title,0,500);
 	my $summary = $href->{'gseSummary'};
@@ -221,7 +234,6 @@ foreach my $gse (@gses) {
 	$design = "Not available from source" if(!defined($design));
 	$design = substr($design,0,500);
 	my $seriesSrcId = "$sourceIdBase$gseId";
-	print SER "$seriesSrcId\t$gseId\t$d\t$gseSubmissionDate\t$gsePubMedID\t$gsm\t$title\t$summary\t$design\n";
 	
 	# write data to sample.tab
 	# NOTE: gsmPlatform{'gplID' => 'GPL198'}
@@ -234,18 +246,27 @@ foreach my $gse (@gses) {
 			}
 			next; # don't parse rest of the GSM data
 		}
+		my $unkemail = 0;  # initially assume email is given
 		if(@gsmWarnings) {
 			foreach my $warning (@gsmWarnings) {
 				print WAR "$gse->$g: $warning\n";
+				if($warning =~ m/.*no contact email.*/) {
+					$unkemail = 1;
+				}
 			}
 		}
 		my $gsmOrganism = $gsmref->{$g}->{'gsmSampleOrganism'};
-		$gsmOrganism =~ s/\s+/_/;
+		$gsmOrganism =~ s/\s+/_/g;
 		my $sampleSrcId = "$sourceIdBase$g-$gsmOrganism";
+		$gsm .= $sampleSrcId.",";
+
+		print PAS "$gse\t$g\t$sampleSrcId\n";
+
 		$samples{$g} = $sampleSrcId; # store GSM source-id
 		my $molecule = $gsmref->{$g}->{'gsmMolecule'};
 		if(!defined($molecule)) {
 			$molecule = "UNKNOWN";
+			print LOG "$g:$g: GEO Parser could not figure out the molecule type\n";
 		}
 		my $type = "microarray";                                       #$gsmref->{$g}->{''};
 		my $dataSource = "GEO";                                        #$gsmref->{$g}->{''};
@@ -254,31 +275,51 @@ foreach my $gse (@gses) {
 		my $person = "";
 		my $pref = $gsmref->{$g}->{'contactPeople'};
 		foreach my $email (keys(%{$pref})) {
-			if(!defined($email) || length($email=~s/\s*//) == 0) {
-				$email = "unknown_email_$unk";
-				++$unk;
-			}
 			my $fn = $pref->{$email}->{'contactFirstName'};
 			if(!defined($fn)) {
-				$fn = "unknown_fn_$unk";
-				++$unk;
+				$fn = "unknown_fn";
+			} else {
+				$fn =~ s/^\s+//;
+				$fn =~ s/\s+$//;
+				if(length($fn) > 0) {
+					$fn =~ s/ /_/g;
+				} else {
+					$fn = "unknown_fn";
+				}
 			}
 			my $ln = $pref->{$email}->{'contactLastName'};
 			if(!defined($ln)) {
-				$ln = "unknown_ln_$unk";
-				++$unk;
-			}
+				$ln = "unknown_ln";
+			} else {
+                                $ln =~ s/^\s+//;
+                                $ln =~ s/\s+$//;
+                                if(length($ln) > 0) {
+                                        $ln =~ s/ /_/g;
+                                } else {
+                                        $ln = "unknown_ln";
+                                }
+                        }
 			my $inst = $pref->{$email}->{'contactInstitution'};
 			if(!defined($inst)) {
-				$inst = "unknown_inst_$unk";
-				++$unk;
+				$inst = "unknown_inst";
+			} else {
+                                $inst =~ s/^\s+//;
+                                $inst =~ s/\s+$//;
+                                if(length($inst) > 0) {
+                                } else {
+                                        $inst = "unknown_inst";
+                                }
+                        }
+			if($unkemail) {
+				$email = "email\@unknown";
 			}
 			# Take care of the redundancy (if any) due to letter-case
 			$email = lc($email);
 			$fn = lc($fn);
 			$ln = lc($ln);
 			$inst = lc($inst);
-			my $personSrcId = "$email:$loadId.$ver|$fn$ln";
+			my $md5 = md5_hex("$fn$ln$email");
+			my $personSrcId = "$providerId:$loadId.$ver|$md5";
 			$person = $person.$personSrcId.",";
 			my $personkey = "$personSrcId\t$email\t$fn\t$ln\t$inst";
 			$persons{$personkey} = 1;
@@ -287,42 +328,72 @@ foreach my $gse (@gses) {
 		my $gsmTaxId = $gsmref->{$g}->{'gsmTaxID'};
 		my $platformRef = $gsmref->{$g}->{'gsmPlatform'};
 		my $gpl = $platformRef->{'gplID'};
-		my $platformSrcId = "$sourceIdBase$gpl";
-		my $strainSrcId = "$providerId:$gsmOrganism-$gsmTaxId.$ver|$gsmOrganism";
-		if(!defined($strain{$strainSrcId})) {
-			$sth->execute($gsmOrganism);
-			my @row = $sth->fetchrow_array;
-			my $genomeId = $row[0];
-			$sth->finish;
-			$strain{$strainSrcId} = "FALSE\t$gsmOrganism\tFALSE\t.\t$genomeId\t.\tTRUE\t$gsmOrganism";
+		my $platformSrcId;
+		my $strainSrcId;
+		if($gpl eq 'GPL198' || $gsmTaxId eq '3702') {
+			$platformSrcId = $athPlaId;
+			$strainSrcId = $athStrId;
+		} elsif($gpl eq 'GPL4359' || $gsmTaxId eq '3694') {
+			$platformSrcId = $ptrPlaId;
+			$strainSrcId = $ptrStrId;
+		} else {
+			print LOG "Strain ID and/or Platform ID error: $gse, $g, $gsmTaxId, $gpl\n";
 		}
-		if(!defined($platforms{$platformSrcId})) {
-			my $gplTaxId = $platformRef->{'gplTaxID'};
-			my $gplTechnology = $platformRef->{'gplTechnology'};
-			my $gplTitle = $platformRef->{'gplTitle'};
-			$platforms{$platformSrcId} = "$strainSrcId\t$type\t$gplTechnology\t$gpl\t$gplTitle";
-		}
+		#my $platformSrcId = "$sourceIdBase$gpl";
+		#my $strainSrcId = "$providerId:$gsmOrganism-$gsmTaxId.$ver|$gsmOrganism";
+		#if(!defined($strain{$strainSrcId})) {
+		#	my $sciSpName = $gsmOrganism;
+		#	$sciSpName =~ s/_/ /g;
+		#	$sth->execute($sciSpName);
+		#	my @row = $sth->fetchrow_array;
+		#	my $genomeId = $row[0];
+		#	if(!defined($genomeId)) {
+		#		print LOG "Genome Id fetched from DB failed: $gse | $g | $sciSpName\n";
+		#	}
+		#	$sth->finish;
+		#	$strain{$strainSrcId} = "FALSE\t$gsmOrganism-wildtype\tTRUE\t.\t$genomeId\t.\tTRUE\t$sciSpName wildtype";
+		#}
+		#if(!defined($platforms{$platformSrcId})) {
+		#	my $gplTaxId = $platformRef->{'gplTaxID'};
+		#	my $gplTechnology = $platformRef->{'gplTechnology'};
+		#	my $gplTitle = $platformRef->{'gplTitle'};
+		#	$platforms{$platformSrcId} = "$strainSrcId\t$type\t$gplTechnology\t$gpl\t$gplTitle";
+		#}
 		my $gsmProtocolDesc = $gsmref->{$g}->{'gsmProtocol'};
-		if(!defined($gsmProtocolDesc)) {
-			$gsmProtocolDesc = "unknown";
-		}
-		my $protocolSrcId = $protocols{$gsmProtocolDesc};
-		if(!defined($protocols{$gsmProtocolDesc})) {
-			$protocolSrcId = "$sourceIdBase$gseId-Protocol_$protCount";
-			$protocols{$gsmProtocolDesc} = $protocolSrcId;
-			++$protCount;
+		my $protocolSrcId;
+		undef $protocolSrcId;
+		if(defined($gsmProtocolDesc)) {
+			$gsmProtocolDesc =~ s/^\s*//;
+			$gsmProtocolDesc =~ s/\s*$//;
+			if(length($gsmProtocolDesc) > 0) {
+				$protocolSrcId = $protocols{$gsmProtocolDesc};
+				if(!defined($protocolSrcId)) {
+					$protocolSrcId = "$sourceIdBase$gseId-Protocol_$protCount";
+					$protocols{$gsmProtocolDesc} = $protocolSrcId;
+					++$protCount;
+				}
+			} else {
+				$protocolSrcId = ".";
+			}
+		} else {
+			$protocolSrcId = ".";
 		}
 		my $experimentalUnitId = ".";                                  #$gsmref->{$g}->{''};
 		my $defaultControlSampleId = ".";                              #$gsmref->{$g}->{''};
 		my $averagedFromSamples = ".";                                 #$gsmref->{$g}->{''};
 		my $title = $gsmref->{$g}->{'gsmTitle'};
 		my $description = $gsmref->{$g}->{'gsmDescription'};
-		print SAM "$sampleSrcId\t$molecule\t$type\t$g\t$dataSource\t$d\t$externalSourceDate\t$originalLog2Median\t$person\t$strainSrcId\t$platformSrcId\t$protocolSrcId\t$experimentalUnitId\t$defaultControlSampleId\t$averagedFromSamples\t$title\t$description\n";
+		$description =~ s/\s*$//;
+		$description =~ s/^\s*//;
+		print SAM "$sampleSrcId\t$title\t$description\t$molecule\t$type\t$g\t$dataSource\t$d\t$externalSourceDate\t$originalLog2Median\t$person\t$strainSrcId\t$platformSrcId\t$protocolSrcId\t$experimentalUnitId\t$defaultControlSampleId\t$averagedFromSamples\n";
 	}
-	foreach my $kk (keys(%protocols)) {
-		my $protocolSrcId = $protocols{$kk};
-		print PRO "$protocolSrcId\t.\tno-name\t$kk\n"; # where $kk = Protocol Description;
+	foreach my $p (keys(%protocols)) {
+		my $protSrcId = $protocols{$p};
+		print PRO "$protSrcId\t.\tno-name\t$p\n"; # where $kk = Protocol Description;
 	}
+	$gsm =~ s/,$//;
+	print SER "$seriesSrcId\t$gseId\t$d\t$gseSubmissionDate\t$gsePubMedID\t$gsm\t$title\t$summary\t$design\n";
+	$gsm = ""; # re-initialize it for next series
 }
 
 $db1h->disconnect;
@@ -335,27 +406,28 @@ foreach my $k (keys(%persons)) {
 }
 
 # write data to platform.tab
-foreach my $k (keys(%platforms)) {
-	print PLA "$k\t".$platforms{$k}."\n";
-}
+#foreach my $k (keys(%platforms)) {
+#	print PLA "$k\t".$platforms{$k}."\n";
+#}
 
 # write data to publication.tab
 foreach my $k (keys(%publication)) {
-	print PUB $publication{$k}."\tcurrdate\tunknown\n";
+	print PUB "$k\t".$publication{$k}."\tunknown\n";
 }
 
 # write data to strain.tab
-foreach my $strn (keys(%strain)) {
-	print STR "$strn\t".$strain{$strn}."\n";
-}
+#foreach my $strn (keys(%strain)) {
+#	print STR "$strn\t".$strain{$strn}."\n";
+#}
 
 # close all open files
 close SER;
 close SAM;
 close PER;
 close PRO;
-close PLA;
-close STR;
+#close PLA;
+#close STR;
 close PUB;
 close ERR;
 close WAR;
+close LOG;
