@@ -404,7 +404,7 @@ if ($need_new_measurement_file == 1)
 
 	#make new sample.tab file
 	open (SAMPLE_FILE, ">".$sample_file) or die "Unable to make the new sample file : $sample_file $!\n";
-	print SAMPLE_FILE $sample_header_line;
+	print SAMPLE_FILE $sample_header_line . "\n";
 
 	foreach my $sample_source_id (sort(keys(%sample_lines_hash)))
 	{

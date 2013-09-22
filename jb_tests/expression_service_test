@@ -220,7 +220,8 @@ print "get_expression_sample_ids_by_sample_external_source_ids()\n";
 #get_expression_sample_ids_by_platform_external_source_ids
 print "get_expression_sample_ids_by_platform_external_source_ids()\n";
 #$result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821']);
-$result = $client->get_expression_sample_ids_by_platform_external_source_ids([]); 
+#FOLLOWING ONE throws an error (planned)
+#$result = $client->get_expression_sample_ids_by_platform_external_source_ids([]); 
 #$result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821AA']);
 #print Dumper($result) . "\n----------------------------\n";
 

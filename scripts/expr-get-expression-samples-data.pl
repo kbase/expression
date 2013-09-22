@@ -92,7 +92,7 @@ DESCRIPTION
     Measurement is a float
 
 EXAMPLES
-    perl get_expression_samples_data.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3' 
+    perl expr-get-expression-samples-data.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3' 
 
 AUTHORS
     Jason Baumohl (jkbaumohl\@lbl.gov)
@@ -117,7 +117,7 @@ if (defined($h) || defined($help) || defined($man)) {
 }
 if (scalar(@sampleID) < 1)
 {
-    print "NOTE This requires SampleIDs to passed in.\n    Ex: perl get_expression_samples_data.pl -sampleID=kb|sample.2 -sampleID=kb|sample.3 ".
+    print "NOTE This requires SampleIDs to passed in.\n   ".
 	$DESCRIPTION;
     exit 1;
 }
