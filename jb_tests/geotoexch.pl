@@ -385,6 +385,7 @@ foreach my $gse (@gses) {
 		my $description = $gsmref->{$g}->{'gsmDescription'};
 		$description =~ s/\s*$//;
 		$description =~ s/^\s*//;
+		$description = substr($description,0,500) if(length($description) > 500);
 		print SAM "$sampleSrcId\t$title\t$description\t$molecule\t$type\t$g\t$dataSource\t$d\t$externalSourceDate\t$originalLog2Median\t$person\t$strainSrcId\t$platformSrcId\t$protocolSrcId\t$experimentalUnitId\t$defaultControlSampleId\t$averagedFromSamples\n";
 	}
 	foreach my $p (keys(%protocols)) {
