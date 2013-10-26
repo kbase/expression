@@ -2,6 +2,12 @@ use POSIX;
 use strict;
 use DBI; 
 
+my $timestamp = localtime(time);
+print "\nSTART TIME $timestamp \n";
+
+
+my $feature_batch_size = 10000;	
+my $sample_batch_size = 200;
 my $deploy_file = "/kb/dev_container/modules/expression/deploy.cfg";
 open (DEPLOY,$deploy_file) or die "Unable to open deploy file : $deploy_file.\n\n"; 
 my @deploy_lines = (<DEPLOY>);
@@ -34,6 +40,11 @@ my $dbh = DBI->connect('DBI:mysql:'.$db_name.':'.$db_host, $db_user, '',
     );
 
 my $dir = shift;	
+my $show_measurement_duplicates = shift;
+if ($show_measurement_duplicates eq "show")
+{
+    $show_measurement_duplicates = 1;
+}
 my $ls = `ls $dir`;	
 my @ls_array = split(/\s+/,$ls);
 my %ls_hash;
@@ -137,14 +148,35 @@ if (!exists($ls_hash{'measurement.tab'}))
 { 
         $error_message .= "A measurement.tab file was not found in $dir : This program requires a measurement.tab file.\n";
 } 
-my $sample_file = $dir . "/sample.tab";
-open (IN,$sample_file) or die "Unable to open sample file : $sample_file.\n\n"; 
+
+if ($error_message ne '') 
+{ 
+        print $error_message; 
+        exit; 
+} 
+
+
+#
+#Go Through Sample FILE and check if it is OK.
+#
+
+my %feature_id_hash; #key {feature_id} -> value pointer to array of line numbers that contain that feature.
+
+#Move original sample.tab and measurement.tab to original_sample.tab and original_measurement.tab respectively.
+#(Only does log2level if the median of all sample was not zero)
+print "\nMoving the  $dir/sample.tab to $dir/original_sample.tab\n"; 
+print "\nMoving the  $dir/measurement.tab to $dir/original_measurement.tab\n"; 
+`mv $dir/sample.tab $dir/original_sample.tab`; 
+`mv $dir/measurement.tab $dir/original_measurement.tab`;
+
+my $original_sample_file = $dir . "/original_sample.tab";
+open(IN,$original_sample_file) or die "Unable to open sample file : $original_sample_file.\n\n"; 
 my @sample_lines = (<IN>); 
 close(IN);
 chomp(@sample_lines);
 for (my $i = 0; $i <  scalar(@sample_lines); $i++)
 {
-	$sample_lines[$i] =~ s/\r//; 
+    $sample_lines[$i] =~ s/\r//; 
 }	
 my %sample_lines_hash;  #key source_id ->values an array ref to the elements on the line
 my $sample_header_line = shift(@sample_lines);  #Must contain source-id and originalLog2Medain column headers
@@ -154,63 +186,63 @@ my $sampleSourceIdColIndex = undef;
 my $header_counter = 0;
 foreach my $header_column (@header_columns)
 { 
-  $header_column = trim($header_column);
-  $originalLog2MedianColIndex = column_header_checker($header_column,'^originalLog2Median$',$originalLog2MedianColIndex,$header_counter);
-  $sampleSourceIdColIndex = column_header_checker($header_column,'^source-id$',$sampleSourceIdColIndex,$header_counter);
-  $header_counter++;
+    $header_column = trim($header_column);
+    $originalLog2MedianColIndex = column_header_checker($header_column,'^originalLog2Median$',$originalLog2MedianColIndex,$header_counter);
+    $sampleSourceIdColIndex = column_header_checker($header_column,'^source-id$',$sampleSourceIdColIndex,$header_counter);
+    $header_counter++;
 }
 unless (defined($originalLog2MedianColIndex) && defined($sampleSourceIdColIndex))
 {
-	$error_message .= "The sample.tab file must have a 'source-id' and 'originalLog2Median' column headers.\n";
+    $error_message .= "The sample.tab file must have a 'source-id' and 'originalLog2Median' column headers.\n";
 }
 if (($originalLog2MedianColIndex eq "duplicate") || ($sampleSourceIdColIndex eq "duplicate"))
 {
-	$error_message .= "The sample.tab file has a duplicate column headers for 'source-id' and/or 'originalLog2Median'.\n";
+    $error_message .= "The sample.tab file has a duplicate column headers for 'source-id' and/or 'originalLog2Median'.\n";
 }
-if ($error_message ne '') 
-{ 
-        print $error_message; 
-        exit; 
-} 
-
+#LOOP THROUGH SAMPLE RECORDS and get the source-ids.
 foreach my $sample_line (@sample_lines) 
-{ 
-        my @sample_elements = split("\t",$sample_line); 
-        if ($sample_elements[$sampleSourceIdColIndex] eq '') 
-        { 
-                $error_message .= "One of the lines in the sample file does not contain a source_id\n"; 
-        } 
-        elsif (!(($sample_elements[$originalLog2MedianColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
-	      || ($sample_elements[$originalLog2MedianColIndex] eq "."))) 
-        { 
-                $error_message .= "The Sample with source-id of ".$sample_elements[$sampleSourceIdColIndex].
-			       " does not have a valid originalLog2Median (must be a number or .)\n"; 
-        } 
-        else #populate data_structure. 
-        { 
-#               #CUSTOM IS ALWAYS FALSE (will add capability for custom averagings later). 
-#               $sample_elements[10] = 'FALSE'; 
-                $sample_lines_hash{$sample_elements[$sampleSourceIdColIndex]} = \@sample_elements; 
-        } 
-} 
-#check that Median of Log2Level is Zero 
-my $measurement_file = $dir . "/measurement.tab"; 
-open (IN,$measurement_file) or die "Unable to open measurement file : $measurement_file.\n\n"; 
-my @measurement_lines = (<IN>); 
-close(IN); 
-chomp(@measurement_lines); 
-for (my $i = 0; $i <  scalar(@measurement_lines); $i++) 
-{ 
-        $measurement_lines[$i] =~ s/\r//; 
+{
+    my @sample_elements = split("\t",$sample_line); 
+    if ($sample_elements[$sampleSourceIdColIndex] eq '') 
+    { 
+        $error_message .= "One of the lines in the sample file does not contain a source_id\n";
+    } 
+    elsif (!(($sample_elements[$originalLog2MedianColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/)
+              || ($sample_elements[$originalLog2MedianColIndex] eq ".")))
+    { 
+        $error_message .= "The Sample with source-id of ".$sample_elements[$sampleSourceIdColIndex].
+                               " does not have a valid originalLog2Median (must be a number or .)\n";
+    } 
+    else #populate data_structure. 
+    { 
+	if (defined($sample_lines_hash{$sample_elements[$sampleSourceIdColIndex]}))
+	{
+	    $error_message .= "Multiple samples have the source-id of ".
+	                      $sample_elements[$sampleSourceIdColIndex]."\n";
+	}
+	else
+	{
+	     $sample_lines_hash{$sample_elements[$sampleSourceIdColIndex]} = \@sample_elements; 
+	}
+    } 
 } 
 
-my $measurement_header_line = shift(@measurement_lines);  #Must contain value, sample-id, source-id and KB-feature-id column headers 
+
+#
+#Check measurement file for filled out entries, valid Sample-IDs and FeatureIDs existing on DB.
+#
+my %unique_sample_source_ids_in_measurement_file;
+my $original_measurement_file = $dir . "/original_measurement.tab"; 
+open(IN,$original_measurement_file) or die "Unable to open measurement file : $original_measurement_file.\n\n"; 
+my $measurement_header_line = <IN>;
+chomp($measurement_header_line);
+$measurement_header_line =~ s/\r//;		 
 my @measurement_header_columns = split(/\t/,$measurement_header_line); 
 my $kbFeatureIdColIndex = undef; 
 my $valueColIndex = undef; 
 my $sampleIdColIndex = undef; 
-my $measurementSourceIdColIndex = undef;
-my $header_counter = 0;
+my $measurementSourceIdColIndex = undef; 
+my $header_counter = 0; 
 foreach my $header_column (@measurement_header_columns) 
 { 
   $header_column = trim($header_column); 
@@ -227,215 +259,270 @@ unless (defined($kbFeatureIdColIndex) && defined($valueColIndex)  && defined($sa
 if (($kbFeatureIdColIndex eq "duplicate") || ($valueColIndex eq "duplicate") 
    || ($sampleIdColIndex eq "duplicate") || ($measurementSourceIdColIndex eq "duplicate")) 
 { 
-        $error_message .= "The measurement.tab file has a duplicate column headers for 'source-id','KB-feature-id','value' and/or 'sample-id'.\n";
-        $error_message .= "'source-id' - $measurementSourceIdColIndex \n 'KB-feature-id' - $kbFeatureIdColIndex \n".
-	                  "'value' - $valueColIndex \n 'sample-id' - $sampleIdColIndex .\n";
- 
+        $error_message .= "The measurement.tab file has a duplicate column headers for 'source-id','KB-feature-id','value' and/or 'sample-id'.\n"; 
+        $error_message .= "'source-id' - $measurementSourceIdColIndex \n 'KB-feature-id' - $kbFeatureIdColIndex \n". 
+                          "'value' - $valueColIndex \n 'sample-id' - $sampleIdColIndex .\n";  
 } 
-if ($error_message ne '') 
-{ 
-        print $error_message; 
-        exit; 
-} 
-my %measurement_lines_hash; #key {sample_source_id}->{feature_id}= array ref to the elements of the measurement_line 
-my %feature_id_hash; #key {feature_id} -> value pointer to array of line numbers that contain that feature.
-my $measurement_line_counter = 2;
-foreach my $measurement_line (@measurement_lines) 
-{ 
-        my $measurement_line_error_message = '';	
-        my @measurement_elements = split("\t",$measurement_line); 
-        if ($measurement_elements[$measurementSourceIdColIndex] eq '') 
-        { 
-          $measurement_line_error_message .= "One of the lines in the measurement file does not contain a source_id\n"; 
-        } 
-        else 
-        { 
-          if (($measurement_elements[$valueColIndex] eq '') || ($measurement_elements[$valueColIndex] eq '.')) 
-          { 
-                  $measurement_line_error_message .= "The measurement record with the source-id ". 
-		  				  $measurement_elements[$measurementSourceIdColIndex] . " is empty for the value\n"; 
-          } 
-          if (($measurement_elements[$kbFeatureIdColIndex] eq '') || ($measurement_elements[$kbFeatureIdColIndex] eq '.')) 
-          { 
-                  $measurement_line_error_message .= "The measurement record with the source-id ". 
-		  				  $measurement_elements[$measurementSourceIdColIndex] . " does not have a feature_id\n"; 
-          } 
-	  else
-	  {
-		#populate the %feature_id_hash
-		if (exists($feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}))
-		{
-			#if exists add another line number to array
-			push(@{$feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}},$measurement_line_counter);	
-		}
-		else
-		{
-			#did not exist, initialize the feature with the first_line_number it existed.
-			$feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}=[$measurement_line_counter];
-		}
-	  }
-          unless ($measurement_elements[$valueColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
-          { 
-                  $measurement_line_error_message .= "The measurement record with the source-id ". 
-		  				  $measurement_elements[$measurementSourceIdColIndex] . 
-                  				  " does not have a valid value number (".$measurement_elements[$valueColIndex].")\n"; 
-          } 
-          if (($measurement_elements[$sampleIdColIndex] eq '') || ($measurement_elements[$sampleIdColIndex] eq '.')) 
-          { 
-                  $measurement_line_error_message .= "The measurement record with the source-id ". 
-		  				  $measurement_elements[$measurementSourceIdColIndex] . 
-                  				  " does not have a valid sample-id.\n"; 
-          } 
-          unless (exists($sample_lines_hash{$measurement_elements[$sampleIdColIndex]})) 
-          { 
-                  $measurement_line_error_message .= "The measurement record with the source-id ". 
-                                                  $measurement_elements[$measurementSourceIdColIndex] .
-                                                  " has a sample_id that does not exist in the sample.tab file..\n";
-          } 
-        } 
-        if ($measurement_line_error_message ne '') 
-        { 
-                $error_message .= $measurement_line_error_message; 
-        } 
-        else #populate data_structure. 
-        { 
-                $measurement_elements[$valueColIndex] =~ s/\s//g; 
-                $measurement_lines_hash{$measurement_elements[$sampleIdColIndex]}->{$measurement_elements[$kbFeatureIdColIndex]} 
-						= \@measurement_elements; 
-        } 
-	$measurement_line_counter++;
-} 
-
-#DETERMINE IF ANY OF FEATURES ARE NOT IN THE CDM
-#Do query vs the DB vs all keys in %feature_id_hash
-#If the feature_id_exists delete the key from the hash  delete $HASH{$key};
-#After done with that and go through the remaining elements in the hash and report that those Features were not found in the DB.
-#Throw the an error, exit beofre modifying any of the files.
-my $find_features_q = qq^ select id from kbase_sapling_v1.Feature where id in (^.
-                       join(",", ("?") x scalar(keys(%feature_id_hash))) . ") ";
-my $find_features_qh = $dbh->prepare($find_features_q) or die "Unable to prepare find_features_q : $find_features_q : ".$dbh->errstr();
-$find_features_qh->execute(keys(%feature_id_hash)) or die "Unable to execute find_features_q : $find_features_q : ".
-						   $find_features_qh->errstr();
-while (my ($db_feature_id) = $find_features_qh->fetchrow_array())
+unless ($error_message ne '')
 {
-        delete $feature_id_hash{$db_feature_id}; 
-} 
-if (scalar(keys(%feature_id_hash)) > 0) 
-{ 
+    #build hash of unique feature_ids
+    my $measurement_line_counter = 1;
+    while (my $measurement_line = <IN>)
+    {	
+        $measurement_line_counter++;	
+    	chomp($measurement_line);
+	$measurement_line =~ s/\r//;			
+	my $measurement_error_message = '';
+        my @measurement_elements = split("\t",$measurement_line); 
+
+        #MAKE hash of sample source ids from measurement file
+        if (($measurement_elements[$sampleIdColIndex] eq '') || ($measurement_elements[$sampleIdColIndex] eq '.'))
+	{
+            $measurement_error_message .= "The measurement record on line $measurement_line_counter does not contain a sample-id\n";
+	}	        
+        else
+	{
+	    $unique_sample_source_ids_in_measurement_file{$measurement_elements[$sampleIdColIndex]} = 1;
+	}
+
+        if (($measurement_elements[$measurementSourceIdColIndex] eq '') ||   ($measurement_elements[$measurementSourceIdColIndex] eq '.'))
+        {
+            $measurement_error_message .= "The measurement record on line $measurement_line_counter does not contain a source_id\n";
+        } 
+	if (($measurement_elements[$valueColIndex] eq '') || ($measurement_elements[$valueColIndex] eq '.'))
+        {
+            $measurement_error_message .= "The measurement record on line $measurement_line_counter does not contain a value\n";	
+        } 
+        if (($measurement_elements[$kbFeatureIdColIndex] eq '') || ($measurement_elements[$kbFeatureIdColIndex] eq '.'))
+        {
+	    $measurement_error_message .= "The measurement record on line $measurement_line_counter does not contain a feature_id\n";	
+        }           
+        unless ($measurement_elements[$valueColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/) 
+        { 
+             $measurement_error_message .= "The measurement record on line $measurement_line_counter ".  
+                                                  "does not have a valid value number (".$measurement_elements[$valueColIndex].")\n"; 
+        } 
+        unless (exists($sample_lines_hash{$measurement_elements[$sampleIdColIndex]})) 
+        { 
+             $measurement_error_message .= "The measurement record with the source-id ". 
+                                           $measurement_elements[$measurementSourceIdColIndex] . 
+                                           " on line $measurement_line_counter has a sample_id that does not exist in the sample.tab file.\n"; 
+        } 
+	if ($measurement_error_message eq '') 
+        { 
+            #populate the %feature_id_hash 
+            if (exists($feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]})) 
+            { 
+                #if exists add another line number to array 
+                push(@{$feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}},$measurement_line_counter);             						
+	    } 
+            else 
+            { 
+                #did not exist, initialize the feature with the first_line_number it existed. 
+                $feature_id_hash{$measurement_elements[$kbFeatureIdColIndex]}=[$measurement_line_counter]; 
+            } 
+        }
+	else
+	{
+	    $error_message .= $measurement_error_message;
+	}
+    }
+    #check all of the unique feature_ids exist in the database
+    #DETERMINE IF ANY OF FEATURES ARE NOT IN THE CDM 
+    #Do queries vs the DB vs all keys in %feature_id_hash
+    #If the feature_id_exists delete the key from the hash  delete $HASH{$key};
+    #After done with that and go through the remaining elements in the hash and report that those Features were not found in the DB.
+    #Throw the an error, exit beofre modifying any of the files.
+    my @unique_feature_ids = keys(%feature_id_hash);
+    my $num_unique_feature_count = scalar(@unique_feature_ids);
+    for (my $feature_id_count = 0; $feature_id_count < $num_unique_feature_count; $feature_id_count = $feature_id_count + $feature_batch_size)
+    {
+	my $this_batch_size = $feature_batch_size;
+	if ( ($feature_id_count + $feature_batch_size) > $num_unique_feature_count)
+	{
+	    $this_batch_size =  $num_unique_feature_count % $feature_batch_size;
+	}
+	my @batch_feature_ids = @unique_feature_ids[$feature_id_count .. ($feature_id_count + $this_batch_size -1)];  
+        my $find_features_q = qq^ select id from kbase_sapling_v1.Feature where id in (^.
+                       join(",", ("?") x $this_batch_size) . ") ";
+        my $find_features_qh = $dbh->prepare($find_features_q) or die "Unable to prepare find_features_q : $find_features_q : ".$dbh->errstr();
+    	$find_features_qh->execute(@batch_feature_ids) or die "Unable to execute find_features_q : $find_features_q : ". 
+                                                   $find_features_qh->errstr();
+        while (my ($db_feature_id) = $find_features_qh->fetchrow_array())
+    	{ 
+            delete $feature_id_hash{$db_feature_id}; 
+    	}
+     } 
+     if (scalar(keys(%feature_id_hash)) > 0) 
+     { 
         $error_message .= "\nThe following Feature IDs in the measurement.tab file do not exist in the CDM.  ".
                           "Line number in the measurement tab record in '()'.\n"; 
         foreach my $temp_feature_id (keys(%feature_id_hash))
         { 
-                $error_message .= "Feature ID : $temp_feature_id (".join (",",@{$feature_id_hash{$temp_feature_id}}).")\n";
+                $error_message .= "Feature ID : $temp_feature_id (".join (",",@{$feature_id_hash{$temp_feature_id}}).")\n"; 
         } 
         $error_message .= "\n";
-} 
+    } 
+}
+close(IN); 
+
 if ($error_message ne '') 
 { 
-        print $error_message;
-        exit; 
+  process_error($error_message,$dir);
 } 
-#print "ERROR MESSAGE:\n".$error_message."\n"; 
 
-#go through each sample and load all log2Levels into an array
-#numerical sort the array and see if median is zero (within tolerance) 
-#if not within tolerance then determine the median replace it within the sample file
-# and change all the log2Levels for that sample by subtracting out the determined median.
-my $threshold = .00001;
-my $need_new_measurement_file = 0;
-foreach my $sample_id (sort(keys(%measurement_lines_hash)))
-{
-	my @sample_measurements = ();
-	foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}}))
-	{
-		push(@sample_measurements,$measurement_lines_hash{$sample_id}->{$feature_id}->[$valueColIndex]);
-	}
-	my @sorted_measurements = sort {$a <=> $b} @sample_measurements;
-	my $num_elements = scalar @sorted_measurements;
-	my $median;
-	if (($num_elements%2) == 0)
-	{
-		$median = (($sorted_measurements[(($num_elements-1)/2)]) +
-			  ($sorted_measurements[(($num_elements)/2)]))/2
-	}
-	else #odd elements just take middle one
-	{
-		$median = $sorted_measurements[floor($num_elements/2)]
-	}
-	#print "OLD SAMPLE: $sample_id - MEDIAN: $median - NUM ELEMENTS $num_elements \n";
-	if (abs($median) > $threshold)
-	{
-		$need_new_measurement_file = 1;
-		#set the originalLog2Median in for the sample
-		$sample_lines_hash{$sample_id}->[$originalLog2MedianColIndex] = $median;
-		#change the log2Levels from the original score minus the new median.
-		foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}})) 
-        	{
-			$measurement_lines_hash{$sample_id}->{$feature_id}->[$valueColIndex] = 
-				$measurement_lines_hash{$sample_id}->{$feature_id}->[$valueColIndex] - $median;
-        	}
-	}
-}
+#print sample header line to new sample file
+#make new sample.tab file
+my $sample_file = $dir . "/sample.tab"; 
+open (SAMPLE_FILE, ">".$sample_file) or die "Unable to make the new sample file : $sample_file $!\n";
+print SAMPLE_FILE $sample_header_line . "\n";
 
-if ($error_message ne "")
-{
-	print "THE FOLLOWING ERRORS NEED TO BE ADDRESSED BEFORE THE PREPROCESSOR CAN WORK:\n".$error_message."\n";
-	exit;
-}
+#print measurement header line to new measurement file
+#make new measurement.tab file 
+my $measurement_file = $dir . "/measurement.tab"; 
+open (MEASUREMENT_FILE, ">".$measurement_file) or die "Unable to make the new sample file : $sample_file $!\n"; 
+print MEASUREMENT_FILE $measurement_header_line . "\n";	
 
-if ($need_new_measurement_file == 1)
-{
-	#Move original sample.tab and measurement.tab to original_sample.tab and original_measurement.tab respectively. 
-	#(Only does log2level if the median of all sample was not zero) 
-	`mv $dir/sample.tab $dir/original_sample.tab`; 
+#process each sample alone 
+#grab the records from the original_measurement file and keep running list of unique feature_ids.
+my @unique_sample_ids = sort(keys(%sample_lines_hash));
+my $number_of_samples = scalar(@unique_sample_ids); 
+my %duplicate_measurement_source_ids;
+for (my $sample_id_count = 0; $sample_id_count < $number_of_samples; $sample_id_count = $sample_id_count + $sample_batch_size)
+{ 	
+    my $this_batch_size = $sample_batch_size;
+    if (($sample_id_count + $sample_batch_size) > $number_of_samples)
+    { 
+        $this_batch_size =  $number_of_samples % $sample_batch_size;
+    }
+    my @batch_sample_ids = @unique_sample_ids[$sample_id_count .. ($sample_id_count + $this_batch_size -1)];  
 
-	`mv $dir/measurement.tab $dir/original_measurement.tab`;
-	open (MEASUREMENT_FILE, ">".$measurement_file) or die "Unable to make the measurement file : $measurement_file $!\n";
-	print MEASUREMENT_FILE  $measurement_header_line . "\n";
-	foreach my $sample_id (sort(keys(%measurement_lines_hash)))
+    my %measurement_lines_hash; #key {sample_source_id}->{feature_id}= array ref to the elements of the measurement_line
+    my %measurement_value_array_hash;  #key {sample_source_id}-> array ref to the values for that sample
+
+    #go through the original_measurement file and grab all the values associated with any of the samples in that batch
+    open (IN,$original_measurement_file) or die "Unable to open original measurement file : $original_measurement_file.\n\n"; 
+    my $dummy_header_line = <IN>;
+    while (my $measurement_line = <IN>)
+    { 
+	chomp($measurement_line);
+        $measurement_line =~ s/\r//; 
+        my @measurement_elements = split(/\t/,$measurement_line); 
+	if($measurement_elements[$sampleIdColIndex] ~~ @batch_sample_ids)
 	{
-        	foreach my $feature_id (keys(%{$measurement_lines_hash{$sample_id}}))
+	    #PUT IN DATA STRUCTURES
+	    if (defined($measurement_lines_hash{$measurement_elements[$sampleIdColIndex]}->{$measurement_elements[$measurementSourceIdColIndex]}))
+	    {
+		if (defined($duplicate_measurement_source_ids{$measurement_elements[$sampleIdColIndex]}))
 		{
-			my @temp_arr =  @{$measurement_lines_hash{$sample_id}->{$feature_id}};
-			print MEASUREMENT_FILE join("\t",@temp_arr) . "\n";
-		} 
-	}
-	close (MEASUREMENT_FILE);
-
-	#make new sample.tab file
-	open (SAMPLE_FILE, ">".$sample_file) or die "Unable to make the new sample file : $sample_file $!\n";
-	print SAMPLE_FILE $sample_header_line . "\n";
-
-	foreach my $sample_source_id (sort(keys(%sample_lines_hash)))
-	{
-		for (my $i=0;$i<=15 ; $i++)
-		{
-			print SAMPLE_FILE $sample_lines_hash{$sample_source_id}->[$i] . "\t";
+		    $duplicate_measurement_source_ids{$measurement_elements[$measurementSourceIdColIndex]} = 
+		        $duplicate_measurement_source_ids{$measurement_elements[$measurementSourceIdColIndex]} + 1;
 		}
-		print SAMPLE_FILE ".\n";
+		else
+		{
+		    $duplicate_measurement_source_ids{$measurement_elements[$measurementSourceIdColIndex]} = 2;
+		}
+	    }
+            else
+	    {
+		$measurement_lines_hash{$measurement_elements[$sampleIdColIndex]}->{$measurement_elements[$measurementSourceIdColIndex]} 
+                                                = \@measurement_elements;
+	    } 
+	    if (defined($measurement_value_array_hash{$measurement_elements[$sampleIdColIndex]}))
+	    {
+	        #if exists add another value to the array
+                push(@{$measurement_value_array_hash{$measurement_elements[$sampleIdColIndex]}},$measurement_elements[$valueColIndex]);
+            } 
+            else 
+            { 
+                #did not exist, initialize the array with the first value
+                $measurement_value_array_hash{$measurement_elements[$sampleIdColIndex]}=[$measurement_elements[$valueColIndex]];
+	    }
 	}
+    }
+    if (scalar(keys(%duplicate_measurement_source_ids)) > 0)
+    {
+	$error_message .= "\nThere are ".scalar(keys(%duplicate_measurement_source_ids))." measurement records with duplicate source ids.  ".
+	                  "\nIf you want a detailed list of measurement source ids add \" show\" to the command you ran for this\n\n";
+        if ( $show_measurement_duplicates == 1)
+	{
+	    foreach my $meas_source_id (sort(keys(%duplicate_measurement_source_ids)))
+	    {
+                $error_message .= "There are " . $duplicate_measurement_source_ids{$meas_source_id} . 
+                                  " records with the same Measurement Source ID ". $meas_source_id . "\n";
+	    }
+	}        
+    }
 
-	#close Sample
+    close(IN);
+    if ($error_message ne '') 
+    { 
+        close(SAMPLE_FILE); 
+        close(MEASUREMENT_FILE); 
+        process_error($error_message,$dir); 
+    } 
+
+    foreach my $sample_source_id (@batch_sample_ids) 
+    {
+        my @sample_elements = @{$sample_lines_hash{$sample_source_id}};             
+	my @sorted_measurements = sort {$a <=> $b} @{$measurement_value_array_hash{$sample_source_id}};
+        my $num_elements = scalar @sorted_measurements; 
+        my $median; 
+        if (($num_elements%2) == 0)
+        { 
+            $median = (($sorted_measurements[(($num_elements-1)/2)]) + 
+                       ($sorted_measurements[(($num_elements)/2)]))/2 
+        } 
+        else #odd elements just take middle one 
+        { 
+            $median = $sorted_measurements[floor($num_elements/2)] 
+        }
+        #print "OLD SAMPLE: $sample_id - MEDIAN: $median - NUM ELEMENTS $num_elements \n"; 
+        #set the originalLog2Median in for the sample 
+        my $threshold = .00001;
+        #Have a warning if the original log2Median had a value and the median is greater than the threshold.
+        if ( ($sample_elements[$originalLog2MedianColIndex] =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/ ) && 
+             (abs($median) > $threshold))
+        { 
+            print "\nWARNING : Sample with the source_id $sample_source_id had an existing original log2median value of ".
+   	        $sample_elements[$originalLog2MedianColIndex] . 
+	        ".  However the measurement data for the sample did not have a median equal to zero (within $threshold). ".
+	        "The median of the measurement data was $median .  The original log2 median value was changed to the new median value.";
+        }   
+        #PRINT SAMPLE LINE
+        $sample_lines_hash{$sample_source_id}->[$originalLog2MedianColIndex] = $median; 
+        print SAMPLE_FILE join("\t",@{$sample_lines_hash{$sample_source_id}})."\n"; 
+        #PRINT ALL THE MEASUREMENT VALUES THAT MATCH THIS SAMPLE SOURCE ID
+	foreach my $measurement_source_id (sort(keys(%{$measurement_lines_hash{$sample_source_id}})))
+	{
+	    my @temp_measurement_elements = @{$measurement_lines_hash{$sample_source_id}->{$measurement_source_id}};
+	    $temp_measurement_elements[$valueColIndex] = $temp_measurement_elements[$valueColIndex] - $median;
+	    print MEASUREMENT_FILE join("\t",@temp_measurement_elements)."\n";
+	}
+    }
+    if ($error_message ne '') 
+    {
 	close(SAMPLE_FILE);
+	close(MEASUREMENT_FILE); 
+        process_error($error_message,$dir);
+    }
+} 
 
-	print "\nSuccess:\n";
-	print "The original $sample_file has been renamed to $dir/original_sample.tab \n";
-	print "The original $measurement_file has been renamed to $dir/original_measurement.tab \n"; 
+close(SAMPLE_FILE);
+close(MEASUREMENT_FILE); 
 
-	print "The following_files have been created : \n" .$sample_file . "\n";
-	if ($need_new_measurement_file == 1)
-	{ 
-  	  print $measurement_file . "\n";
-	}
-}
-else
+if ($error_message ne '')
 {
-	print "\nAll Samples already had a median log level of 0 already.  Nothing needed to be done. \n";
-}	
+    process_error($error_message,$dir);
+} 
 
+print "\nSuccess:\n";
+print "The original $sample_file has been renamed to $dir/original_sample.tab \n";
+print "The original $measurement_file has been renamed to $dir/original_measurement.tab \n"; 
+print "New $dir/sample.tab and $dir/measurement.tab files have been created\n\n";
 
-
-
+my $timestamp = localtime(time);
+print "\nEND TIME $timestamp \n";
 
 
 sub column_header_checker ( $ $ $ $ )
@@ -461,6 +548,19 @@ sub column_header_checker ( $ $ $ $ )
         return $column_exists_flag; 
     } 
 } 
+
+sub process_error 
+{
+    my $error_message = shift;
+    my $dir = shift;
+    print "THE FOLLOWING ERRORS NEED TO BE ADDRESSED BEFORE THE PREPROCESSOR CAN WORK:\n".$error_message."\n";	
+    print "\n\nReturing Files to original state:\n"; 
+    print "Copying the  $dir/original_sample.tab back to $dir/sample.tab\n"; 
+    print "Copying the  $dir/original_measurement.tab back to $dir/measurement.tab\n"; 
+    `cp $dir/original_sample.tab $dir/sample.tab`; 
+    `cp $dir/original_measurement.tab $dir/measurement.tab`; 
+    exit; 
+}
 
 # Perl trim function to remove whitespace from the start and end of the string
 sub trim($)
