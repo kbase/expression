@@ -11,7 +11,7 @@ ExpressionServices
 
 =head1 DESCRIPTION
 
-
+Service for all different sorts of Expression data (microarray, RNA_seq, proteomics, qPCR
 
 =cut
 
@@ -129,7 +129,7 @@ sub new
 
 =head2 get_expression_samples_data
 
-  $expressionDataSamplesMap = $obj->get_expression_samples_data($sampleIDs)
+  $expression_data_samples_map = $obj->get_expression_samples_data($sample_ids)
 
 =over 4
 
@@ -138,70 +138,70 @@ sub new
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$expressionDataSamplesMap is an ExpressionDataSamplesMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
+$sample_ids is an ExpressionServices.sample_ids
+$expression_data_samples_map is an ExpressionServices.expression_data_samples_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -209,70 +209,70 @@ Measurement is a float
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$expressionDataSamplesMap is an ExpressionDataSamplesMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
+$sample_ids is an ExpressionServices.sample_ids
+$expression_data_samples_map is an ExpressionServices.expression_data_samples_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -291,10 +291,10 @@ core function used by many others.  Given a list of KBase SampleIds returns mapp
 sub get_expression_samples_data
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -302,10 +302,10 @@ sub get_expression_samples_data
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($expressionDataSamplesMap);
+    my($expression_data_samples_map);
     #BEGIN get_expression_samples_data
-    $expressionDataSamplesMap = {};
-    if (0 == @{$sampleIDs}) 
+    $expression_data_samples_map = {};
+    if (0 == @{$sample_ids}) 
     { 
         my $msg = "get_expression_samples_data requires a list of valid sample ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -349,10 +349,10 @@ sub get_expression_samples_data
                                     left outer join ProtocolForSample pfs on sam.id = pfs.to_link 
                                     left outer join Protocol pro on pfs.from_link = pro.id 
                                     where sam.id in ( ^. 
-				 join(",", ("?") x @{$sampleIDs}) . ") "; 
+				 join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_sample_meta_data_qh = $dbh->prepare($get_sample_meta_data_q) or die "Unable to prepare : get_sample_meta_data_q : ".
 	                          $get_sample_meta_data_q . " : " .$dbh->errstr();
-    $get_sample_meta_data_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_sample_meta_data_q : ".$get_sample_meta_data_qh->errstr();
+    $get_sample_meta_data_qh->execute(@{$sample_ids}) or die "Unable to execute : get_sample_meta_data_q : ".$get_sample_meta_data_qh->errstr();
     while(my ($sample_id, $sample_source_id, $sample_title, $sample_description, $sample_molecule, $sample_type, 
               $sample_dataSource, $sample_externalSourceId, $sample_kbaseSubmissionDate, $sample_externalSourceDate,
               $sample_custom, $sample_originalLog2Median, $strain_id, $referenceStrain, $wildtype, $strain_description, 
@@ -360,7 +360,7 @@ sub get_expression_samples_data
               $experiment_meta_id, $experiment_meta_title, $experiment_meta_description, $environment_id, $environment_description,
               $protocol_id, $protocol_description, $protocol_name) = $get_sample_meta_data_qh->fetchrow_array())
     {
-	$expressionDataSamplesMap->{$sample_id}={"sampleID" => $sample_id,
+	$expression_data_samples_map->{$sample_id}={"sampleID" => $sample_id,
 						 "sourceID" => $sample_source_id,
 						 "sampleTitle" => $sample_title,
 						 "sampleDescription" => $sample_description,
@@ -405,10 +405,10 @@ sub get_expression_samples_data
                                       inner join OntologyForSample ofs on ofs.to_link = san.id 
                                       inner join Ontology ont on ont.id = ofs.from_link 
                                       where sam.id in (^.
-                                  join(",", ("?") x @{$sampleIDs}) . ") "; 
+                                  join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_sample_annotations_qh = $dbh->prepare($get_sample_annotations_q) or die "Unable to prepare get_sample_annotations_q : ".
 	$get_sample_annotations_q . " : " . $dbh->errstr();
-    $get_sample_annotations_qh->execute(@{$sampleIDs}) or die "Unable to execute get_sample_annotations_q : ".$get_sample_annotations_q.
+    $get_sample_annotations_qh->execute(@{$sample_ids}) or die "Unable to execute get_sample_annotations_q : ".$get_sample_annotations_q.
                                     " : " .$get_sample_annotations_qh->errstr();
     while (my ($sample_id,$sample_annotation_id, $ontology_id, $ontology_name, $ontology_definition) 
 	   = $get_sample_annotations_qh->fetchrow_array()) 
@@ -421,7 +421,7 @@ sub get_expression_samples_data
 	{
 	    $temp_hash{"ontologyDefinition"} = $ontology_definition;
 	}
-        push(@{$expressionDataSamplesMap->{$sample_id}->{"sampleAnnotationIDs"}},\%temp_hash);
+        push(@{$expression_data_samples_map->{$sample_id}->{"sampleAnnotationIDs"}},\%temp_hash);
     }        
 
     #SeriesIds
@@ -430,26 +430,26 @@ sub get_expression_samples_data
                                      inner join SampleInSeries sis on sam.id = sis.from_link
                                      inner join Series ser on sis.to_link = ser.id
                                      where sam.id in (^.
-                                  join(",", ("?") x @{$sampleIDs}) . ") "; 
+                                  join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_sample_series_ids_qh = $dbh->prepare($get_sample_series_ids_q) or die "Unable to prepare : get_sample_series_ids_q : ".
 	$get_sample_series_ids_q . " : " .$dbh->errstr();
-    $get_sample_series_ids_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_sample_series_ids_q : ".$get_sample_series_ids_qh->errstr();
+    $get_sample_series_ids_qh->execute(@{$sample_ids}) or die "Unable to execute : get_sample_series_ids_q : ".$get_sample_series_ids_qh->errstr();
     while (my ($sample_id,$series_id) = $get_sample_series_ids_qh->fetchrow_array())
     {
-          push(@{$expressionDataSamplesMap->{$sample_id}->{"seriesIDs"}},$series_id);
+          push(@{$expression_data_samples_map->{$sample_id}->{"seriesIDs"}},$series_id);
     }
 
     #SampleIDsAveragedFrom
     my $get_sample_ids_averaged_from_q = qq^select saf.from_link, saf.to_link
                                             from SampleAveragedFrom saf
                                             where saf.to_link in (^. 
-                                         join(",", ("?") x @{$sampleIDs}) . ") "; 
+                                         join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_sample_ids_averaged_from_qh = $dbh->prepare($get_sample_ids_averaged_from_q) or die "Unable to prepare : get_sample_ids_averaged_from_q : ". 
         $get_sample_ids_averaged_from_q . " : " .$dbh->errstr(); 
-    $get_sample_ids_averaged_from_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_sample_ids_averaged_from_q : ".$get_sample_ids_averaged_from_qh->errstr(); 
+    $get_sample_ids_averaged_from_qh->execute(@{$sample_ids}) or die "Unable to execute : get_sample_ids_averaged_from_q : ".$get_sample_ids_averaged_from_qh->errstr(); 
     while (my ($averaged_from_sample_id, $averaged_to_sample_id) = $get_sample_ids_averaged_from_qh->fetchrow_array()) 
     { 
-          push(@{$expressionDataSamplesMap->{$averaged_to_sample_id}->{"sampleIDsAveragedFrom"}},$averaged_from_sample_id); 
+          push(@{$expression_data_samples_map->{$averaged_to_sample_id}->{"sampleIDsAveragedFrom"}},$averaged_from_sample_id); 
     } 
     
     #PersonIds     
@@ -458,13 +458,13 @@ sub get_expression_samples_data
                                      inner join SampleContactPerson scp on sam.id = scp.from_link 
                                      inner join Person per on scp.to_link = per.id 
                                      where sam.id in (^.
-                                  join(",", ("?") x @{$sampleIDs}) . ") ";
+                                  join(",", ("?") x @{$sample_ids}) . ") ";
     my $get_sample_person_ids_qh = $dbh->prepare($get_sample_person_ids_q) or die "Unable to prepare : get_sample_person_ids_q : ".           
                                    $get_sample_person_ids_q . " : " .$dbh->errstr();        
-    $get_sample_person_ids_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_sample_person_ids_q : ".$get_sample_person_ids_qh->errstr();  
+    $get_sample_person_ids_qh->execute(@{$sample_ids}) or die "Unable to execute : get_sample_person_ids_q : ".$get_sample_person_ids_qh->errstr();  
     while (my ($sample_id,$person_id) = $get_sample_person_ids_qh->fetchrow_array())
     {
-        push(@{$expressionDataSamplesMap->{$sample_id}->{"personIDs"}},$person_id);
+        push(@{$expression_data_samples_map->{$sample_id}->{"personIDs"}},$person_id);
     }
 
     #log2Levels
@@ -475,24 +475,24 @@ sub get_expression_samples_data
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link
                               inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id
                               where sam.id in (^. 
-                           join(",", ("?") x @{$sampleIDs}) . ") ";  
+                           join(",", ("?") x @{$sample_ids}) . ") ";  
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
                             $get_log2levels_q . " : " . $dbh->errstr();
-    $get_log2levels_qh->execute(@{$sampleIDs}) or die "Unable to execute get_log2levels_q : " . $get_log2levels_q . " : ".
+    $get_log2levels_qh->execute(@{$sample_ids}) or die "Unable to execute get_log2levels_q : " . $get_log2levels_q . " : ".
                             $get_log2levels_qh->errstr();
     while(my ($sample_id, $feature_id, $log2level) = $get_log2levels_qh->fetchrow_array())
     {
-        $expressionDataSamplesMap->{$sample_id}->{"dataExpressionLevelsForSample"}->{$feature_id} = $log2level;
+        $expression_data_samples_map->{$sample_id}->{"dataExpressionLevelsForSample"}->{$feature_id} = $log2level;
     }
     #END get_expression_samples_data
     my @_bad_returns;
-    (ref($expressionDataSamplesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"expressionDataSamplesMap\" (value was \"$expressionDataSamplesMap\")");
+    (ref($expression_data_samples_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"expression_data_samples_map\" (value was \"$expression_data_samples_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data');
     }
-    return($expressionDataSamplesMap);
+    return($expression_data_samples_map);
 }
 
 
@@ -500,7 +500,7 @@ sub get_expression_samples_data
 
 =head2 get_expression_data_by_samples_and_features
 
-  $labelDataMapping = $obj->get_expression_data_by_samples_and_features($sampleIDs, $featureIDs)
+  $label_data_mapping = $obj->get_expression_data_by_samples_and_features($sample_ids, $feature_ids)
 
 =over 4
 
@@ -509,16 +509,16 @@ sub get_expression_samples_data
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$featureIDs is a FeatureIDs
-$labelDataMapping is a LabelDataMapping
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-FeatureIDs is a reference to a list where each element is a FeatureID
-FeatureID is a string
-LabelDataMapping is a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-Measurement is a float
+$sample_ids is an ExpressionServices.sample_ids
+$feature_ids is an ExpressionServices.feature_ids
+$label_data_mapping is an ExpressionServices.label_data_mapping
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+feature_ids is a reference to a list where each element is an ExpressionServices.feature_id
+feature_id is a string
+label_data_mapping is a reference to a hash where the key is a string and the value is an ExpressionServices.data_expression_levels_for_sample
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+measurement is a float
 
 </pre>
 
@@ -526,16 +526,16 @@ Measurement is a float
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$featureIDs is a FeatureIDs
-$labelDataMapping is a LabelDataMapping
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-FeatureIDs is a reference to a list where each element is a FeatureID
-FeatureID is a string
-LabelDataMapping is a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-Measurement is a float
+$sample_ids is an ExpressionServices.sample_ids
+$feature_ids is an ExpressionServices.feature_ids
+$label_data_mapping is an ExpressionServices.label_data_mapping
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+feature_ids is a reference to a list where each element is an ExpressionServices.feature_id
+feature_id is a string
+label_data_mapping is a reference to a hash where the key is a string and the value is an ExpressionServices.data_expression_levels_for_sample
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+measurement is a float
 
 
 =end text
@@ -554,11 +554,11 @@ If feature list is an empty array [], all features with measurment values will b
 sub get_expression_data_by_samples_and_features
 {
     my $self = shift;
-    my($sampleIDs, $featureIDs) = @_;
+    my($sample_ids, $feature_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
-    (ref($featureIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"featureIDs\" (value was \"$featureIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
+    (ref($feature_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"feature_ids\" (value was \"$feature_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_data_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -566,10 +566,10 @@ sub get_expression_data_by_samples_and_features
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($labelDataMapping);
+    my($label_data_mapping);
     #BEGIN get_expression_data_by_samples_and_features
-    $labelDataMapping = {};
-    if (0 == @{$sampleIDs}) 
+    $label_data_mapping = {};
+    if (0 == @{$sample_ids}) 
     { 
 	my $msg = "get_expression_data_by_samples_and_features requires a list of valid sample ids.  Note that feature ids can be empty.  ".
 	    "If features are empty all features for the sample will be returned";
@@ -588,30 +588,30 @@ sub get_expression_data_by_samples_and_features
                                      inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link      
                                      inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id       
                                      where sam.id in (^.
-				     join(",", ("?") x @{$sampleIDs}). ") ";
-    if (scalar(@{$featureIDs}) > 0)
+				     join(",", ("?") x @{$sample_ids}). ") ";
+    if (scalar(@{$feature_ids}) > 0)
     {
-	$get_feature_log2level_q .= qq^ and fea.id in (^. join(",", ("?") x @{$featureIDs}). ") ";
+	$get_feature_log2level_q .= qq^ and fea.id in (^. join(",", ("?") x @{$feature_ids}). ") ";
     }
 
     my $get_feature_log2level_qh = $dbh->prepare($get_feature_log2level_q) or die "Unable to prepare get_feature_log2level_q : ".
         $get_feature_log2level_q . " : " .$dbh->errstr();
-    $get_feature_log2level_qh->execute(@{$sampleIDs},@{$featureIDs})  or die "Unable to execute get_feature_log2level_q : ".
+    $get_feature_log2level_qh->execute(@{$sample_ids},@{$feature_ids})  or die "Unable to execute get_feature_log2level_q : ".
         $get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr();
     while(my ($sample_id,$feature_id,$log2level) = $get_feature_log2level_qh->fetchrow_array())
     { 
-        $labelDataMapping->{$sample_id}->{$feature_id}=$log2level;
+        $label_data_mapping->{$sample_id}->{$feature_id}=$log2level;
     } 
 
     #END get_expression_data_by_samples_and_features
     my @_bad_returns;
-    (ref($labelDataMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"labelDataMapping\" (value was \"$labelDataMapping\")");
+    (ref($label_data_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"label_data_mapping\" (value was \"$label_data_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_data_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_data_by_samples_and_features');
     }
-    return($labelDataMapping);
+    return($label_data_mapping);
 }
 
 
@@ -619,7 +619,7 @@ sub get_expression_data_by_samples_and_features
 
 =head2 get_expression_samples_data_by_series_ids
 
-  $seriesExpressionDataSamplesMapping = $obj->get_expression_samples_data_by_series_ids($seriesIDs)
+  $series_expression_data_samples_mapping = $obj->get_expression_samples_data_by_series_ids($series_ids)
 
 =over 4
 
@@ -628,70 +628,70 @@ sub get_expression_data_by_samples_and_features
 =begin html
 
 <pre>
-$seriesIDs is a SeriesIDs
-$seriesExpressionDataSamplesMapping is a SeriesExpressionDataSamplesMapping
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesExpressionDataSamplesMapping is a reference to a hash where the key is a SeriesID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$series_ids is an ExpressionServices.series_ids
+$series_expression_data_samples_mapping is an ExpressionServices.series_expression_data_samples_mapping
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.series_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -699,70 +699,70 @@ Measurement is a float
 
 =begin text
 
-$seriesIDs is a SeriesIDs
-$seriesExpressionDataSamplesMapping is a SeriesExpressionDataSamplesMapping
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesExpressionDataSamplesMapping is a reference to a hash where the key is a SeriesID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$series_ids is an ExpressionServices.series_ids
+$series_expression_data_samples_mapping is an ExpressionServices.series_expression_data_samples_mapping
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.series_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -780,10 +780,10 @@ given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples :
 sub get_expression_samples_data_by_series_ids
 {
     my $self = shift;
-    my($seriesIDs) = @_;
+    my($series_ids) = @_;
 
     my @_bad_arguments;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -791,10 +791,10 @@ sub get_expression_samples_data_by_series_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesExpressionDataSamplesMapping);
+    my($series_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_series_ids
-    $seriesExpressionDataSamplesMapping = {};
-    if (0 == @{$seriesIDs})
+    $series_expression_data_samples_mapping = {};
+    if (0 == @{$series_ids})
     { 
         my $msg = "get_expression_samples_data_by_series_ids requires a list of valid series ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -812,11 +812,11 @@ sub get_expression_samples_data_by_series_ids
            inner join SampleInSeries sis on sam.id = sis.from_link
            inner join Series ser on sis.to_link = ser.id
            where ser.id in (^.
-	join(",", ("?") x @{$seriesIDs}) . ") "; 
+	join(",", ("?") x @{$series_ids}) . ") "; 
     my $get_sample_ids_by_series_ids_qh = $dbh->prepare($get_sample_ids_by_series_ids_q) or die
                                                 "Unable to prepare get_sample_ids_by_series_ids_q : ". 
                                                 $get_sample_ids_by_series_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_sample_ids_by_series_ids_qh->execute(@{$seriesIDs}) or die "Unable to execute get_sample_ids_by_series_ids_q : ".
+    $get_sample_ids_by_series_ids_qh->execute(@{$series_ids}) or die "Unable to execute get_sample_ids_by_series_ids_q : ".
 			    $get_sample_ids_by_series_ids_q . " : " . $get_sample_ids_by_series_ids_qh->errstr() . "\n\n";
     my %series_id_sample_id_hash; # {seriesID}->{sample_id}=1		
     my %sample_ids_hash; #hash to get unique sample_id_hash
@@ -839,16 +839,16 @@ sub get_expression_samples_data_by_series_ids
 	    $series_id_sample_data_hash{$series_id}->{$sample_id} = $sample_ids_data_hash{$sample_id};
 	} 
     } 
-    $seriesExpressionDataSamplesMapping = \%series_id_sample_data_hash;
+    $series_expression_data_samples_mapping = \%series_id_sample_data_hash;
     #END get_expression_samples_data_by_series_ids
     my @_bad_returns;
-    (ref($seriesExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesExpressionDataSamplesMapping\" (value was \"$seriesExpressionDataSamplesMapping\")");
+    (ref($series_expression_data_samples_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"series_expression_data_samples_mapping\" (value was \"$series_expression_data_samples_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data_by_series_ids');
     }
-    return($seriesExpressionDataSamplesMapping);
+    return($series_expression_data_samples_mapping);
 }
 
 
@@ -856,7 +856,7 @@ sub get_expression_samples_data_by_series_ids
 
 =head2 get_expression_sample_ids_by_series_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_series_ids($seriesIDs)
+  $sample_ids = $obj->get_expression_sample_ids_by_series_ids($series_ids)
 
 =over 4
 
@@ -865,12 +865,12 @@ sub get_expression_samples_data_by_series_ids
 =begin html
 
 <pre>
-$seriesIDs is a SeriesIDs
-$sampleIDs is a SampleIDs
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$series_ids is an ExpressionServices.series_ids
+$sample_ids is an ExpressionServices.sample_ids
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -878,12 +878,12 @@ SampleID is a string
 
 =begin text
 
-$seriesIDs is a SeriesIDs
-$sampleIDs is a SampleIDs
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$series_ids is an ExpressionServices.series_ids
+$sample_ids is an ExpressionServices.sample_ids
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -901,10 +901,10 @@ given a list of SeriesIDs returns a list of Sample IDs
 sub get_expression_sample_ids_by_series_ids
 {
     my $self = shift;
-    my($seriesIDs) = @_;
+    my($series_ids) = @_;
 
     my @_bad_arguments;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -912,9 +912,9 @@ sub get_expression_sample_ids_by_series_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_series_ids
-    if (0 == @{$seriesIDs}) 
+    if (0 == @{$series_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_series_ids requires a list of valid series ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -931,11 +931,11 @@ sub get_expression_sample_ids_by_series_ids
            inner join SampleInSeries sis on sam.id = sis.from_link  
            inner join Series ser on sis.to_link = ser.id  
            where ser.id in (^. 
-	   join(",", ("?") x @{$seriesIDs}) . ") "; 
+	   join(",", ("?") x @{$series_ids}) . ") "; 
     my $get_sample_ids_by_series_ids_qh = $dbh->prepare($get_sample_ids_by_series_ids_q) or die 
                                                 "Unable to prepare get_sample_ids_by_series_ids_q : ". 
                                                 $get_sample_ids_by_series_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_sample_ids_by_series_ids_qh->execute(@{$seriesIDs}) or die "Unable to execute get_sample_ids_by_series_ids_q : ". 
+    $get_sample_ids_by_series_ids_qh->execute(@{$series_ids}) or die "Unable to execute get_sample_ids_by_series_ids_q : ". 
 	$get_sample_ids_by_series_ids_q . " : " . $get_sample_ids_by_series_ids_qh->errstr() . "\n\n"; 
     my %sample_ids_hash; #hash to get unique sample_id_hash 
     while (my ($sample_id) = $get_sample_ids_by_series_ids_qh->fetchrow_array()) 
@@ -943,16 +943,16 @@ sub get_expression_sample_ids_by_series_ids
 	$sample_ids_hash{$sample_id} = 1;
     } 
     my @temp_arr = keys(%sample_ids_hash);
-    $sampleIDs = \@temp_arr;
+    $sample_ids = \@temp_arr;
     #END get_expression_sample_ids_by_series_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_series_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_series_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -960,7 +960,7 @@ sub get_expression_sample_ids_by_series_ids
 
 =head2 get_expression_samples_data_by_experimental_unit_ids
 
-  $experimentalUnitExpressionDataSamplesMapping = $obj->get_expression_samples_data_by_experimental_unit_ids($experimentalUnitIDs)
+  $experimental_unit_expression_data_samples_mapping = $obj->get_expression_samples_data_by_experimental_unit_ids($experimental_unit_ids)
 
 =over 4
 
@@ -969,71 +969,71 @@ sub get_expression_sample_ids_by_series_ids
 =begin html
 
 <pre>
-$experimentalUnitIDs is an ExperimentalUnitIDs
-$experimentalUnitExpressionDataSamplesMapping is an ExperimentalUnitExpressionDataSamplesMapping
-ExperimentalUnitIDs is a reference to a list where each element is an ExperimentalUnitID
-ExperimentalUnitID is a string
-ExperimentalUnitExpressionDataSamplesMapping is a reference to a hash where the key is an ExperimentalUnitID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$experimental_unit_ids is an ExpressionServices.experimental_unit_ids
+$experimental_unit_expression_data_samples_mapping is an ExpressionServices.experimental_unit_expression_data_samples_mapping
+experimental_unit_ids is a reference to a list where each element is an ExpressionServices.experimental_unit_id
+experimental_unit_id is a string
+experimental_unit_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.experimental_unit_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -1041,71 +1041,71 @@ Measurement is a float
 
 =begin text
 
-$experimentalUnitIDs is an ExperimentalUnitIDs
-$experimentalUnitExpressionDataSamplesMapping is an ExperimentalUnitExpressionDataSamplesMapping
-ExperimentalUnitIDs is a reference to a list where each element is an ExperimentalUnitID
-ExperimentalUnitID is a string
-ExperimentalUnitExpressionDataSamplesMapping is a reference to a hash where the key is an ExperimentalUnitID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$experimental_unit_ids is an ExpressionServices.experimental_unit_ids
+$experimental_unit_expression_data_samples_mapping is an ExpressionServices.experimental_unit_expression_data_samples_mapping
+experimental_unit_ids is a reference to a list where each element is an ExpressionServices.experimental_unit_id
+experimental_unit_id is a string
+experimental_unit_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.experimental_unit_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -1123,10 +1123,10 @@ given a list of ExperimentalUnitIDs returns mapping of ExperimentalUnitID to exp
 sub get_expression_samples_data_by_experimental_unit_ids
 {
     my $self = shift;
-    my($experimentalUnitIDs) = @_;
+    my($experimental_unit_ids) = @_;
 
     my @_bad_arguments;
-    (ref($experimentalUnitIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentalUnitIDs\" (value was \"$experimentalUnitIDs\")");
+    (ref($experimental_unit_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimental_unit_ids\" (value was \"$experimental_unit_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1134,10 +1134,10 @@ sub get_expression_samples_data_by_experimental_unit_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($experimentalUnitExpressionDataSamplesMapping);
+    my($experimental_unit_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_experimental_unit_ids
-    $experimentalUnitExpressionDataSamplesMapping = {};
-    if (0 == @{$experimentalUnitIDs}) 
+    $experimental_unit_expression_data_samples_mapping = {};
+    if (0 == @{$experimental_unit_ids}) 
     { 
         my $msg = "get_expression_samples_data_by_experimental_unit_ids requires a list of valid experimental unit ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -1153,11 +1153,11 @@ sub get_expression_samples_data_by_experimental_unit_ids
            inner join HasExpressionSample hes on sam.id = hes.to_link
            inner join ExperimentalUnit eu on hes.from_link = eu.id
            where eu.id in (^.
-	   join(",", ("?") x @{$experimentalUnitIDs}) . ") "; 
+	   join(",", ("?") x @{$experimental_unit_ids}) . ") "; 
     my $get_sample_ids_by_experimental_unit_ids_qh = $dbh->prepare($get_sample_ids_by_experimental_unit_ids_q) or die 
                                                               "Unable to prepare get_sample_ids_by_experimental_unit_ids_q : ". 
                                                               $get_sample_ids_by_experimental_unit_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_sample_ids_by_experimental_unit_ids_qh->execute(@{$experimentalUnitIDs}) or die "Unable to execute get_sample_ids_by_experimental_unit_ids_q : ". 
+    $get_sample_ids_by_experimental_unit_ids_qh->execute(@{$experimental_unit_ids}) or die "Unable to execute get_sample_ids_by_experimental_unit_ids_q : ". 
         $get_sample_ids_by_experimental_unit_ids_q . " : " . $get_sample_ids_by_experimental_unit_ids_qh->errstr() . "\n\n"; 
     my %experimental_unit_sample_list_hash; # {experimentalUnitID}->[Sample_IDS]                                                                                                                                                                                                               
     my %sample_ids_hash; #hash to get unique sample_id_hash                                                                                                                                                                                                                                    
@@ -1184,16 +1184,16 @@ sub get_expression_samples_data_by_experimental_unit_ids
             $exp_unit_sample_data_hash{$experimental_unit_id}->{$sample_id} = $sample_ids_data_hash{$sample_id}; 
         } 
     } 
-    $experimentalUnitExpressionDataSamplesMapping = \%exp_unit_sample_data_hash; 
+    $experimental_unit_expression_data_samples_mapping = \%exp_unit_sample_data_hash; 
     #END get_expression_samples_data_by_experimental_unit_ids
     my @_bad_returns;
-    (ref($experimentalUnitExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"experimentalUnitExpressionDataSamplesMapping\" (value was \"$experimentalUnitExpressionDataSamplesMapping\")");
+    (ref($experimental_unit_expression_data_samples_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"experimental_unit_expression_data_samples_mapping\" (value was \"$experimental_unit_expression_data_samples_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
     }
-    return($experimentalUnitExpressionDataSamplesMapping);
+    return($experimental_unit_expression_data_samples_mapping);
 }
 
 
@@ -1201,7 +1201,7 @@ sub get_expression_samples_data_by_experimental_unit_ids
 
 =head2 get_expression_sample_ids_by_experimental_unit_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_experimental_unit_ids($experimentalUnitIDs)
+  $sample_ids = $obj->get_expression_sample_ids_by_experimental_unit_ids($experimental_unit_ids)
 
 =over 4
 
@@ -1210,12 +1210,12 @@ sub get_expression_samples_data_by_experimental_unit_ids
 =begin html
 
 <pre>
-$experimentalUnitIDs is an ExperimentalUnitIDs
-$sampleIDs is a SampleIDs
-ExperimentalUnitIDs is a reference to a list where each element is an ExperimentalUnitID
-ExperimentalUnitID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$experimental_unit_ids is an ExpressionServices.experimental_unit_ids
+$sample_ids is an ExpressionServices.sample_ids
+experimental_unit_ids is a reference to a list where each element is an ExpressionServices.experimental_unit_id
+experimental_unit_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -1223,12 +1223,12 @@ SampleID is a string
 
 =begin text
 
-$experimentalUnitIDs is an ExperimentalUnitIDs
-$sampleIDs is a SampleIDs
-ExperimentalUnitIDs is a reference to a list where each element is an ExperimentalUnitID
-ExperimentalUnitID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$experimental_unit_ids is an ExpressionServices.experimental_unit_ids
+$sample_ids is an ExpressionServices.sample_ids
+experimental_unit_ids is a reference to a list where each element is an ExpressionServices.experimental_unit_id
+experimental_unit_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -1246,10 +1246,10 @@ given a list of ExperimentalUnitIDs returns a list of Sample IDs
 sub get_expression_sample_ids_by_experimental_unit_ids
 {
     my $self = shift;
-    my($experimentalUnitIDs) = @_;
+    my($experimental_unit_ids) = @_;
 
     my @_bad_arguments;
-    (ref($experimentalUnitIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentalUnitIDs\" (value was \"$experimentalUnitIDs\")");
+    (ref($experimental_unit_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimental_unit_ids\" (value was \"$experimental_unit_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1257,10 +1257,10 @@ sub get_expression_sample_ids_by_experimental_unit_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_experimental_unit_ids
-    $sampleIDs = [];
-    if (0 == @{$experimentalUnitIDs}) 
+    $sample_ids = [];
+    if (0 == @{$experimental_unit_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_experimental_unit_ids requires a list of valid experimental unit ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1276,25 +1276,25 @@ sub get_expression_sample_ids_by_experimental_unit_ids
            inner join HasExpressionSample hes on sam.id = hes.to_link  
            inner join ExperimentalUnit eu on hes.from_link = eu.id
            where eu.id in (^. 
-           join(",", ("?") x @{$experimentalUnitIDs}) . ") "; 
+           join(",", ("?") x @{$experimental_unit_ids}) . ") "; 
     my $get_sample_ids_by_experimental_unit_ids_qh = $dbh->prepare($get_sample_ids_by_experimental_unit_ids_q) or die 
                                                               "Unable to prepare get_sample_ids_by_experimental_unit_ids_q : ". 
                                                               $get_sample_ids_by_experimental_unit_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_sample_ids_by_experimental_unit_ids_qh->execute(@{$experimentalUnitIDs}) or die "Unable to execute get_sample_ids_by_experimental_unit_ids_q : ". 
+    $get_sample_ids_by_experimental_unit_ids_qh->execute(@{$experimental_unit_ids}) or die "Unable to execute get_sample_ids_by_experimental_unit_ids_q : ". 
         $get_sample_ids_by_experimental_unit_ids_q . " : " . $get_sample_ids_by_experimental_unit_ids_qh->errstr() . "\n\n"; 
     while (my ($sample_id) = $get_sample_ids_by_experimental_unit_ids_qh->fetchrow_array()) 
     { 
-	push(@$sampleIDs,$sample_id);
+	push(@$sample_ids,$sample_id);
     } 
     #END get_expression_sample_ids_by_experimental_unit_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_experimental_unit_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_experimental_unit_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -1302,7 +1302,7 @@ sub get_expression_sample_ids_by_experimental_unit_ids
 
 =head2 get_expression_samples_data_by_experiment_meta_ids
 
-  $experimentMetaExpressionDataSamplesMapping = $obj->get_expression_samples_data_by_experiment_meta_ids($experimentMetaIDs)
+  $experiment_meta_expression_data_samples_mapping = $obj->get_expression_samples_data_by_experiment_meta_ids($experiment_meta_ids)
 
 =over 4
 
@@ -1311,72 +1311,72 @@ sub get_expression_sample_ids_by_experimental_unit_ids
 =begin html
 
 <pre>
-$experimentMetaIDs is an ExperimentMetaIDs
-$experimentMetaExpressionDataSamplesMapping is an ExperimentMetaExpressionDataSamplesMapping
-ExperimentMetaIDs is a reference to a list where each element is an ExperimentMetaID
-ExperimentMetaID is a string
-ExperimentMetaExpressionDataSamplesMapping is a reference to a hash where the key is an ExperimentMetaID and the value is an ExperimentalUnitExpressionDataSamplesMapping
-ExperimentalUnitExpressionDataSamplesMapping is a reference to a hash where the key is an ExperimentalUnitID and the value is an ExpressionDataSamplesMap
-ExperimentalUnitID is a string
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$experiment_meta_ids is an ExpressionServices.experiment_meta_ids
+$experiment_meta_expression_data_samples_mapping is an ExpressionServices.experiment_meta_expression_data_samples_mapping
+experiment_meta_ids is a reference to a list where each element is an ExpressionServices.experiment_meta_id
+experiment_meta_id is a string
+experiment_meta_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.experiment_meta_id and the value is an ExpressionServices.experimental_unit_expression_data_samples_mapping
+experimental_unit_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.experimental_unit_id and the value is an ExpressionServices.expression_data_samples_map
+experimental_unit_id is a string
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -1384,72 +1384,72 @@ Measurement is a float
 
 =begin text
 
-$experimentMetaIDs is an ExperimentMetaIDs
-$experimentMetaExpressionDataSamplesMapping is an ExperimentMetaExpressionDataSamplesMapping
-ExperimentMetaIDs is a reference to a list where each element is an ExperimentMetaID
-ExperimentMetaID is a string
-ExperimentMetaExpressionDataSamplesMapping is a reference to a hash where the key is an ExperimentMetaID and the value is an ExperimentalUnitExpressionDataSamplesMapping
-ExperimentalUnitExpressionDataSamplesMapping is a reference to a hash where the key is an ExperimentalUnitID and the value is an ExpressionDataSamplesMap
-ExperimentalUnitID is a string
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$experiment_meta_ids is an ExpressionServices.experiment_meta_ids
+$experiment_meta_expression_data_samples_mapping is an ExpressionServices.experiment_meta_expression_data_samples_mapping
+experiment_meta_ids is a reference to a list where each element is an ExpressionServices.experiment_meta_id
+experiment_meta_id is a string
+experiment_meta_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.experiment_meta_id and the value is an ExpressionServices.experimental_unit_expression_data_samples_mapping
+experimental_unit_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.experimental_unit_id and the value is an ExpressionServices.expression_data_samples_map
+experimental_unit_id is a string
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-SampleType is a string
-StrainID is a string
-GenomeID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+sample_type is a string
+strain_id is a string
+genome_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -1467,10 +1467,10 @@ given a list of ExperimentMetaIDs returns mapping of {experimentMetaID -> {exper
 sub get_expression_samples_data_by_experiment_meta_ids
 {
     my $self = shift;
-    my($experimentMetaIDs) = @_;
+    my($experiment_meta_ids) = @_;
 
     my @_bad_arguments;
-    (ref($experimentMetaIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentMetaIDs\" (value was \"$experimentMetaIDs\")");
+    (ref($experiment_meta_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experiment_meta_ids\" (value was \"$experiment_meta_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1478,10 +1478,10 @@ sub get_expression_samples_data_by_experiment_meta_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($experimentMetaExpressionDataSamplesMapping);
+    my($experiment_meta_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_experiment_meta_ids
-    $experimentMetaExpressionDataSamplesMapping = {}; 
-    if (0 == @{$experimentMetaIDs}) 
+    $experiment_meta_expression_data_samples_mapping = {}; 
+    if (0 == @{$experiment_meta_ids}) 
     { 
         my $msg = "get_expression_samples_data_by_experimental_meta_ids requires a list of valid experimental unit ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -1501,11 +1501,11 @@ sub get_expression_samples_data_by_experiment_meta_ids
            inner join HasExperimentalUnit heu on eu.id = heu.to_link   
            inner join ExperimentMeta em on heu.from_link = em.id   
            where em.id in (^. 
-	join(",", ("?") x @{$experimentMetaIDs}) . ") "; 
+	join(",", ("?") x @{$experiment_meta_ids}) . ") "; 
     my $get_experimental_unit_ids_by_experiment_meta_ids_qh = $dbh->prepare($get_experimental_unit_ids_by_experiment_meta_ids_q) or die 
                                                               "Unable to prepare get_experimental_unit_ids_by_experiment_meta_ids_q : ". 
     $get_experimental_unit_ids_by_experiment_meta_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_experimental_unit_ids_by_experiment_meta_ids_qh->execute(@{$experimentMetaIDs}) or 
+    $get_experimental_unit_ids_by_experiment_meta_ids_qh->execute(@{$experiment_meta_ids}) or 
 			       die "Unable to execute get_experimental_unit_ids_by_experiment_meta_ids_q : ". 
     $get_experimental_unit_ids_by_experiment_meta_ids_q . " : " . $get_experimental_unit_ids_by_experiment_meta_ids_qh->errstr() . "\n\n"; 
     while (my ($experiment_meta_id, $experimental_unit_id) = $get_experimental_unit_ids_by_experiment_meta_ids_qh->fetchrow_array()) 
@@ -1514,26 +1514,26 @@ sub get_expression_samples_data_by_experiment_meta_ids
 	$experimental_unit_ids_hash{$experimental_unit_id}=1; 
     } 
     my @distinct_experimental_unit_ids = keys(%experimental_unit_ids_hash); 
-    my %experimentalUnitExpressionDataSamplesMapping = %{$self->get_expression_samples_data_by_experimental_unit_ids(\@distinct_experimental_unit_ids)}; 
+    my %experimental_unit_expression_data_samples_mapping = %{$self->get_expression_samples_data_by_experimental_unit_ids(\@distinct_experimental_unit_ids)}; 
     my %return_expmeta_data_hash; 
     foreach my $experiment_meta_id (keys(%experimentMetaExpressionDataSamplesMapping_hash)) 
     { 
 	my %exp_unit_hash = %{$experimentMetaExpressionDataSamplesMapping_hash{$experiment_meta_id}}; 
         foreach my $experimental_unit_id (keys(%exp_unit_hash)) 
         { 
-            $return_expmeta_data_hash{$experiment_meta_id}->{$experimental_unit_id}=$experimentalUnitExpressionDataSamplesMapping{$experimental_unit_id}; 
+            $return_expmeta_data_hash{$experiment_meta_id}->{$experimental_unit_id}=$experimental_unit_expression_data_samples_mapping{$experimental_unit_id}; 
         } 
     } 
-    $experimentMetaExpressionDataSamplesMapping = \%return_expmeta_data_hash; 
+    $experiment_meta_expression_data_samples_mapping = \%return_expmeta_data_hash; 
     #END get_expression_samples_data_by_experiment_meta_ids
     my @_bad_returns;
-    (ref($experimentMetaExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"experimentMetaExpressionDataSamplesMapping\" (value was \"$experimentMetaExpressionDataSamplesMapping\")");
+    (ref($experiment_meta_expression_data_samples_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"experiment_meta_expression_data_samples_mapping\" (value was \"$experiment_meta_expression_data_samples_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data_by_experiment_meta_ids');
     }
-    return($experimentMetaExpressionDataSamplesMapping);
+    return($experiment_meta_expression_data_samples_mapping);
 }
 
 
@@ -1541,7 +1541,7 @@ sub get_expression_samples_data_by_experiment_meta_ids
 
 =head2 get_expression_sample_ids_by_experiment_meta_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_experiment_meta_ids($experimentMetaIDs)
+  $sample_ids = $obj->get_expression_sample_ids_by_experiment_meta_ids($experiment_meta_ids)
 
 =over 4
 
@@ -1550,12 +1550,12 @@ sub get_expression_samples_data_by_experiment_meta_ids
 =begin html
 
 <pre>
-$experimentMetaIDs is an ExperimentMetaIDs
-$sampleIDs is a SampleIDs
-ExperimentMetaIDs is a reference to a list where each element is an ExperimentMetaID
-ExperimentMetaID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$experiment_meta_ids is an ExpressionServices.experiment_meta_ids
+$sample_ids is an ExpressionServices.sample_ids
+experiment_meta_ids is a reference to a list where each element is an ExpressionServices.experiment_meta_id
+experiment_meta_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -1563,12 +1563,12 @@ SampleID is a string
 
 =begin text
 
-$experimentMetaIDs is an ExperimentMetaIDs
-$sampleIDs is a SampleIDs
-ExperimentMetaIDs is a reference to a list where each element is an ExperimentMetaID
-ExperimentMetaID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$experiment_meta_ids is an ExpressionServices.experiment_meta_ids
+$sample_ids is an ExpressionServices.sample_ids
+experiment_meta_ids is a reference to a list where each element is an ExpressionServices.experiment_meta_id
+experiment_meta_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -1586,10 +1586,10 @@ given a list of ExperimentMetaIDs returns a list of Sample IDs
 sub get_expression_sample_ids_by_experiment_meta_ids
 {
     my $self = shift;
-    my($experimentMetaIDs) = @_;
+    my($experiment_meta_ids) = @_;
 
     my @_bad_arguments;
-    (ref($experimentMetaIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experimentMetaIDs\" (value was \"$experimentMetaIDs\")");
+    (ref($experiment_meta_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"experiment_meta_ids\" (value was \"$experiment_meta_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1597,10 +1597,10 @@ sub get_expression_sample_ids_by_experiment_meta_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_experiment_meta_ids
-    $sampleIDs = [];
-    if (0 == @{$experimentMetaIDs}) 
+    $sample_ids = [];
+    if (0 == @{$experiment_meta_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_experimental_meta_ids requires a list of valid experimental unit ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -1618,26 +1618,26 @@ sub get_expression_sample_ids_by_experiment_meta_ids
            inner join HasExperimentalUnit heu on eu.id = heu.to_link  
            inner join ExperimentMeta em on heu.from_link = em.id  
            where em.id in (^. 
-	   join(",", ("?") x @{$experimentMetaIDs}) . ") "; 
+	   join(",", ("?") x @{$experiment_meta_ids}) . ") "; 
     my $get_experimental_unit_ids_by_experiment_meta_ids_qh = $dbh->prepare($get_experimental_unit_ids_by_experiment_meta_ids_q) or die 
                                                               "Unable to prepare get_experimental_unit_ids_by_experiment_meta_ids_q : ". 
 							      $get_experimental_unit_ids_by_experiment_meta_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_experimental_unit_ids_by_experiment_meta_ids_qh->execute(@{$experimentMetaIDs}) or 
+    $get_experimental_unit_ids_by_experiment_meta_ids_qh->execute(@{$experiment_meta_ids}) or 
                                die "Unable to execute get_experimental_unit_ids_by_experiment_meta_ids_q : ". 
 			       $get_experimental_unit_ids_by_experiment_meta_ids_q . " : " . $get_experimental_unit_ids_by_experiment_meta_ids_qh->errstr() . "\n\n"; 
     while (my ($sample_id) = $get_experimental_unit_ids_by_experiment_meta_ids_qh->fetchrow_array()) 
     { 
-	push(@$sampleIDs,$sample_id);
+	push(@$sample_ids,$sample_id);
     } 
     #END get_expression_sample_ids_by_experiment_meta_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_experiment_meta_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_experiment_meta_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -1645,7 +1645,7 @@ sub get_expression_sample_ids_by_experiment_meta_ids
 
 =head2 get_expression_samples_data_by_strain_ids
 
-  $strainExpressionDataSamplesMapping = $obj->get_expression_samples_data_by_strain_ids($strainIDs, $sampleType)
+  $strain_expression_data_samples_mapping = $obj->get_expression_samples_data_by_strain_ids($strain_ids, $sample_type)
 
 =over 4
 
@@ -1654,72 +1654,72 @@ sub get_expression_sample_ids_by_experiment_meta_ids
 =begin html
 
 <pre>
-$strainIDs is a StrainIDs
-$sampleType is a SampleType
-$strainExpressionDataSamplesMapping is a StrainExpressionDataSamplesMapping
-StrainIDs is a reference to a list where each element is a StrainID
-StrainID is a string
-SampleType is a string
-StrainExpressionDataSamplesMapping is a reference to a hash where the key is a StrainID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$strain_ids is an ExpressionServices.strain_ids
+$sample_type is an ExpressionServices.sample_type
+$strain_expression_data_samples_mapping is an ExpressionServices.strain_expression_data_samples_mapping
+strain_ids is a reference to a list where each element is an ExpressionServices.strain_id
+strain_id is a string
+sample_type is a string
+strain_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.strain_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-GenomeID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+genome_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -1727,72 +1727,72 @@ Measurement is a float
 
 =begin text
 
-$strainIDs is a StrainIDs
-$sampleType is a SampleType
-$strainExpressionDataSamplesMapping is a StrainExpressionDataSamplesMapping
-StrainIDs is a reference to a list where each element is a StrainID
-StrainID is a string
-SampleType is a string
-StrainExpressionDataSamplesMapping is a reference to a hash where the key is a StrainID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$strain_ids is an ExpressionServices.strain_ids
+$sample_type is an ExpressionServices.sample_type
+$strain_expression_data_samples_mapping is an ExpressionServices.strain_expression_data_samples_mapping
+strain_ids is a reference to a list where each element is an ExpressionServices.strain_id
+strain_id is a string
+sample_type is a string
+strain_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.strain_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-GenomeID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+genome_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -1811,11 +1811,11 @@ StrainId -> ExpressionSampleDataStructure {strain_id -> {sample_id -> expression
 sub get_expression_samples_data_by_strain_ids
 {
     my $self = shift;
-    my($strainIDs, $sampleType) = @_;
+    my($strain_ids, $sample_type) = @_;
 
     my @_bad_arguments;
-    (ref($strainIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"strainIDs\" (value was \"$strainIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
+    (ref($strain_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"strain_ids\" (value was \"$strain_ids\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1823,29 +1823,29 @@ sub get_expression_samples_data_by_strain_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($strainExpressionDataSamplesMapping);
+    my($strain_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_strain_ids
-    $strainExpressionDataSamplesMapping = {};
-    if (0 == scalar(@{$strainIDs})) 
+    $strain_expression_data_samples_mapping = {};
+    if (0 == scalar(@{$strain_ids})) 
     { 
         my $msg = "get_expression_samples_data_by_strain_ids requires a list of valid strain ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_samples_data_by_strain_ids'); 
     } 
     my $sample_type_part = ""; 
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ")) 
     { 
         $sample_type_part = " and sam.type = 'RNA-Seq' "; 
     } 
-    elsif(uc($sampleType) eq "QPCR") 
+    elsif(uc($sample_type) eq "QPCR") 
     { 
         $sample_type_part = " and sam.type = 'qPCR' "; 
     } 
-    elsif(uc($sampleType) eq "MICROARRAY") 
+    elsif(uc($sample_type) eq "MICROARRAY") 
     { 
         $sample_type_part = " and sam.type = 'microarray' "; 
     } 
-    elsif(uc($sampleType) eq "PROTEOMICS") 
+    elsif(uc($sample_type) eq "PROTEOMICS") 
     { 
         $sample_type_part = " and sam.type = 'proteomics' "; 
     } 
@@ -1863,12 +1863,12 @@ sub get_expression_samples_data_by_strain_ids
            inner join StrainWithSample sws on sam.id = sws.to_link
            inner join Strain str on sws.from_link = str.id 
            where str.id in (^. 
-	join(",", ("?") x @{$strainIDs}) . ") ".
+	join(",", ("?") x @{$strain_ids}) . ") ".
 	$sample_type_part;
     my $get_sample_ids_by_strain_ids_qh = $dbh->prepare($get_sample_ids_by_strain_ids_q) or die 
                                                               "Unable to prepare get_sample_ids_by_strain_ids_q : ". 
                                                               $get_sample_ids_by_strain_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_sample_ids_by_strain_ids_qh->execute(@{$strainIDs}) or die "Unable to execute get_sample_ids_by_strain_ids_q : ". 
+    $get_sample_ids_by_strain_ids_qh->execute(@{$strain_ids}) or die "Unable to execute get_sample_ids_by_strain_ids_q : ". 
         $get_sample_ids_by_strain_ids_q . " : " . $get_sample_ids_by_strain_ids_qh->errstr() . "\n\n"; 
     my %strain_id_sample_id_hash; # {strainID}->{sample_id}=1     
     my %sample_ids_hash; #hash to get unique sample_id_hash      
@@ -1888,16 +1888,16 @@ sub get_expression_samples_data_by_strain_ids
             $strain_id_sample_data_hash{$strain_id}->{$sample_id} = $sample_ids_data_hash{$sample_id}; 
         } 
     } 
-    $strainExpressionDataSamplesMapping = \%strain_id_sample_data_hash; 
+    $strain_expression_data_samples_mapping = \%strain_id_sample_data_hash; 
     #END get_expression_samples_data_by_strain_ids
     my @_bad_returns;
-    (ref($strainExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"strainExpressionDataSamplesMapping\" (value was \"$strainExpressionDataSamplesMapping\")");
+    (ref($strain_expression_data_samples_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"strain_expression_data_samples_mapping\" (value was \"$strain_expression_data_samples_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data_by_strain_ids');
     }
-    return($strainExpressionDataSamplesMapping);
+    return($strain_expression_data_samples_mapping);
 }
 
 
@@ -1905,7 +1905,7 @@ sub get_expression_samples_data_by_strain_ids
 
 =head2 get_expression_sample_ids_by_strain_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_strain_ids($strainIDs, $sampleType)
+  $sample_ids = $obj->get_expression_sample_ids_by_strain_ids($strain_ids, $sample_type)
 
 =over 4
 
@@ -1914,14 +1914,14 @@ sub get_expression_samples_data_by_strain_ids
 =begin html
 
 <pre>
-$strainIDs is a StrainIDs
-$sampleType is a SampleType
-$sampleIDs is a SampleIDs
-StrainIDs is a reference to a list where each element is a StrainID
-StrainID is a string
-SampleType is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$strain_ids is an ExpressionServices.strain_ids
+$sample_type is an ExpressionServices.sample_type
+$sample_ids is an ExpressionServices.sample_ids
+strain_ids is a reference to a list where each element is an ExpressionServices.strain_id
+strain_id is a string
+sample_type is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -1929,14 +1929,14 @@ SampleID is a string
 
 =begin text
 
-$strainIDs is a StrainIDs
-$sampleType is a SampleType
-$sampleIDs is a SampleIDs
-StrainIDs is a reference to a list where each element is a StrainID
-StrainID is a string
-SampleType is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$strain_ids is an ExpressionServices.strain_ids
+$sample_type is an ExpressionServices.sample_type
+$sample_ids is an ExpressionServices.sample_ids
+strain_ids is a reference to a list where each element is an ExpressionServices.strain_id
+strain_id is a string
+sample_type is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -1954,11 +1954,11 @@ given a list of Strains, and a SampleType, it returns a list of Sample IDs
 sub get_expression_sample_ids_by_strain_ids
 {
     my $self = shift;
-    my($strainIDs, $sampleType) = @_;
+    my($strain_ids, $sample_type) = @_;
 
     my @_bad_arguments;
-    (ref($strainIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"strainIDs\" (value was \"$strainIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
+    (ref($strain_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"strain_ids\" (value was \"$strain_ids\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1966,29 +1966,29 @@ sub get_expression_sample_ids_by_strain_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_strain_ids
-    $sampleIDs = [];
-    if (0 == @{$strainIDs}) 
+    $sample_ids = [];
+    if (0 == @{$strain_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_strain_ids requires a list of valid strain ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_sample_ids_by_strain_ids'); 
     } 
     my $sample_type_part = ""; 
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ")) 
     { 
         $sample_type_part = " and sam.type = 'RNA-Seq' "; 
     } 
-    elsif(uc($sampleType) eq "QPCR") 
+    elsif(uc($sample_type) eq "QPCR") 
     { 
         $sample_type_part = " and sam.type = 'qPCR' "; 
     } 
-    elsif(uc($sampleType) eq "MICROARRAY") 
+    elsif(uc($sample_type) eq "MICROARRAY") 
     { 
         $sample_type_part = " and sam.type = 'microarray' "; 
     } 
-    elsif(uc($sampleType) eq "PROTEOMICS") 
+    elsif(uc($sample_type) eq "PROTEOMICS") 
     { 
         $sample_type_part = " and sam.type = 'proteomics' "; 
     } 
@@ -2006,26 +2006,26 @@ sub get_expression_sample_ids_by_strain_ids
            inner join StrainWithSample sws on sam.id = sws.to_link 
            inner join Strain str on sws.from_link = str.id   
            where str.id in (^. 
-	   join(",", ("?") x @{$strainIDs}) . ") ". 
+	   join(",", ("?") x @{$strain_ids}) . ") ". 
 	   $sample_type_part; 
     my $get_sample_ids_by_strain_ids_qh = $dbh->prepare($get_sample_ids_by_strain_ids_q) or die
                                                               "Unable to prepare get_sample_ids_by_strain_ids_q : ".
 							      $get_sample_ids_by_strain_ids_q . " : " . dbh->errstr() . "\n\n";
-    $get_sample_ids_by_strain_ids_qh->execute(@{$strainIDs}) or die "Unable to execute get_sample_ids_by_strain_ids_q : ".
+    $get_sample_ids_by_strain_ids_qh->execute(@{$strain_ids}) or die "Unable to execute get_sample_ids_by_strain_ids_q : ".
 	$get_sample_ids_by_strain_ids_q . " : " . $get_sample_ids_by_strain_ids_qh->errstr() . "\n\n";
     while (my ($sample_id) = $get_sample_ids_by_strain_ids_qh->fetchrow_array()) 
     { 
-	push(@$sampleIDs,$sample_id);
+	push(@$sample_ids,$sample_id);
     } 
     #END get_expression_sample_ids_by_strain_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_strain_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_strain_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -2033,7 +2033,7 @@ sub get_expression_sample_ids_by_strain_ids
 
 =head2 get_expression_samples_data_by_genome_ids
 
-  $genomeExpressionDataSamplesMapping = $obj->get_expression_samples_data_by_genome_ids($genomeIDs, $sampleType, $wildTypeOnly)
+  $genome_expression_data_samples_mapping = $obj->get_expression_samples_data_by_genome_ids($genome_ids, $sample_type, $wild_type_only)
 
 =over 4
 
@@ -2042,75 +2042,75 @@ sub get_expression_sample_ids_by_strain_ids
 =begin html
 
 <pre>
-$genomeIDs is a GenomeIDs
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$genomeExpressionDataSamplesMapping is a GenomeExpressionDataSamplesMapping
-GenomeIDs is a reference to a list where each element is a GenomeID
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-GenomeExpressionDataSamplesMapping is a reference to a hash where the key is a GenomeID and the value is a StrainExpressionDataSamplesMapping
-StrainExpressionDataSamplesMapping is a reference to a hash where the key is a StrainID and the value is an ExpressionDataSamplesMap
-StrainID is a string
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$genome_ids is an ExpressionServices.genome_ids
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$genome_expression_data_samples_mapping is an ExpressionServices.genome_expression_data_samples_mapping
+genome_ids is a reference to a list where each element is an ExpressionServices.genome_id
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+genome_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.strain_expression_data_samples_mapping
+strain_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.strain_id and the value is an ExpressionServices.expression_data_samples_map
+strain_id is a string
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -2118,75 +2118,75 @@ Measurement is a float
 
 =begin text
 
-$genomeIDs is a GenomeIDs
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$genomeExpressionDataSamplesMapping is a GenomeExpressionDataSamplesMapping
-GenomeIDs is a reference to a list where each element is a GenomeID
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-GenomeExpressionDataSamplesMapping is a reference to a hash where the key is a GenomeID and the value is a StrainExpressionDataSamplesMapping
-StrainExpressionDataSamplesMapping is a reference to a hash where the key is a StrainID and the value is an ExpressionDataSamplesMap
-StrainID is a string
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$genome_ids is an ExpressionServices.genome_ids
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$genome_expression_data_samples_mapping is an ExpressionServices.genome_expression_data_samples_mapping
+genome_ids is a reference to a list where each element is an ExpressionServices.genome_id
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+genome_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.strain_expression_data_samples_mapping
+strain_expression_data_samples_mapping is a reference to a hash where the key is an ExpressionServices.strain_id and the value is an ExpressionServices.expression_data_samples_map
+strain_id is a string
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -2206,12 +2206,12 @@ GenomeId -> StrainId -> ExpressionDataSample.  StrainId -> ExpressionSampleDataS
 sub get_expression_samples_data_by_genome_ids
 {
     my $self = shift;
-    my($genomeIDs, $sampleType, $wildTypeOnly) = @_;
+    my($genome_ids, $sample_type, $wild_type_only) = @_;
 
     my @_bad_arguments;
-    (ref($genomeIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genomeIDs\" (value was \"$genomeIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    (ref($genome_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genome_ids\" (value was \"$genome_ids\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
+    (!ref($wild_type_only)) or push(@_bad_arguments, "Invalid type for argument \"wild_type_only\" (value was \"$wild_type_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2219,10 +2219,10 @@ sub get_expression_samples_data_by_genome_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($genomeExpressionDataSamplesMapping);
+    my($genome_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_genome_ids
-    $genomeExpressionDataSamplesMapping = {};
-    if (0 == @{$genomeIDs}) 
+    $genome_expression_data_samples_mapping = {};
+    if (0 == @{$genome_ids}) 
     { 
         my $msg = "get_expression_samples_data_by_genome_ids  requires a list of valid genome ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -2233,24 +2233,24 @@ sub get_expression_samples_data_by_genome_ids
 	);
 
     my $wild_type_part = "";
-    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE"))
+    if (($wild_type_only eq "1") || (uc($wild_type_only) eq "Y") || (uc($wild_type_only) eq "TRUE"))
     {
 	$wild_type_part = " and str.wildType = 'Y' ";
     }
     my $sample_type_part = "";
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ"))
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ"))
     {
 	$sample_type_part = " and sam.type = 'RNA-Seq' ";
     }
-    elsif(uc($sampleType) eq "QPCR")
+    elsif(uc($sample_type) eq "QPCR")
     {
 	$sample_type_part = " and sam.type = 'qPCR' ";
     }
-    elsif(uc($sampleType) eq "MICROARRAY")
+    elsif(uc($sample_type) eq "MICROARRAY")
     {
 	$sample_type_part = " and sam.type = 'microarray' ";
     }
-    elsif(uc($sampleType) eq "PROTEOMICS")
+    elsif(uc($sample_type) eq "PROTEOMICS")
     {
         $sample_type_part = " and sam.type = 'proteomics' ";
     }
@@ -2268,13 +2268,13 @@ sub get_expression_samples_data_by_genome_ids
            inner join GenomeParentOf gpo on str.id = gpo.to_link
            inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id
            where gen.id in (^.
-	   join(",", ("?") x @{$genomeIDs}). ") ". 
+	   join(",", ("?") x @{$genome_ids}). ") ". 
 	   $wild_type_part . 
 	   $sample_type_part;
     my $get_strain_ids_by_genome_ids_qh = $dbh->prepare($get_strain_ids_by_genome_ids_q) or die 
                                                               "Unable to prepare get_strain_ids_by_genome_ids_q : ". 
                                                               $get_strain_ids_by_genome_ids_q . " : " . dbh->errstr() . "\n\n"; 
-    $get_strain_ids_by_genome_ids_qh->execute(@{$genomeIDs}) or die "Unable to execute get_strain_ids_by_genome_ids_q : ". 
+    $get_strain_ids_by_genome_ids_qh->execute(@{$genome_ids}) or die "Unable to execute get_strain_ids_by_genome_ids_q : ". 
         $get_strain_ids_by_genome_ids_q . " : " . $get_strain_ids_by_genome_ids_qh->errstr() . "\n\n"; 
     while (my ($genome_id, $strain_id) = $get_strain_ids_by_genome_ids_qh->fetchrow_array()) 
     { 
@@ -2282,7 +2282,7 @@ sub get_expression_samples_data_by_genome_ids
         $strain_ids_hash{$strain_id}=1; 
     } 
     my @distinct_strain_ids = keys(%strain_ids_hash); 
-    my %strainExpressionDataSamplesMapping = %{$self->get_expression_samples_data_by_strain_ids(\@distinct_strain_ids, $sampleType)}; 
+    my %strainExpressionDataSamplesMapping = %{$self->get_expression_samples_data_by_strain_ids(\@distinct_strain_ids, $sample_type)}; 
  
     my %return_genome_data_hash; 
     foreach my $genome_id (keys(%genome_strain_id_hash)) 
@@ -2293,16 +2293,16 @@ sub get_expression_samples_data_by_genome_ids
 	    $return_genome_data_hash{$genome_id}->{$strain_id} = $strainExpressionDataSamplesMapping{$strain_id};
 	}
     } 
-    $genomeExpressionDataSamplesMapping = \%return_genome_data_hash;              
+    $genome_expression_data_samples_mapping = \%return_genome_data_hash;              
     #END get_expression_samples_data_by_genome_ids
     my @_bad_returns;
-    (ref($genomeExpressionDataSamplesMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"genomeExpressionDataSamplesMapping\" (value was \"$genomeExpressionDataSamplesMapping\")");
+    (ref($genome_expression_data_samples_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"genome_expression_data_samples_mapping\" (value was \"$genome_expression_data_samples_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data_by_genome_ids');
     }
-    return($genomeExpressionDataSamplesMapping);
+    return($genome_expression_data_samples_mapping);
 }
 
 
@@ -2310,7 +2310,7 @@ sub get_expression_samples_data_by_genome_ids
 
 =head2 get_expression_sample_ids_by_genome_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_genome_ids($genomeIDs, $sampleType, $wildTypeOnly)
+  $sample_ids = $obj->get_expression_sample_ids_by_genome_ids($genome_ids, $sample_type, $wild_type_only)
 
 =over 4
 
@@ -2319,16 +2319,16 @@ sub get_expression_samples_data_by_genome_ids
 =begin html
 
 <pre>
-$genomeIDs is a GenomeIDs
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$sampleIDs is a SampleIDs
-GenomeIDs is a reference to a list where each element is a GenomeID
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$genome_ids is an ExpressionServices.genome_ids
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$sample_ids is an ExpressionServices.sample_ids
+genome_ids is a reference to a list where each element is an ExpressionServices.genome_id
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -2336,16 +2336,16 @@ SampleID is a string
 
 =begin text
 
-$genomeIDs is a GenomeIDs
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$sampleIDs is a SampleIDs
-GenomeIDs is a reference to a list where each element is a GenomeID
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$genome_ids is an ExpressionServices.genome_ids
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$sample_ids is an ExpressionServices.sample_ids
+genome_ids is a reference to a list where each element is an ExpressionServices.genome_id
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -2364,12 +2364,12 @@ and a int indicating WildType Only (1 = true, 0 = false) , it returns a list of 
 sub get_expression_sample_ids_by_genome_ids
 {
     my $self = shift;
-    my($genomeIDs, $sampleType, $wildTypeOnly) = @_;
+    my($genome_ids, $sample_type, $wild_type_only) = @_;
 
     my @_bad_arguments;
-    (ref($genomeIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genomeIDs\" (value was \"$genomeIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    (ref($genome_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"genome_ids\" (value was \"$genome_ids\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
+    (!ref($wild_type_only)) or push(@_bad_arguments, "Invalid type for argument \"wild_type_only\" (value was \"$wild_type_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2377,10 +2377,10 @@ sub get_expression_sample_ids_by_genome_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_genome_ids
-    $sampleIDs = [];
-    if (0 == @{$genomeIDs}) 
+    $sample_ids = [];
+    if (0 == @{$genome_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_genome_ids requires a list of valid genome ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -2391,24 +2391,24 @@ sub get_expression_sample_ids_by_genome_ids
         ); 
  
     my $wild_type_part = ""; 
-    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
+    if (($wild_type_only eq "1") || (uc($wild_type_only) eq "Y") || (uc($wild_type_only) eq "TRUE")) 
     { 
         $wild_type_part = " and str.wildType = 'Y' "; 
     } 
     my $sample_type_part = ""; 
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ")) 
     { 
         $sample_type_part = " and sam.type = 'RNA-Seq' "; 
     } 
-    elsif(uc($sampleType) eq "QPCR") 
+    elsif(uc($sample_type) eq "QPCR") 
     { 
         $sample_type_part = " and sam.type = 'qPCR' "; 
     } 
-    elsif(uc($sampleType) eq "MICROARRAY") 
+    elsif(uc($sample_type) eq "MICROARRAY") 
     { 
         $sample_type_part = " and sam.type = 'microarray' "; 
     } 
-    elsif(uc($sampleType) eq "PROTEOMICS") 
+    elsif(uc($sample_type) eq "PROTEOMICS") 
     { 
         $sample_type_part = " and sam.type = 'proteomics' "; 
     } 
@@ -2424,27 +2424,27 @@ sub get_expression_sample_ids_by_genome_ids
            inner join GenomeParentOf gpo on str.id = gpo.to_link 
            inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id     
            where gen.id in (^. 
-	   join(",", ("?") x @{$genomeIDs}). ") ". 
+	   join(",", ("?") x @{$genome_ids}). ") ". 
            $wild_type_part . 
 	   $sample_type_part; 
     my $get_strain_ids_by_genome_ids_qh = $dbh->prepare($get_strain_ids_by_genome_ids_q) or die
 	"Unable to prepare get_strain_ids_by_genome_ids_q : ".
 	$get_strain_ids_by_genome_ids_q . " : " . dbh->errstr() . "\n\n";
-    $get_strain_ids_by_genome_ids_qh->execute(@{$genomeIDs}) or die "Unable to execute get_strain_ids_by_genome_ids_q : ".
+    $get_strain_ids_by_genome_ids_qh->execute(@{$genome_ids}) or die "Unable to execute get_strain_ids_by_genome_ids_q : ".
 	$get_strain_ids_by_genome_ids_q . " : " . $get_strain_ids_by_genome_ids_qh->errstr() . "\n\n";
     while (my ($sample_id) = $get_strain_ids_by_genome_ids_qh->fetchrow_array())
     {
-	push(@$sampleIDs,$sample_id);
+	push(@$sample_ids,$sample_id);
     }
     #END get_expression_sample_ids_by_genome_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_genome_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_genome_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -2452,7 +2452,7 @@ sub get_expression_sample_ids_by_genome_ids
 
 =head2 get_expression_samples_data_by_ontology_ids
 
-  $ontologyExpressionDataSampleMapping = $obj->get_expression_samples_data_by_ontology_ids($ontologyIDs, $AndOr, $genomeId, $sampleType, $wildTypeOnly)
+  $ontology_expression_data_sample_mapping = $obj->get_expression_samples_data_by_ontology_ids($ontology_ids, $and_or, $genome_id, $sample_type, $wild_type_only)
 
 =over 4
 
@@ -2461,76 +2461,76 @@ sub get_expression_sample_ids_by_genome_ids
 =begin html
 
 <pre>
-$ontologyIDs is an OntologyIDs
-$AndOr is a string
-$genomeId is a GenomeID
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$ontologyExpressionDataSampleMapping is an OntologyExpressionDataSampleMapping
-OntologyIDs is a reference to a list where each element is an OntologyID
-OntologyID is a string
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-OntologyExpressionDataSampleMapping is a reference to a hash where the key is an OntologyID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$ontology_ids is an ExpressionServices.ontology_ids
+$and_or is a string
+$genome_id is an ExpressionServices.genome_id
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$ontology_expression_data_sample_mapping is an ExpressionServices.ontology_expression_data_sample_mapping
+ontology_ids is a reference to a list where each element is an ExpressionServices.ontology_id
+ontology_id is a string
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+ontology_expression_data_sample_mapping is a reference to a hash where the key is an ExpressionServices.ontology_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-StrainID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+strain_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 </pre>
 
@@ -2538,76 +2538,76 @@ Measurement is a float
 
 =begin text
 
-$ontologyIDs is an OntologyIDs
-$AndOr is a string
-$genomeId is a GenomeID
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$ontologyExpressionDataSampleMapping is an OntologyExpressionDataSampleMapping
-OntologyIDs is a reference to a list where each element is an OntologyID
-OntologyID is a string
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-OntologyExpressionDataSampleMapping is a reference to a hash where the key is an OntologyID and the value is an ExpressionDataSamplesMap
-ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
-SampleID is a string
+$ontology_ids is an ExpressionServices.ontology_ids
+$and_or is a string
+$genome_id is an ExpressionServices.genome_id
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$ontology_expression_data_sample_mapping is an ExpressionServices.ontology_expression_data_sample_mapping
+ontology_ids is a reference to a list where each element is an ExpressionServices.ontology_id
+ontology_id is a string
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+ontology_expression_data_sample_mapping is a reference to a hash where the key is an ExpressionServices.ontology_id and the value is an ExpressionServices.expression_data_samples_map
+expression_data_samples_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
+sample_id is a string
 ExpressionDataSample is a reference to a hash where the following keys are defined:
-	sampleID has a value which is a SampleID
-	sourceID has a value which is a string
-	sampleTitle has a value which is a string
-	sampleDescription has a value which is a string
+	sample_id has a value which is an ExpressionServices.sample_id
+	source_id has a value which is a string
+	sample_title has a value which is a string
+	sample_description has a value which is a string
 	molecule has a value which is a string
-	sampleType has a value which is a SampleType
-	dataSource has a value which is a string
-	externalSourceID has a value which is a string
-	externalSourceDate has a value which is a string
-	kbaseSubmissionDate has a value which is a string
+	sample_type has a value which is an ExpressionServices.sample_type
+	data_source has a value which is a string
+	external_source_id has a value which is a string
+	external_source_date has a value which is a string
+	kbase_submission_date has a value which is a string
 	custom has a value which is a string
-	originalLog2Median has a value which is a float
-	strainID has a value which is a StrainID
-	referenceStrain has a value which is a string
+	original_log2_median has a value which is a float
+	strain_id has a value which is an ExpressionServices.strain_id
+	reference_strain has a value which is a string
 	wildtype has a value which is a string
-	strainDescription has a value which is a string
-	genomeID has a value which is a GenomeID
-	genomeScientificName has a value which is a string
-	platformID has a value which is a string
-	platformTitle has a value which is a string
-	platformTechnology has a value which is a string
-	experimentalUnitID has a value which is an ExperimentalUnitID
-	experimentMetaID has a value which is an ExperimentMetaID
-	experimentTitle has a value which is a string
-	experimentDescription has a value which is a string
-	environmentID has a value which is a string
-	environmentDescription has a value which is a string
-	protocolID has a value which is a string
-	protocolDescription has a value which is a string
-	protocolName has a value which is a string
-	sampleAnnotations has a value which is a SampleAnnotations
-	seriesIDs has a value which is a SeriesIDs
-	personIDs has a value which is a PersonIDs
-	sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-	dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
-StrainID is a string
-ExperimentalUnitID is a string
-ExperimentMetaID is a string
-SampleAnnotations is a reference to a list where each element is a SampleAnnotation
+	strain_description has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	genome_scientific_name has a value which is a string
+	platform_id has a value which is a string
+	platform_title has a value which is a string
+	platform_technology has a value which is a string
+	experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+	experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+	experiment_title has a value which is a string
+	experiment_description has a value which is a string
+	environment_id has a value which is a string
+	environment_description has a value which is a string
+	protocol_id has a value which is a string
+	protocol_description has a value which is a string
+	protocol_name has a value which is a string
+	sample_annotations has a value which is an ExpressionServices.sample_annotations
+	series_ids has a value which is an ExpressionServices.series_ids
+	person_ids has a value which is an ExpressionServices.person_ids
+	sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+	data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
+strain_id is a string
+experimental_unit_id is a string
+experiment_meta_id is a string
+sample_annotations is a reference to a list where each element is an ExpressionServices.SampleAnnotation
 SampleAnnotation is a reference to a hash where the following keys are defined:
-	sampleAnnotationID has a value which is a SampleAnnotationID
-	ontologyID has a value which is an OntologyID
-	ontologyName has a value which is an OntologyName
-	ontologyDefinition has a value which is an OntologyDefinition
-SampleAnnotationID is a string
-OntologyName is a string
-OntologyDefinition is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-PersonIDs is a reference to a list where each element is a PersonID
-PersonID is a string
-SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
+	sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+	ontology_id has a value which is an ExpressionServices.ontology_id
+	ontology_name has a value which is an ExpressionServices.ontology_name
+	ontology_definition has a value which is an ExpressionServices.ontology_definition
+sample_annotation_id is a string
+ontology_name is a string
+ontology_definition is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+person_ids is a reference to a list where each element is an ExpressionServices.person_id
+person_id is a string
+sample_ids_averaged_from is a reference to a list where each element is an ExpressionServices.sample_id
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
 
 
 =end text
@@ -2626,14 +2626,14 @@ SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics), 
 sub get_expression_samples_data_by_ontology_ids
 {
     my $self = shift;
-    my($ontologyIDs, $AndOr, $genomeId, $sampleType, $wildTypeOnly) = @_;
+    my($ontology_ids, $and_or, $genome_id, $sample_type, $wild_type_only) = @_;
 
     my @_bad_arguments;
-    (ref($ontologyIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ontologyIDs\" (value was \"$ontologyIDs\")");
-    (!ref($AndOr)) or push(@_bad_arguments, "Invalid type for argument \"AndOr\" (value was \"$AndOr\")");
-    (!ref($genomeId)) or push(@_bad_arguments, "Invalid type for argument \"genomeId\" (value was \"$genomeId\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    (ref($ontology_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ontology_ids\" (value was \"$ontology_ids\")");
+    (!ref($and_or)) or push(@_bad_arguments, "Invalid type for argument \"and_or\" (value was \"$and_or\")");
+    (!ref($genome_id)) or push(@_bad_arguments, "Invalid type for argument \"genome_id\" (value was \"$genome_id\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
+    (!ref($wild_type_only)) or push(@_bad_arguments, "Invalid type for argument \"wild_type_only\" (value was \"$wild_type_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_data_by_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2641,46 +2641,46 @@ sub get_expression_samples_data_by_ontology_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($ontologyExpressionDataSampleMapping);
+    my($ontology_expression_data_sample_mapping);
     #BEGIN get_expression_samples_data_by_ontology_ids
-    $ontologyExpressionDataSampleMapping = {}; 
-    if (0 == @{$ontologyIDs}) 
+    $ontology_expression_data_sample_mapping = {}; 
+    if (0 == @{$ontology_ids}) 
     { 
         my $msg = "get_expression_samples_data_by_ontology_ids requires a list of valid ontology ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
 							       method_name => 'get_expression_samples_data_by_ontology_ids'); 
     } 
-    if (uc($AndOr) eq 'AND')
+    if (uc($and_or) eq 'AND')
     {
-	$AndOr = 'and';
+	$and_or = 'and';
     }
-    elsif (uc($AndOr) eq 'OR')
+    elsif (uc($and_or) eq 'OR')
     {
-	$AndOr = 'or';
+	$and_or = 'or';
     }
     else  #DEFAULTS TO OR : Really should have a warning or error message, but this is undefined KBase wide.  Meantime will default.
     {
-	$AndOr = 'or';
+	$and_or = 'or';
     }
     my $wild_type_part = ""; 
-    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
+    if (($wild_type_only eq "1") || (uc($wild_type_only) eq "Y") || (uc($wild_type_only) eq "TRUE")) 
     { 
         $wild_type_part = " and str.wildType = 'Y' "; 
     } 
     my $sample_type_part = ""; 
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ")) 
     { 
         $sample_type_part = " and sam.type = 'RNA-Seq' "; 
     } 
-    elsif(uc($sampleType) eq "QPCR") 
+    elsif(uc($sample_type) eq "QPCR") 
     { 
         $sample_type_part = " and sam.type = 'qPCR' "; 
     } 
-    elsif(uc($sampleType) eq "MICROARRAY") 
+    elsif(uc($sample_type) eq "MICROARRAY") 
     { 
         $sample_type_part = " and sam.type = 'microarray' "; 
     } 
-    elsif(uc($sampleType) eq "PROTEOMICS") 
+    elsif(uc($sample_type) eq "PROTEOMICS") 
     { 
         $sample_type_part = " and sam.type = 'proteomics' "; 
     } 
@@ -2689,7 +2689,7 @@ sub get_expression_samples_data_by_ontology_ids
         #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.          
     } 
     my %distinct_ontologies;
-    foreach my $ont_id (@{$ontologyIDs})
+    foreach my $ont_id (@{$ontology_ids})
     {
 	$distinct_ontologies{$ont_id} = 1;
     }
@@ -2714,12 +2714,12 @@ sub get_expression_samples_data_by_ontology_ids
 	    qq^ and ont.id in ( ^.
             join(",", ("?") x $distinct_ontology_count). ") "; 
 
-    if (($AndOr eq 'or') || ($distinct_ontology_count == 1)) 
+    if (($and_or eq 'or') || ($distinct_ontology_count == 1)) 
     { 
 	my $get_sample_ids_by_ontology_ids_qh = $dbh->prepare($get_sample_ids_by_ontology_ids_q) or die 
                                                               "Unable to prepare get_sample_ids_by_ontolgy_ids_q : ". 
                                                               $get_sample_ids_by_ontology_ids_q . " : " . dbh->errstr() . "\n\n"; 
-	$get_sample_ids_by_ontology_ids_qh->execute($genomeId, keys(%distinct_ontologies)) 
+	$get_sample_ids_by_ontology_ids_qh->execute($genome_id, keys(%distinct_ontologies)) 
 	    or die "Unable to execute get_sample_ids_by_ontology_ids_q : ". 
 	    $get_sample_ids_by_ontology_ids_q . " : " . $get_sample_ids_by_ontology_ids_qh->errstr() . "\n\n"; 
 	my %ontology_id_sample_id_hash; # {ontologyID}->{sample_id}=1   
@@ -2740,9 +2740,9 @@ sub get_expression_samples_data_by_ontology_ids
 		$ontology_id_sample_data_hash{$ontology_id}->{$sample_id} = $sample_ids_data_hash{$sample_id}; 
 	    } 
 	} 
-	$ontologyExpressionDataSampleMapping = \%ontology_id_sample_data_hash; 
+	$ontology_expression_data_sample_mapping = \%ontology_id_sample_data_hash; 
     }
-    elsif ($AndOr eq 'and')
+    elsif ($and_or eq 'and')
     {
 	$get_sample_ids_by_ontology_ids_q =  
 	    qq^select results.samid from ( ^.
@@ -2755,7 +2755,7 @@ sub get_expression_samples_data_by_ontology_ids
         my $get_sample_ids_by_ontology_ids_qh = $dbh->prepare($get_sample_ids_by_ontology_ids_q) or die
                                                               "Unable to prepare get_sample_ids_by_ontolgy_ids_q : ".
                                                               $get_sample_ids_by_ontology_ids_q . " : " . dbh->errstr() . "\n\n";
-        $get_sample_ids_by_ontology_ids_qh->execute($genomeId, keys(%distinct_ontologies)) 
+        $get_sample_ids_by_ontology_ids_qh->execute($genome_id, keys(%distinct_ontologies)) 
 	    or die "Unable to execute get_sample_ids_by_ontology_ids_q : ".
             $get_sample_ids_by_ontology_ids_q . " : " . $get_sample_ids_by_ontology_ids_qh->errstr() . "\n\n";
         my %ontology_id_sample_data_hash; # {ontologyID}->{sample_id}=1 
@@ -2770,17 +2770,17 @@ sub get_expression_samples_data_by_ontology_ids
 	    my $ontology_and_key = join(",",sort(keys(%distinct_ontologies)));
 	    $ontology_id_sample_data_hash{$ontology_and_key}= \%sample_ids_data_hash; 
 	}
-	$ontologyExpressionDataSampleMapping = \%ontology_id_sample_data_hash; 
+	$ontology_expression_data_sample_mapping = \%ontology_id_sample_data_hash; 
     }
     #END get_expression_samples_data_by_ontology_ids
     my @_bad_returns;
-    (ref($ontologyExpressionDataSampleMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"ontologyExpressionDataSampleMapping\" (value was \"$ontologyExpressionDataSampleMapping\")");
+    (ref($ontology_expression_data_sample_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"ontology_expression_data_sample_mapping\" (value was \"$ontology_expression_data_sample_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_data_by_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_data_by_ontology_ids');
     }
-    return($ontologyExpressionDataSampleMapping);
+    return($ontology_expression_data_sample_mapping);
 }
 
 
@@ -2788,7 +2788,7 @@ sub get_expression_samples_data_by_ontology_ids
 
 =head2 get_expression_sample_ids_by_ontology_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_ontology_ids($ontologyIDs, $AndOr, $genomeId, $sampleType, $wildTypeOnly)
+  $sample_ids = $obj->get_expression_sample_ids_by_ontology_ids($ontology_ids, $and_or, $genome_id, $sample_type, $wild_type_only)
 
 =over 4
 
@@ -2797,19 +2797,19 @@ sub get_expression_samples_data_by_ontology_ids
 =begin html
 
 <pre>
-$ontologyIDs is an OntologyIDs
-$AndOr is a string
-$genomeId is a GenomeID
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$sampleIDs is a SampleIDs
-OntologyIDs is a reference to a list where each element is an OntologyID
-OntologyID is a string
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$ontology_ids is an ExpressionServices.ontology_ids
+$and_or is a string
+$genome_id is an ExpressionServices.genome_id
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$sample_ids is an ExpressionServices.sample_ids
+ontology_ids is a reference to a list where each element is an ExpressionServices.ontology_id
+ontology_id is a string
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -2817,19 +2817,19 @@ SampleID is a string
 
 =begin text
 
-$ontologyIDs is an OntologyIDs
-$AndOr is a string
-$genomeId is a GenomeID
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$sampleIDs is a SampleIDs
-OntologyIDs is a reference to a list where each element is an OntologyID
-OntologyID is a string
-GenomeID is a string
-SampleType is a string
-WildTypeOnly is an int
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$ontology_ids is an ExpressionServices.ontology_ids
+$and_or is a string
+$genome_id is an ExpressionServices.genome_id
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$sample_ids is an ExpressionServices.sample_ids
+ontology_ids is a reference to a list where each element is an ExpressionServices.ontology_id
+ontology_id is a string
+genome_id is a string
+sample_type is a string
+wild_type_only is an int
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -2848,14 +2848,14 @@ SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics), 
 sub get_expression_sample_ids_by_ontology_ids
 {
     my $self = shift;
-    my($ontologyIDs, $AndOr, $genomeId, $sampleType, $wildTypeOnly) = @_;
+    my($ontology_ids, $and_or, $genome_id, $sample_type, $wild_type_only) = @_;
 
     my @_bad_arguments;
-    (ref($ontologyIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ontologyIDs\" (value was \"$ontologyIDs\")");
-    (!ref($AndOr)) or push(@_bad_arguments, "Invalid type for argument \"AndOr\" (value was \"$AndOr\")");
-    (!ref($genomeId)) or push(@_bad_arguments, "Invalid type for argument \"genomeId\" (value was \"$genomeId\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    (ref($ontology_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ontology_ids\" (value was \"$ontology_ids\")");
+    (!ref($and_or)) or push(@_bad_arguments, "Invalid type for argument \"and_or\" (value was \"$and_or\")");
+    (!ref($genome_id)) or push(@_bad_arguments, "Invalid type for argument \"genome_id\" (value was \"$genome_id\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
+    (!ref($wild_type_only)) or push(@_bad_arguments, "Invalid type for argument \"wild_type_only\" (value was \"$wild_type_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2863,46 +2863,46 @@ sub get_expression_sample_ids_by_ontology_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_ontology_ids
-    $sampleIDs = [];
-    if (0 == @{$ontologyIDs})
+    $sample_ids = [];
+    if (0 == @{$ontology_ids})
     { 
         my $msg = "get_expression_sample_ids_by_ontology_ids requires a list of valid ontology ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							     method_name => 'get_expression_sample_ids_by_ontology_ids');
     } 
-    if (uc($AndOr) eq 'AND')
+    if (uc($and_or) eq 'AND')
     { 
-        $AndOr = 'and'; 
+        $and_or = 'and'; 
     } 
-    elsif (uc($AndOr) eq 'OR') 
+    elsif (uc($and_or) eq 'OR') 
     { 
-        $AndOr = 'or'; 
+        $and_or = 'or'; 
     } 
     else  #DEFAULTS TO OR : Really should have a warning or error message, but this is undefined KBase wide.  Meantime will default.  
     { 
-        $AndOr = 'or'; 
+        $and_or = 'or'; 
     } 
     my $wild_type_part = ""; 
-    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
+    if (($wild_type_only eq "1") || (uc($wild_type_only) eq "Y") || (uc($wild_type_only) eq "TRUE")) 
     { 
         $wild_type_part = " and str.wildType = 'Y' "; 
     } 
     my $sample_type_part = ""; 
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ")) 
     { 
         $sample_type_part = " and sam.type = 'RNA-Seq' "; 
     } 
-    elsif(uc($sampleType) eq "QPCR") 
+    elsif(uc($sample_type) eq "QPCR") 
     { 
         $sample_type_part = " and sam.type = 'qPCR' "; 
     } 
-    elsif(uc($sampleType) eq "MICROARRAY")
+    elsif(uc($sample_type) eq "MICROARRAY")
     {
         $sample_type_part = " and sam.type = 'microarray' ";
     } 
-    elsif(uc($sampleType) eq "PROTEOMICS") 
+    elsif(uc($sample_type) eq "PROTEOMICS") 
     { 
         $sample_type_part = " and sam.type = 'proteomics' "; 
     } 
@@ -2911,7 +2911,7 @@ sub get_expression_sample_ids_by_ontology_ids
         #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.         
     } 
     my %distinct_ontologies; 
-    foreach my $ont_id (@{$ontologyIDs}) 
+    foreach my $ont_id (@{$ontology_ids}) 
     { 
         $distinct_ontologies{$ont_id} = 1; 
     } 
@@ -2935,21 +2935,21 @@ sub get_expression_sample_ids_by_ontology_ids
                $wild_type_part . 
             qq^ and ont.id in ( ^. 
             join(",", ("?") x $distinct_ontology_count). ") ";
-    if (($AndOr eq 'or') || ($distinct_ontology_count == 1)) 
+    if (($and_or eq 'or') || ($distinct_ontology_count == 1)) 
     { 
 	my $get_sample_ids_by_ontology_ids_q = $get_sample_ids_by_ontology_ids_q_p1 . $get_sample_ids_by_ontology_ids_q_p2;
         my $get_sample_ids_by_ontology_ids_qh = $dbh->prepare($get_sample_ids_by_ontology_ids_q) or die 
                                                               "Unable to prepare get_sample_ids_by_ontolgy_ids_q : ".
                                                               $get_sample_ids_by_ontology_ids_q . " : " . dbh->errstr() . "\n\n";
-        $get_sample_ids_by_ontology_ids_qh->execute($genomeId, keys(%distinct_ontologies))
+        $get_sample_ids_by_ontology_ids_qh->execute($genome_id, keys(%distinct_ontologies))
             or die "Unable to execute get_sample_ids_by_ontology_ids_q : ". 
             $get_sample_ids_by_ontology_ids_q . " : " . $get_sample_ids_by_ontology_ids_qh->errstr() . "\n\n";
         while (my ($sample_id) = $get_sample_ids_by_ontology_ids_qh->fetchrow_array())
         {
-            push(@$sampleIDs,$sample_id);
+            push(@$sample_ids,$sample_id);
         } 
     }
-    elsif ($AndOr eq 'and') 
+    elsif ($and_or eq 'and') 
     { 
         my $get_sample_ids_by_ontology_ids_q = 
             qq^select results.samid from ( ^. 
@@ -2963,23 +2963,23 @@ sub get_expression_sample_ids_by_ontology_ids
 	my $get_sample_ids_by_ontology_ids_qh = $dbh->prepare($get_sample_ids_by_ontology_ids_q) or die 
                                                               "Unable to prepare get_sample_ids_by_ontolgy_ids_q : ". 
                                                               $get_sample_ids_by_ontology_ids_q . " : " . dbh->errstr() . "\n\n"; 
-        $get_sample_ids_by_ontology_ids_qh->execute($genomeId, keys(%distinct_ontologies)) 
+        $get_sample_ids_by_ontology_ids_qh->execute($genome_id, keys(%distinct_ontologies)) 
             or die "Unable to execute get_sample_ids_by_ontology_ids_q : ". 
             $get_sample_ids_by_ontology_ids_q . " : " . $get_sample_ids_by_ontology_ids_qh->errstr() . "\n\n"; 
         while (my ($sample_id) = $get_sample_ids_by_ontology_ids_qh->fetchrow_array()) 
         { 
-            push(@$sampleIDs,$sample_id); 
+            push(@$sample_ids,$sample_id); 
         } 
     }
     #END get_expression_sample_ids_by_ontology_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_ontology_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -2987,7 +2987,7 @@ sub get_expression_sample_ids_by_ontology_ids
 
 =head2 get_expression_data_by_feature_ids
 
-  $featureSampleMeasurementMapping = $obj->get_expression_data_by_feature_ids($featureIDs, $sampleType, $wildTypeOnly)
+  $feature_sample_measurement_mapping = $obj->get_expression_data_by_feature_ids($feature_ids, $sample_type, $wild_type_only)
 
 =over 4
 
@@ -2996,18 +2996,18 @@ sub get_expression_sample_ids_by_ontology_ids
 =begin html
 
 <pre>
-$featureIDs is a FeatureIDs
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$featureSampleMeasurementMapping is a FeatureSampleMeasurementMapping
-FeatureIDs is a reference to a list where each element is a FeatureID
-FeatureID is a string
-SampleType is a string
-WildTypeOnly is an int
-FeatureSampleMeasurementMapping is a reference to a hash where the key is a FeatureID and the value is a SampleMeasurementMapping
-SampleMeasurementMapping is a reference to a hash where the key is a SampleID and the value is a Measurement
-SampleID is a string
-Measurement is a float
+$feature_ids is an ExpressionServices.feature_ids
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$feature_sample_measurement_mapping is an ExpressionServices.feature_sample_measurement_mapping
+feature_ids is a reference to a list where each element is an ExpressionServices.feature_id
+feature_id is a string
+sample_type is a string
+wild_type_only is an int
+feature_sample_measurement_mapping is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.sample_measurement_mapping
+sample_measurement_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.measurement
+sample_id is a string
+measurement is a float
 
 </pre>
 
@@ -3015,18 +3015,18 @@ Measurement is a float
 
 =begin text
 
-$featureIDs is a FeatureIDs
-$sampleType is a SampleType
-$wildTypeOnly is a WildTypeOnly
-$featureSampleMeasurementMapping is a FeatureSampleMeasurementMapping
-FeatureIDs is a reference to a list where each element is a FeatureID
-FeatureID is a string
-SampleType is a string
-WildTypeOnly is an int
-FeatureSampleMeasurementMapping is a reference to a hash where the key is a FeatureID and the value is a SampleMeasurementMapping
-SampleMeasurementMapping is a reference to a hash where the key is a SampleID and the value is a Measurement
-SampleID is a string
-Measurement is a float
+$feature_ids is an ExpressionServices.feature_ids
+$sample_type is an ExpressionServices.sample_type
+$wild_type_only is an ExpressionServices.wild_type_only
+$feature_sample_measurement_mapping is an ExpressionServices.feature_sample_measurement_mapping
+feature_ids is a reference to a list where each element is an ExpressionServices.feature_id
+feature_id is a string
+sample_type is a string
+wild_type_only is an int
+feature_sample_measurement_mapping is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.sample_measurement_mapping
+sample_measurement_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.measurement
+sample_id is a string
+measurement is a float
 
 
 =end text
@@ -3045,12 +3045,12 @@ and an int indicating WildType Only (1 = true, 0 = false) returns a FeatureSampl
 sub get_expression_data_by_feature_ids
 {
     my $self = shift;
-    my($featureIDs, $sampleType, $wildTypeOnly) = @_;
+    my($feature_ids, $sample_type, $wild_type_only) = @_;
 
     my @_bad_arguments;
-    (ref($featureIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"featureIDs\" (value was \"$featureIDs\")");
-    (!ref($sampleType)) or push(@_bad_arguments, "Invalid type for argument \"sampleType\" (value was \"$sampleType\")");
-    (!ref($wildTypeOnly)) or push(@_bad_arguments, "Invalid type for argument \"wildTypeOnly\" (value was \"$wildTypeOnly\")");
+    (ref($feature_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"feature_ids\" (value was \"$feature_ids\")");
+    (!ref($sample_type)) or push(@_bad_arguments, "Invalid type for argument \"sample_type\" (value was \"$sample_type\")");
+    (!ref($wild_type_only)) or push(@_bad_arguments, "Invalid type for argument \"wild_type_only\" (value was \"$wild_type_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_data_by_feature_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -3058,10 +3058,10 @@ sub get_expression_data_by_feature_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($featureSampleMeasurementMapping);
+    my($feature_sample_measurement_mapping);
     #BEGIN get_expression_data_by_feature_ids
-    $featureSampleMeasurementMapping = {};
-    if (0 == @{$featureIDs}) 
+    $feature_sample_measurement_mapping = {};
+    if (0 == @{$feature_ids}) 
     { 
         my $msg = "get_expression_data_by_feature_ids requires a list of valid feature ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -3073,24 +3073,24 @@ sub get_expression_data_by_feature_ids
 	);
 
     my $wild_type_part = ""; 
-    if (($wildTypeOnly eq "1") || (uc($wildTypeOnly) eq "Y") || (uc($wildTypeOnly) eq "TRUE")) 
+    if (($wild_type_only eq "1") || (uc($wild_type_only) eq "Y") || (uc($wild_type_only) eq "TRUE")) 
     { 
         $wild_type_part = " and str.wildType = 'Y' "; 
     } 
     my $sample_type_part = ""; 
-    if ((uc($sampleType) eq "RNA-SEQ") || (uc($sampleType) eq "RNA_SEQ") || (uc($sampleType) eq "RNASEQ") || (uc($sampleType) eq "RNA SEQ")) 
+    if ((uc($sample_type) eq "RNA-SEQ") || (uc($sample_type) eq "RNA_SEQ") || (uc($sample_type) eq "RNASEQ") || (uc($sample_type) eq "RNA SEQ")) 
     { 
         $sample_type_part = " and sam.type = 'RNA-Seq' "; 
     } 
-    elsif(uc($sampleType) eq "QPCR") 
+    elsif(uc($sample_type) eq "QPCR") 
     { 
         $sample_type_part = " and sam.type = 'qPCR' "; 
     } 
-    elsif(uc($sampleType) eq "MICROARRAY") 
+    elsif(uc($sample_type) eq "MICROARRAY") 
     { 
         $sample_type_part = " and sam.type = 'microarray' "; 
     } 
-    elsif(uc($sampleType) eq "PROTEOMICS") 
+    elsif(uc($sample_type) eq "PROTEOMICS") 
     { 
         $sample_type_part = " and sam.type = 'proteomics' "; 
     } 
@@ -3107,26 +3107,26 @@ sub get_expression_data_by_feature_ids
                                      inner join StrainWithSample sws on sam.id = sws.to_link 
                                      inner join Strain str on sws.from_link = str.id  
                                      where fea.id in (^.
-                                 join(",", ("?") x @{$featureIDs}). ") ". 
+                                 join(",", ("?") x @{$feature_ids}). ") ". 
                                  $wild_type_part . 
                                  $sample_type_part; 
     my $get_feature_log2level_qh = $dbh->prepare($get_feature_log2level_q) or die "Unable to prepare get_feature_log2level_q : ".
 	$get_feature_log2level_q . " : " .$dbh->errstr();
-    $get_feature_log2level_qh->execute(@{$featureIDs})  or die "Unable to execute get_feature_log2level_q : ".
+    $get_feature_log2level_qh->execute(@{$feature_ids})  or die "Unable to execute get_feature_log2level_q : ".
         $get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr(); 
     while(my ($sample_id,$feature_id,$log2level) = $get_feature_log2level_qh->fetchrow_array())
     {
-	$featureSampleMeasurementMapping->{$feature_id}->{$sample_id}=$log2level;
+	$feature_sample_measurement_mapping->{$feature_id}->{$sample_id}=$log2level;
     }
     #END get_expression_data_by_feature_ids
     my @_bad_returns;
-    (ref($featureSampleMeasurementMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"featureSampleMeasurementMapping\" (value was \"$featureSampleMeasurementMapping\")");
+    (ref($feature_sample_measurement_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"feature_sample_measurement_mapping\" (value was \"$feature_sample_measurement_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_data_by_feature_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_data_by_feature_ids');
     }
-    return($featureSampleMeasurementMapping);
+    return($feature_sample_measurement_mapping);
 }
 
 
@@ -3134,7 +3134,7 @@ sub get_expression_data_by_feature_ids
 
 =head2 compare_samples
 
-  $sampleComparisonMapping = $obj->compare_samples($numeratorsDataMapping, $denominatorsDataMapping)
+  $sample_comparison_mapping = $obj->compare_samples($numerators_data_mapping, $denominators_data_mapping)
 
 =over 4
 
@@ -3143,19 +3143,19 @@ sub get_expression_data_by_feature_ids
 =begin html
 
 <pre>
-$numeratorsDataMapping is a LabelDataMapping
-$denominatorsDataMapping is a LabelDataMapping
-$sampleComparisonMapping is a SampleComparisonMapping
-LabelDataMapping is a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-SampleID is a string
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-Log2Ratio is a float
+$numerators_data_mapping is an ExpressionServices.label_data_mapping
+$denominators_data_mapping is an ExpressionServices.label_data_mapping
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
+label_data_mapping is a reference to a hash where the key is a string and the value is an ExpressionServices.data_expression_levels_for_sample
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+sample_id is a string
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+log2_ratio is a float
 
 </pre>
 
@@ -3163,19 +3163,19 @@ Log2Ratio is a float
 
 =begin text
 
-$numeratorsDataMapping is a LabelDataMapping
-$denominatorsDataMapping is a LabelDataMapping
-$sampleComparisonMapping is a SampleComparisonMapping
-LabelDataMapping is a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
-DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-FeatureID is a string
-Measurement is a float
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-SampleID is a string
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-Log2Ratio is a float
+$numerators_data_mapping is an ExpressionServices.label_data_mapping
+$denominators_data_mapping is an ExpressionServices.label_data_mapping
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
+label_data_mapping is a reference to a hash where the key is a string and the value is an ExpressionServices.data_expression_levels_for_sample
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+sample_id is a string
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+log2_ratio is a float
 
 
 =end text
@@ -3195,11 +3195,11 @@ SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sample_id(o
 sub compare_samples
 {
     my $self = shift;
-    my($numeratorsDataMapping, $denominatorsDataMapping) = @_;
+    my($numerators_data_mapping, $denominators_data_mapping) = @_;
 
     my @_bad_arguments;
-    (ref($numeratorsDataMapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"numeratorsDataMapping\" (value was \"$numeratorsDataMapping\")");
-    (ref($denominatorsDataMapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"denominatorsDataMapping\" (value was \"$denominatorsDataMapping\")");
+    (ref($numerators_data_mapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"numerators_data_mapping\" (value was \"$numerators_data_mapping\")");
+    (ref($denominators_data_mapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"denominators_data_mapping\" (value was \"$denominators_data_mapping\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to compare_samples:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -3207,11 +3207,11 @@ sub compare_samples
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleComparisonMapping);
+    my($sample_comparison_mapping);
     #BEGIN compare_samples
-    $sampleComparisonMapping = {};
-    my @numerator_keys = keys(%{$numeratorsDataMapping});
-    my @denominator_keys = keys(%{$denominatorsDataMapping});
+    $sample_comparison_mapping = {};
+    my @numerator_keys = keys(%{$numerators_data_mapping});
+    my @denominator_keys = keys(%{$denominators_data_mapping});
     if ((0 == scalar(@numerator_keys)) || (0 == scalar(@denominator_keys)))
     { 
 	my $msg = "The numerator and/or denominator keys passed to compare_samples are empty \n";
@@ -3222,14 +3222,14 @@ sub compare_samples
     my %empty_denominator_keys;
     foreach my $numerator_key (@numerator_keys)
     {
-	if(scalar(keys(%{$numeratorsDataMapping->{$numerator_key}})) == 0)
+	if(scalar(keys(%{$numerators_data_mapping->{$numerator_key}})) == 0)
 	{
 	    $empty_numerator_keys{$numerator_key} = 1;
 	}
     }
     foreach my $denominator_key (@denominator_keys)
     {
-        if(scalar(keys(%{$denominatorsDataMapping->{$denominator_key}})) == 0)
+        if(scalar(keys(%{$denominators_data_mapping->{$denominator_key}})) == 0)
         {
             $empty_denominator_keys{$denominator_key} = 1;
         }
@@ -3263,17 +3263,17 @@ sub compare_samples
 
     foreach my $denominator_key (@denominator_keys)
     {
-	foreach my $feature_id (keys(%{$denominatorsDataMapping->{$denominator_key}}))
+	foreach my $feature_id (keys(%{$denominators_data_mapping->{$denominator_key}}))
 	{
 	    if(exists($denominator_average_hash{$feature_id})) #add to values
 	    {
 		$denominator_average_hash{$feature_id}{'running_total'} = $denominator_average_hash{$feature_id}{'running_total'} + 
-		    $denominatorsDataMapping->{$denominator_key}->{$feature_id} ;
+		    $denominators_data_mapping->{$denominator_key}->{$feature_id} ;
 		$denominator_average_hash{$feature_id}{'count'} = $denominator_average_hash{$feature_id}{'count'} + 1;
 	    }
 	    else #initialize values
 	    {
-		$denominator_average_hash{$feature_id}{'running_total'} = $denominatorsDataMapping->{$denominator_key}->{$feature_id} ;
+		$denominator_average_hash{$feature_id}{'running_total'} = $denominators_data_mapping->{$denominator_key}->{$feature_id} ;
 		$denominator_average_hash{$feature_id}{'count'} = 1;
 	    }
 	}
@@ -3295,25 +3295,25 @@ sub compare_samples
     #Generate comparisons vs the average.
     foreach my $numerator_key (@numerator_keys)
     {
-	foreach my $feature_id (keys(%{$numeratorsDataMapping->{$numerator_key}}))
+	foreach my $feature_id (keys(%{$numerators_data_mapping->{$numerator_key}}))
 	{
 	    if (exists($denominator_average_hash{$feature_id}->{'average'}))
 	    {
-		$sampleComparisonMapping->{$numerator_key}->{$final_denominator_key}->{$feature_id} = 
-		    $numeratorsDataMapping->{$numerator_key}->{$feature_id} - 
+		$sample_comparison_mapping->{$numerator_key}->{$final_denominator_key}->{$feature_id} = 
+		    $numerators_data_mapping->{$numerator_key}->{$feature_id} - 
 		    $denominator_average_hash{$feature_id}->{'average'};
 	    }
 	}
     }
     #END compare_samples
     my @_bad_returns;
-    (ref($sampleComparisonMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"sampleComparisonMapping\" (value was \"$sampleComparisonMapping\")");
+    (ref($sample_comparison_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"sample_comparison_mapping\" (value was \"$sample_comparison_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to compare_samples:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'compare_samples');
     }
-    return($sampleComparisonMapping);
+    return($sample_comparison_mapping);
 }
 
 
@@ -3321,7 +3321,7 @@ sub compare_samples
 
 =head2 compare_samples_vs_default_controls
 
-  $sampleComparisonMapping = $obj->compare_samples_vs_default_controls($numeratorSampleIDs)
+  $sample_comparison_mapping = $obj->compare_samples_vs_default_controls($numerator_sample_ids)
 
 =over 4
 
@@ -3330,16 +3330,16 @@ sub compare_samples
 =begin html
 
 <pre>
-$numeratorSampleIDs is a SampleIDs
-$sampleComparisonMapping is a SampleComparisonMapping
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$numerator_sample_ids is an ExpressionServices.sample_ids
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 </pre>
 
@@ -3347,16 +3347,16 @@ Log2Ratio is a float
 
 =begin text
 
-$numeratorSampleIDs is a SampleIDs
-$sampleComparisonMapping is a SampleComparisonMapping
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$numerator_sample_ids is an ExpressionServices.sample_ids
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 
 =end text
@@ -3375,10 +3375,10 @@ Takes a list of sampleIDs returns SampleComparisonMapping {sample_id ->{denomina
 sub compare_samples_vs_default_controls
 {
     my $self = shift;
-    my($numeratorSampleIDs) = @_;
+    my($numerator_sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($numeratorSampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"numeratorSampleIDs\" (value was \"$numeratorSampleIDs\")");
+    (ref($numerator_sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"numerator_sample_ids\" (value was \"$numerator_sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to compare_samples_vs_default_controls:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -3386,10 +3386,10 @@ sub compare_samples_vs_default_controls
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleComparisonMapping);
+    my($sample_comparison_mapping);
     #BEGIN compare_samples_vs_default_controls
-    $sampleComparisonMapping = {};
-    if (scalar(@{$numeratorSampleIDs} == 0)) 
+    $sample_comparison_mapping = {};
+    if (scalar(@{$numerator_sample_ids} == 0)) 
     { 
         my $msg = "compare_samples_vs_default_controls requires a list of valid sample ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -3403,10 +3403,10 @@ sub compare_samples_vs_default_controls
     my $get_default_sample_ids_q = qq^select to_link as num_sample_id, from_link as control_sample_id 
                                       from DefaultControlSample
                                       where to_link in (^.
-                                   join(",", ("?") x @{$numeratorSampleIDs}). ") "; 
+                                   join(",", ("?") x @{$numerator_sample_ids}). ") "; 
     my $get_default_sample_ids_qh = $dbh->prepare($get_default_sample_ids_q) or die "Unable to prepare get_default_sample_ids_q : ".
 	$get_default_sample_ids_q , " : " . $dbh->errstr();
-    $get_default_sample_ids_qh->execute(@{$numeratorSampleIDs})  or die "Unable to execute get_default_sample_ids_q : ".
+    $get_default_sample_ids_qh->execute(@{$numerator_sample_ids})  or die "Unable to execute get_default_sample_ids_q : ".
         $get_default_sample_ids_q , " : " . $get_default_sample_ids_qh->errstr();
     my %distinct_sample_ids_hash;
     my %numerator_control_mappings;
@@ -3418,7 +3418,7 @@ sub compare_samples_vs_default_controls
     }
     if (scalar(keys(%distinct_sample_ids_hash)) == 0)
     {
-	return $sampleComparisonMapping;
+	return $sample_comparison_mapping;
     }
     #log2Levels
     my $get_log2levels_q = qq^select sam.id, fea.id, mea.value
@@ -3445,18 +3445,18 @@ sub compare_samples_vs_default_controls
 	my $temp_control_hash->{$numerator_control_mappings{$numerator_sample_id}} = 
 	    $sample_data_hash{$numerator_control_mappings{$numerator_sample_id}};
 	my $temp_comparison_hash_ref = $self->compare_samples($temp_num_hash,$temp_control_hash);	
-	$sampleComparisonMapping->{$numerator_sample_id}->{$numerator_control_mappings{$numerator_sample_id}} = 
+	$sample_comparison_mapping->{$numerator_sample_id}->{$numerator_control_mappings{$numerator_sample_id}} = 
 	    $temp_comparison_hash_ref->{$numerator_sample_id}->{$numerator_control_mappings{$numerator_sample_id}};
     }
     #END compare_samples_vs_default_controls
     my @_bad_returns;
-    (ref($sampleComparisonMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"sampleComparisonMapping\" (value was \"$sampleComparisonMapping\")");
+    (ref($sample_comparison_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"sample_comparison_mapping\" (value was \"$sample_comparison_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to compare_samples_vs_default_controls:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'compare_samples_vs_default_controls');
     }
-    return($sampleComparisonMapping);
+    return($sample_comparison_mapping);
 }
 
 
@@ -3464,7 +3464,7 @@ sub compare_samples_vs_default_controls
 
 =head2 compare_samples_vs_the_average
 
-  $sampleComparisonMapping = $obj->compare_samples_vs_the_average($numeratorSampleIDs, $denominatorSampleIDs)
+  $sample_comparison_mapping = $obj->compare_samples_vs_the_average($numerator_sample_ids, $denominator_sample_ids)
 
 =over 4
 
@@ -3473,17 +3473,17 @@ sub compare_samples_vs_default_controls
 =begin html
 
 <pre>
-$numeratorSampleIDs is a SampleIDs
-$denominatorSampleIDs is a SampleIDs
-$sampleComparisonMapping is a SampleComparisonMapping
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$numerator_sample_ids is an ExpressionServices.sample_ids
+$denominator_sample_ids is an ExpressionServices.sample_ids
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 </pre>
 
@@ -3491,17 +3491,17 @@ Log2Ratio is a float
 
 =begin text
 
-$numeratorSampleIDs is a SampleIDs
-$denominatorSampleIDs is a SampleIDs
-$sampleComparisonMapping is a SampleComparisonMapping
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$numerator_sample_ids is an ExpressionServices.sample_ids
+$denominator_sample_ids is an ExpressionServices.sample_ids
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 
 =end text
@@ -3520,11 +3520,11 @@ returns SampleComparisonMapping {numerator_sample_id->{denominator_sample_id ->{
 sub compare_samples_vs_the_average
 {
     my $self = shift;
-    my($numeratorSampleIDs, $denominatorSampleIDs) = @_;
+    my($numerator_sample_ids, $denominator_sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($numeratorSampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"numeratorSampleIDs\" (value was \"$numeratorSampleIDs\")");
-    (ref($denominatorSampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"denominatorSampleIDs\" (value was \"$denominatorSampleIDs\")");
+    (ref($numerator_sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"numerator_sample_ids\" (value was \"$numerator_sample_ids\")");
+    (ref($denominator_sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"denominator_sample_ids\" (value was \"$denominator_sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to compare_samples_vs_the_average:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -3532,9 +3532,9 @@ sub compare_samples_vs_the_average
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleComparisonMapping);
+    my($sample_comparison_mapping);
     #BEGIN compare_samples_vs_the_average
-    if((scalar(@{$numeratorSampleIDs}) == 0) || (scalar(@{$denominatorSampleIDs}) == 0))
+    if((scalar(@{$numerator_sample_ids}) == 0) || (scalar(@{$denominator_sample_ids}) == 0))
     { 
 	my $msg = "A list of valid sample ids must be present for both the numerator and denominator\n";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -3546,12 +3546,12 @@ sub compare_samples_vs_the_average
     my %distinct_sample_ids_hash; 
     my %numerator_sample_ids_hash; 
     my %denominator_sample_ids_hash; 
-    foreach my $numerator_sample_id (@{$numeratorSampleIDs})
+    foreach my $numerator_sample_id (@{$numerator_sample_ids})
     {
 	$numerator_sample_ids_hash{$numerator_sample_id} = 1;
 	$distinct_sample_ids_hash{$numerator_sample_id} = 1;
     }
-    foreach my $denominator_sample_id (@{$denominatorSampleIDs})
+    foreach my $denominator_sample_id (@{$denominator_sample_ids})
     {
         $denominator_sample_ids_hash{$denominator_sample_id} = 1;
         $distinct_sample_ids_hash{$denominator_sample_id} = 1;
@@ -3588,16 +3588,16 @@ sub compare_samples_vs_the_average
             $denominator_parameter_hash{$sample_id}=$sample_data_hash{$sample_id};
         } 
     }
-    $sampleComparisonMapping = $self->compare_samples(\%numerator_parameter_hash,\%denominator_parameter_hash); 
+    $sample_comparison_mapping = $self->compare_samples(\%numerator_parameter_hash,\%denominator_parameter_hash); 
     #END compare_samples_vs_the_average
     my @_bad_returns;
-    (ref($sampleComparisonMapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"sampleComparisonMapping\" (value was \"$sampleComparisonMapping\")");
+    (ref($sample_comparison_mapping) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"sample_comparison_mapping\" (value was \"$sample_comparison_mapping\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to compare_samples_vs_the_average:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'compare_samples_vs_the_average');
     }
-    return($sampleComparisonMapping);
+    return($sample_comparison_mapping);
 }
 
 
@@ -3605,7 +3605,7 @@ sub compare_samples_vs_the_average
 
 =head2 get_on_off_calls
 
-  $onOffMappings = $obj->get_on_off_calls($sampleComparisonMapping, $off_threshold, $on_threshold)
+  $on_off_mappings = $obj->get_on_off_calls($sample_comparison_mapping, $off_threshold, $on_threshold)
 
 =over 4
 
@@ -3614,17 +3614,17 @@ sub compare_samples_vs_the_average
 =begin html
 
 <pre>
-$sampleComparisonMapping is a SampleComparisonMapping
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
 $off_threshold is a float
 $on_threshold is a float
-$onOffMappings is a SampleComparisonMapping
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-SampleID is a string
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$on_off_mappings is an ExpressionServices.sample_comparison_mapping
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+sample_id is a string
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 </pre>
 
@@ -3632,17 +3632,17 @@ Log2Ratio is a float
 
 =begin text
 
-$sampleComparisonMapping is a SampleComparisonMapping
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
 $off_threshold is a float
 $on_threshold is a float
-$onOffMappings is a SampleComparisonMapping
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-SampleID is a string
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$on_off_mappings is an ExpressionServices.sample_comparison_mapping
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+sample_id is a string
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 
 =end text
@@ -3661,10 +3661,10 @@ returns SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sam
 sub get_on_off_calls
 {
     my $self = shift;
-    my($sampleComparisonMapping, $off_threshold, $on_threshold) = @_;
+    my($sample_comparison_mapping, $off_threshold, $on_threshold) = @_;
 
     my @_bad_arguments;
-    (ref($sampleComparisonMapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"sampleComparisonMapping\" (value was \"$sampleComparisonMapping\")");
+    (ref($sample_comparison_mapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"sample_comparison_mapping\" (value was \"$sample_comparison_mapping\")");
     (!ref($off_threshold)) or push(@_bad_arguments, "Invalid type for argument \"off_threshold\" (value was \"$off_threshold\")");
     (!ref($on_threshold)) or push(@_bad_arguments, "Invalid type for argument \"on_threshold\" (value was \"$on_threshold\")");
     if (@_bad_arguments) {
@@ -3674,9 +3674,9 @@ sub get_on_off_calls
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($onOffMappings);
+    my($on_off_mappings);
     #BEGIN get_on_off_calls
-    if (scalar(keys(%{$sampleComparisonMapping})) == 0)
+    if (scalar(keys(%{$sample_comparison_mapping})) == 0)
     {
         my $msg = "The sampleComparisonMapping (1st argument, the hash was empty)";	 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -3715,13 +3715,13 @@ sub get_on_off_calls
         Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
                                                              method_name => 'get_on_off_calls'); 	
     }
-    foreach my $numerator_key (keys(%{$sampleComparisonMapping}))
+    foreach my $numerator_key (keys(%{$sample_comparison_mapping}))
     {
-	foreach my $denominator_key (keys(%{$sampleComparisonMapping->{$numerator_key}}))
+	foreach my $denominator_key (keys(%{$sample_comparison_mapping->{$numerator_key}}))
 	{
-	    foreach my $feature_id (keys(%{$sampleComparisonMapping->{$numerator_key}->{$denominator_key}}))
+	    foreach my $feature_id (keys(%{$sample_comparison_mapping->{$numerator_key}->{$denominator_key}}))
 	    {
-		my $tested_value = $sampleComparisonMapping->{$numerator_key}->{$denominator_key}->{$feature_id};
+		my $tested_value = $sample_comparison_mapping->{$numerator_key}->{$denominator_key}->{$feature_id};
 		my $call = 0;
 		if ($tested_value >= $on_threshold)
 		{
@@ -3731,19 +3731,19 @@ sub get_on_off_calls
 		{
 		    $call = -1;
 		}
-		$onOffMappings->{$numerator_key}->{$denominator_key}->{$feature_id} = $call;
+		$on_off_mappings->{$numerator_key}->{$denominator_key}->{$feature_id} = $call;
 	    }
 	}
     }
     #END get_on_off_calls
     my @_bad_returns;
-    (ref($onOffMappings) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"onOffMappings\" (value was \"$onOffMappings\")");
+    (ref($on_off_mappings) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"on_off_mappings\" (value was \"$on_off_mappings\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_on_off_calls:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_on_off_calls');
     }
-    return($onOffMappings);
+    return($on_off_mappings);
 }
 
 
@@ -3751,7 +3751,7 @@ sub get_on_off_calls
 
 =head2 get_top_changers
 
-  $topChangersMappings = $obj->get_top_changers($sampleComparisonMapping, $direction, $count)
+  $top_changers_mappings = $obj->get_top_changers($sample_comparison_mapping, $direction, $count)
 
 =over 4
 
@@ -3760,17 +3760,17 @@ sub get_on_off_calls
 =begin html
 
 <pre>
-$sampleComparisonMapping is a SampleComparisonMapping
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
 $direction is a string
 $count is an int
-$topChangersMappings is a SampleComparisonMapping
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-SampleID is a string
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$top_changers_mappings is an ExpressionServices.sample_comparison_mapping
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+sample_id is a string
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 </pre>
 
@@ -3778,17 +3778,17 @@ Log2Ratio is a float
 
 =begin text
 
-$sampleComparisonMapping is a SampleComparisonMapping
+$sample_comparison_mapping is an ExpressionServices.sample_comparison_mapping
 $direction is a string
 $count is an int
-$topChangersMappings is a SampleComparisonMapping
-SampleComparisonMapping is a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
-SampleID is a string
-DenominatorSampleComparison is a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
-ComparisonDenominatorLabel is a string
-DataSampleComparison is a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
-FeatureID is a string
-Log2Ratio is a float
+$top_changers_mappings is an ExpressionServices.sample_comparison_mapping
+sample_comparison_mapping is a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
+sample_id is a string
+denominator_sample_comparison is a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
+comparison_denominator_label is a string
+data_sample_comparison is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
+feature_id is a string
+log2_ratio is a float
 
 
 =end text
@@ -3807,10 +3807,10 @@ returns SampleComparisonMapping {numerator_sample_id(or label)->{denominator_sam
 sub get_top_changers
 {
     my $self = shift;
-    my($sampleComparisonMapping, $direction, $count) = @_;
+    my($sample_comparison_mapping, $direction, $count) = @_;
 
     my @_bad_arguments;
-    (ref($sampleComparisonMapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"sampleComparisonMapping\" (value was \"$sampleComparisonMapping\")");
+    (ref($sample_comparison_mapping) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"sample_comparison_mapping\" (value was \"$sample_comparison_mapping\")");
     (!ref($direction)) or push(@_bad_arguments, "Invalid type for argument \"direction\" (value was \"$direction\")");
     (!ref($count)) or push(@_bad_arguments, "Invalid type for argument \"count\" (value was \"$count\")");
     if (@_bad_arguments) {
@@ -3820,11 +3820,11 @@ sub get_top_changers
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($topChangersMappings);
+    my($top_changers_mappings);
     #BEGIN get_top_changers
-    if (scalar(keys(%{$sampleComparisonMapping})) == 0) 
+    if (scalar(keys(%{$sample_comparison_mapping})) == 0) 
     { 
-        my $msg = "The sampleComparisonMapping (1st argument, the hash was empty)"; 
+        my $msg = "The sample_comparison_mapping (1st argument, the hash was empty)"; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_top_changers'); 
     } 
@@ -3842,11 +3842,11 @@ sub get_top_changers
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_top_changers'); 
     }
-    foreach my $numerator_key (keys(%{$sampleComparisonMapping}))
+    foreach my $numerator_key (keys(%{$sample_comparison_mapping}))
     { 
-        foreach my $denominator_key (keys(%{$sampleComparisonMapping->{$numerator_key}}))
+        foreach my $denominator_key (keys(%{$sample_comparison_mapping->{$numerator_key}}))
         { 
-	    my %data_hash = %{$sampleComparisonMapping->{$numerator_key}->{$denominator_key}};
+	    my %data_hash = %{$sample_comparison_mapping->{$numerator_key}->{$denominator_key}};
 	    if ((uc($direction) eq 'UP') || (uc($direction) eq 'BOTH'))
 	    {
 		#get top up changers
@@ -3855,7 +3855,7 @@ sub get_top_changers
 		{
 		    if ($counter < $count)
 		    {
-			$topChangersMappings->{$numerator_key}->{$denominator_key}->{$feature_id} = 
+			$top_changers_mappings->{$numerator_key}->{$denominator_key}->{$feature_id} = 
 			    $data_hash{$feature_id};
 		    }
 		    else {last;}
@@ -3870,7 +3870,7 @@ sub get_top_changers
                 { 
                     if ($counter < $count)
                     {
-                        $topChangersMappings->{$numerator_key}->{$denominator_key}->{$feature_id} = 
+                        $top_changers_mappings->{$numerator_key}->{$denominator_key}->{$feature_id} = 
                             $data_hash{$feature_id};
                     } 
                     else {last;}
@@ -3881,13 +3881,13 @@ sub get_top_changers
     }     
     #END get_top_changers
     my @_bad_returns;
-    (ref($topChangersMappings) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"topChangersMappings\" (value was \"$topChangersMappings\")");
+    (ref($top_changers_mappings) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"top_changers_mappings\" (value was \"$top_changers_mappings\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_top_changers:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_top_changers');
     }
-    return($topChangersMappings);
+    return($top_changers_mappings);
 }
 
 
@@ -3895,7 +3895,7 @@ sub get_top_changers
 
 =head2 get_expression_samples_titles
 
-  $samplesTitlesMap = $obj->get_expression_samples_titles($sampleIDs)
+  $samples_titles_map = $obj->get_expression_samples_titles($sample_ids)
 
 =over 4
 
@@ -3904,11 +3904,11 @@ sub get_top_changers
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$samplesTitlesMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_titles_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 </pre>
 
@@ -3916,11 +3916,11 @@ SamplesStringMap is a reference to a hash where the key is a SampleID and the va
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$samplesTitlesMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_titles_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 
 =end text
@@ -3938,10 +3938,10 @@ given a List of SampleIDs, returns a Hash (key : SampleID, value: Title of Sampl
 sub get_expression_samples_titles
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_titles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -3949,10 +3949,10 @@ sub get_expression_samples_titles
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($samplesTitlesMap);
+    my($samples_titles_map);
     #BEGIN get_expression_samples_titles
-    $samplesTitlesMap = {}; 
-    if (0 == @{$sampleIDs}) 
+    $samples_titles_map = {}; 
+    if (0 == @{$sample_ids}) 
     { 
         my $msg = "get_expression_samples_titles requires a list of valid sample ids. "; 
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
@@ -3963,23 +3963,23 @@ sub get_expression_samples_titles
                            { RaiseError => 1, ShowErrorStatement => 1 } 
 	); 
     my $get_samples_titles_q = qq^select id, title from Sample where id in (^.
-				    join(",", ("?") x @{$sampleIDs}) . ") "; 
+				    join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_samples_titles_qh = $dbh->prepare($get_samples_titles_q) or die "Unable to prepare : get_samples_titles_q : ". 
 	$get_samples_titles_q . " : " .$dbh->errstr(); 
-    $get_samples_titles_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_titles_q : ".$get_samples_titles_qh->errstr(); 
+    $get_samples_titles_qh->execute(@{$sample_ids}) or die "Unable to execute : get_samples_titles_q : ".$get_samples_titles_qh->errstr(); 
     while (my ($sample_id, $title) = $get_samples_titles_qh->fetchrow_array())
     {
-	$samplesTitlesMap->{$sample_id} = $title;
+	$samples_titles_map->{$sample_id} = $title;
     }
     #END get_expression_samples_titles
     my @_bad_returns;
-    (ref($samplesTitlesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesTitlesMap\" (value was \"$samplesTitlesMap\")");
+    (ref($samples_titles_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samples_titles_map\" (value was \"$samples_titles_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_titles:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_titles');
     }
-    return($samplesTitlesMap);
+    return($samples_titles_map);
 }
 
 
@@ -3987,7 +3987,7 @@ sub get_expression_samples_titles
 
 =head2 get_expression_samples_descriptions
 
-  $samplesDescriptionsMap = $obj->get_expression_samples_descriptions($sampleIDs)
+  $samples_descriptions_map = $obj->get_expression_samples_descriptions($sample_ids)
 
 =over 4
 
@@ -3996,11 +3996,11 @@ sub get_expression_samples_titles
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$samplesDescriptionsMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_descriptions_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 </pre>
 
@@ -4008,11 +4008,11 @@ SamplesStringMap is a reference to a hash where the key is a SampleID and the va
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$samplesDescriptionsMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_descriptions_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 
 =end text
@@ -4030,10 +4030,10 @@ given a List of SampleIDs, returns a Hash (key : SampleID, value: Description of
 sub get_expression_samples_descriptions
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_descriptions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4041,10 +4041,10 @@ sub get_expression_samples_descriptions
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($samplesDescriptionsMap);
+    my($samples_descriptions_map);
     #BEGIN get_expression_samples_descriptions
-    $samplesDescriptionsMap = {}; 
-    if (0 == @{$sampleIDs})
+    $samples_descriptions_map = {}; 
+    if (0 == @{$sample_ids})
     { 
         my $msg = "get_expression_samples_descriptions requires a list of valid sample ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4055,23 +4055,23 @@ sub get_expression_samples_descriptions
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_descriptions_q = qq^select id, description from Sample where id in (^.
-	join(",", ("?") x @{$sampleIDs}) . ") "; 
+	join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_samples_descriptions_qh = $dbh->prepare($get_samples_descriptions_q) or die "Unable to prepare : get_samples_descriptions_q : ".
         $get_samples_descriptions_q . " : " .$dbh->errstr(); 
-    $get_samples_descriptions_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_descriptions_q : ".$get_samples_descriptions_qh->errstr();
+    $get_samples_descriptions_qh->execute(@{$sample_ids}) or die "Unable to execute : get_samples_descriptions_q : ".$get_samples_descriptions_qh->errstr();
     while (my ($sample_id, $description) = $get_samples_descriptions_qh->fetchrow_array())
     { 
-        $samplesDescriptionsMap->{$sample_id} = $description;
+        $samples_descriptions_map->{$sample_id} = $description;
     } 
     #END get_expression_samples_descriptions
     my @_bad_returns;
-    (ref($samplesDescriptionsMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesDescriptionsMap\" (value was \"$samplesDescriptionsMap\")");
+    (ref($samples_descriptions_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samples_descriptions_map\" (value was \"$samples_descriptions_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_descriptions:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_descriptions');
     }
-    return($samplesDescriptionsMap);
+    return($samples_descriptions_map);
 }
 
 
@@ -4079,7 +4079,7 @@ sub get_expression_samples_descriptions
 
 =head2 get_expression_samples_molecules
 
-  $samplesMoleculesMap = $obj->get_expression_samples_molecules($sampleIDs)
+  $samples_molecules_map = $obj->get_expression_samples_molecules($sample_ids)
 
 =over 4
 
@@ -4088,11 +4088,11 @@ sub get_expression_samples_descriptions
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$samplesMoleculesMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_molecules_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 </pre>
 
@@ -4100,11 +4100,11 @@ SamplesStringMap is a reference to a hash where the key is a SampleID and the va
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$samplesMoleculesMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_molecules_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 
 =end text
@@ -4122,10 +4122,10 @@ given a List of SampleIDs, returns a Hash (key : SampleID, value: Molecule of Sa
 sub get_expression_samples_molecules
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_molecules:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4133,10 +4133,10 @@ sub get_expression_samples_molecules
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($samplesMoleculesMap);
+    my($samples_molecules_map);
     #BEGIN get_expression_samples_molecules
-    $samplesMoleculesMap = {}; 
-    if (0 == @{$sampleIDs})
+    $samples_molecules_map = {}; 
+    if (0 == @{$sample_ids})
     { 
         my $msg = "get_expression_samples_molecules requires a list of valid sample ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4147,23 +4147,23 @@ sub get_expression_samples_molecules
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_molecules_q = qq^select id, molecule from Sample where id in (^.
-	join(",", ("?") x @{$sampleIDs}) . ") "; 
+	join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_samples_molecules_qh = $dbh->prepare($get_samples_molecules_q) or die "Unable to prepare : get_samples_molecules_q : ".
         $get_samples_molecules_q . " : " .$dbh->errstr(); 
-    $get_samples_molecules_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_molecules_q : ".$get_samples_molecules_qh->errstr();
+    $get_samples_molecules_qh->execute(@{$sample_ids}) or die "Unable to execute : get_samples_molecules_q : ".$get_samples_molecules_qh->errstr();
     while (my ($sample_id, $molecule) = $get_samples_molecules_qh->fetchrow_array())
     { 
-        $samplesMoleculesMap->{$sample_id} = $molecule;
+        $samples_molecules_map->{$sample_id} = $molecule;
     } 
     #END get_expression_samples_molecules
     my @_bad_returns;
-    (ref($samplesMoleculesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesMoleculesMap\" (value was \"$samplesMoleculesMap\")");
+    (ref($samples_molecules_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samples_molecules_map\" (value was \"$samples_molecules_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_molecules:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_molecules');
     }
-    return($samplesMoleculesMap);
+    return($samples_molecules_map);
 }
 
 
@@ -4171,7 +4171,7 @@ sub get_expression_samples_molecules
 
 =head2 get_expression_samples_types
 
-  $samplesTypesMap = $obj->get_expression_samples_types($sampleIDs)
+  $samples_types_map = $obj->get_expression_samples_types($sample_ids)
 
 =over 4
 
@@ -4180,11 +4180,11 @@ sub get_expression_samples_molecules
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$samplesTypesMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_types_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 </pre>
 
@@ -4192,11 +4192,11 @@ SamplesStringMap is a reference to a hash where the key is a SampleID and the va
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$samplesTypesMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_types_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 
 =end text
@@ -4214,10 +4214,10 @@ given a List of SampleIDs, returns a Hash (key : SampleID, value: Type of Sample
 sub get_expression_samples_types
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_types:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4225,10 +4225,10 @@ sub get_expression_samples_types
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($samplesTypesMap);
+    my($samples_types_map);
     #BEGIN get_expression_samples_types
-    $samplesTypesMap = {}; 
-    if (0 == @{$sampleIDs})
+    $samples_types_map = {}; 
+    if (0 == @{$sample_ids})
     { 
         my $msg = "get_expression_samples_types requires a list of valid sample ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4239,23 +4239,23 @@ sub get_expression_samples_types
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_types_q = qq^select id, type from Sample where id in (^.
-	join(",", ("?") x @{$sampleIDs}) . ") "; 
+	join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_samples_types_qh = $dbh->prepare($get_samples_types_q) or die "Unable to prepare : get_samples_types_q : ".
         $get_samples_types_q . " : " .$dbh->errstr(); 
-    $get_samples_types_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_types_q : ".$get_samples_types_qh->errstr();
+    $get_samples_types_qh->execute(@{$sample_ids}) or die "Unable to execute : get_samples_types_q : ".$get_samples_types_qh->errstr();
     while (my ($sample_id, $type) = $get_samples_types_qh->fetchrow_array())
     { 
-        $samplesTypesMap->{$sample_id} = $type;
+        $samples_types_map->{$sample_id} = $type;
     } 
     #END get_expression_samples_types
     my @_bad_returns;
-    (ref($samplesTypesMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesTypesMap\" (value was \"$samplesTypesMap\")");
+    (ref($samples_types_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samples_types_map\" (value was \"$samples_types_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_types:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_types');
     }
-    return($samplesTypesMap);
+    return($samples_types_map);
 }
 
 
@@ -4263,7 +4263,7 @@ sub get_expression_samples_types
 
 =head2 get_expression_samples_external_source_ids
 
-  $samplesExternalSourceIdMap = $obj->get_expression_samples_external_source_ids($sampleIDs)
+  $samples_external_source_id_map = $obj->get_expression_samples_external_source_ids($sample_ids)
 
 =over 4
 
@@ -4272,11 +4272,11 @@ sub get_expression_samples_types
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$samplesExternalSourceIdMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_external_source_id_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 </pre>
 
@@ -4284,11 +4284,11 @@ SamplesStringMap is a reference to a hash where the key is a SampleID and the va
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$samplesExternalSourceIdMap is a SamplesStringMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesStringMap is a reference to a hash where the key is a SampleID and the value is a string
+$sample_ids is an ExpressionServices.sample_ids
+$samples_external_source_id_map is an ExpressionServices.samples_string_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_string_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 
 =end text
@@ -4306,10 +4306,10 @@ given a List of SampleIDs, returns a Hash (key : SampleID, value: External_Sourc
 sub get_expression_samples_external_source_ids
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4317,10 +4317,10 @@ sub get_expression_samples_external_source_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($samplesExternalSourceIdMap);
+    my($samples_external_source_id_map);
     #BEGIN get_expression_samples_external_source_ids
-    $samplesExternalSourceIdMap = {}; 
-    if (0 == @{$sampleIDs})
+    $samples_external_source_id_map = {}; 
+    if (0 == @{$sample_ids})
     { 
         my $msg = "get_expression_samples_external_source_ids requires a list of valid sample ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4331,23 +4331,23 @@ sub get_expression_samples_external_source_ids
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_ex_id_q = qq^select id, externalSourceId from Sample where id in (^.
-	join(",", ("?") x @{$sampleIDs}) . ") "; 
+	join(",", ("?") x @{$sample_ids}) . ") "; 
     my $get_samples_ex_id_qh = $dbh->prepare($get_samples_ex_id_q) or die "Unable to prepare : get_samples_ex_id_q : ".
         $get_samples_ex_id_q . " : " .$dbh->errstr(); 
-    $get_samples_ex_id_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_ex_id_q : ".$get_samples_ex_id_qh->errstr();
+    $get_samples_ex_id_qh->execute(@{$sample_ids}) or die "Unable to execute : get_samples_ex_id_q : ".$get_samples_ex_id_qh->errstr();
     while (my ($sample_id, $ex_id) = $get_samples_ex_id_qh->fetchrow_array())
     { 
-        $samplesExternalSourceIdMap->{$sample_id} = $ex_id;
+        $samples_external_source_id_map->{$sample_id} = $ex_id;
     } 
     #END get_expression_samples_external_source_ids
     my @_bad_returns;
-    (ref($samplesExternalSourceIdMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesExternalSourceIdMap\" (value was \"$samplesExternalSourceIdMap\")");
+    (ref($samples_external_source_id_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samples_external_source_id_map\" (value was \"$samples_external_source_id_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_external_source_ids');
     }
-    return($samplesExternalSourceIdMap);
+    return($samples_external_source_id_map);
 }
 
 
@@ -4355,7 +4355,7 @@ sub get_expression_samples_external_source_ids
 
 =head2 get_expression_samples_original_log2_medians
 
-  $samplesFloatMap = $obj->get_expression_samples_original_log2_medians($sampleIDs)
+  $samples_float_map = $obj->get_expression_samples_original_log2_medians($sample_ids)
 
 =over 4
 
@@ -4364,11 +4364,11 @@ sub get_expression_samples_external_source_ids
 =begin html
 
 <pre>
-$sampleIDs is a SampleIDs
-$samplesFloatMap is a SamplesFloatMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesFloatMap is a reference to a hash where the key is a SampleID and the value is a float
+$sample_ids is an ExpressionServices.sample_ids
+$samples_float_map is an ExpressionServices.samples_float_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_float_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a float
 
 </pre>
 
@@ -4376,11 +4376,11 @@ SamplesFloatMap is a reference to a hash where the key is a SampleID and the val
 
 =begin text
 
-$sampleIDs is a SampleIDs
-$samplesFloatMap is a SamplesFloatMap
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
-SamplesFloatMap is a reference to a hash where the key is a SampleID and the value is a float
+$sample_ids is an ExpressionServices.sample_ids
+$samples_float_map is an ExpressionServices.samples_float_map
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
+samples_float_map is a reference to a hash where the key is an ExpressionServices.sample_id and the value is a float
 
 
 =end text
@@ -4398,10 +4398,10 @@ given a List of SampleIDs, returns a Hash (key : SampleID, value: OriginalLog2Me
 sub get_expression_samples_original_log2_medians
 {
     my $self = shift;
-    my($sampleIDs) = @_;
+    my($sample_ids) = @_;
 
     my @_bad_arguments;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_samples_original_log2_medians:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4409,10 +4409,10 @@ sub get_expression_samples_original_log2_medians
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($samplesFloatMap);
+    my($samples_float_map);
     #BEGIN get_expression_samples_original_log2_medians
-    $samplesFloatMap = {}; 
-    if (0 == @{$sampleIDs})
+    $samples_float_map = {}; 
+    if (0 == @{$sample_ids})
     { 
         my $msg = "get_expression_samples_original_log2_medians requires a list of valid sample ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4423,24 +4423,24 @@ sub get_expression_samples_original_log2_medians
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_olog2_q = qq^select id, originalLog2Median from Sample where id in (^.
-	join(",", ("?") x @{$sampleIDs}) . ") ";
+	join(",", ("?") x @{$sample_ids}) . ") ";
     my $get_samples_olog2_qh = $dbh->prepare($get_samples_olog2_q) or die "Unable to prepare : get_samples_olog2_q : ".
         $get_samples_olog2_q . " : " .$dbh->errstr();
-    $get_samples_olog2_qh->execute(@{$sampleIDs}) or die "Unable to execute : get_samples_olog2_q : ".$get_samples_olog2_qh->errstr();
+    $get_samples_olog2_qh->execute(@{$sample_ids}) or die "Unable to execute : get_samples_olog2_q : ".$get_samples_olog2_qh->errstr();
     while (my ($sample_id, $olog2) = $get_samples_olog2_qh->fetchrow_array()) 
     { 
-        $samplesFloatMap->{$sample_id} = $olog2; 
+        $samples_float_map->{$sample_id} = $olog2; 
     } 
 
     #END get_expression_samples_original_log2_medians
     my @_bad_returns;
-    (ref($samplesFloatMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samplesFloatMap\" (value was \"$samplesFloatMap\")");
+    (ref($samples_float_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"samples_float_map\" (value was \"$samples_float_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_samples_original_log2_medians:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_samples_original_log2_medians');
     }
-    return($samplesFloatMap);
+    return($samples_float_map);
 }
 
 
@@ -4448,7 +4448,7 @@ sub get_expression_samples_original_log2_medians
 
 =head2 get_expression_series_titles
 
-  $seriesStringMap = $obj->get_expression_series_titles($seriesIDs)
+  $series_string_map = $obj->get_expression_series_titles($series_ids)
 
 =over 4
 
@@ -4457,11 +4457,11 @@ sub get_expression_samples_original_log2_medians
 =begin html
 
 <pre>
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 </pre>
 
@@ -4469,11 +4469,11 @@ SeriesStringMap is a reference to a hash where the key is a SeriesID and the val
 
 =begin text
 
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 
 =end text
@@ -4491,10 +4491,10 @@ given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Title of Serie
 sub get_expression_series_titles
 {
     my $self = shift;
-    my($seriesIDs) = @_;
+    my($series_ids) = @_;
 
     my @_bad_arguments;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_series_titles:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4502,10 +4502,10 @@ sub get_expression_series_titles
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesStringMap);
+    my($series_string_map);
     #BEGIN get_expression_series_titles
-    $seriesStringMap = {}; 
-    if (0 == @{$seriesIDs})
+    $series_string_map = {}; 
+    if (0 == @{$series_ids})
     { 
         my $msg = "get_expression_series_titles requires a list of valid series ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4516,23 +4516,23 @@ sub get_expression_series_titles
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, title from Series where id in (^.
-        join(",", ("?") x @{$seriesIDs}) . ") ";
+        join(",", ("?") x @{$series_ids}) . ") ";
     my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
         $get_series_info_q . " : " .$dbh->errstr();
-    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    $get_series_info_qh->execute(@{$series_ids}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
     while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
     { 
-        $seriesStringMap->{$series_id} = $info; 
+        $series_string_map->{$series_id} = $info; 
     } 
     #END get_expression_series_titles
     my @_bad_returns;
-    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    (ref($series_string_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"series_string_map\" (value was \"$series_string_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_series_titles:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_series_titles');
     }
-    return($seriesStringMap);
+    return($series_string_map);
 }
 
 
@@ -4540,7 +4540,7 @@ sub get_expression_series_titles
 
 =head2 get_expression_series_summaries
 
-  $seriesStringMap = $obj->get_expression_series_summaries($seriesIDs)
+  $series_string_map = $obj->get_expression_series_summaries($series_ids)
 
 =over 4
 
@@ -4549,11 +4549,11 @@ sub get_expression_series_titles
 =begin html
 
 <pre>
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 </pre>
 
@@ -4561,11 +4561,11 @@ SeriesStringMap is a reference to a hash where the key is a SeriesID and the val
 
 =begin text
 
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 
 =end text
@@ -4583,10 +4583,10 @@ given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Summary of Ser
 sub get_expression_series_summaries
 {
     my $self = shift;
-    my($seriesIDs) = @_;
+    my($series_ids) = @_;
 
     my @_bad_arguments;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_series_summaries:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4594,10 +4594,10 @@ sub get_expression_series_summaries
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesStringMap);
+    my($series_string_map);
     #BEGIN get_expression_series_summaries
-    $seriesStringMap = {}; 
-    if (0 == @{$seriesIDs})
+    $series_string_map = {}; 
+    if (0 == @{$series_ids})
     { 
         my $msg = "get_expression_series_summaries requires a list of valid series ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4608,23 +4608,23 @@ sub get_expression_series_summaries
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, summary from Series where id in (^.
-        join(",", ("?") x @{$seriesIDs}) . ") ";
+        join(",", ("?") x @{$series_ids}) . ") ";
     my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
         $get_series_info_q . " : " .$dbh->errstr();
-    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    $get_series_info_qh->execute(@{$series_ids}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
     while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
     { 
-        $seriesStringMap->{$series_id} = $info; 
+        $series_string_map->{$series_id} = $info; 
     } 
     #END get_expression_series_summaries
     my @_bad_returns;
-    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    (ref($series_string_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"series_string_map\" (value was \"$series_string_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_series_summaries:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_series_summaries');
     }
-    return($seriesStringMap);
+    return($series_string_map);
 }
 
 
@@ -4632,7 +4632,7 @@ sub get_expression_series_summaries
 
 =head2 get_expression_series_designs
 
-  $seriesStringMap = $obj->get_expression_series_designs($seriesIDs)
+  $series_string_map = $obj->get_expression_series_designs($series_ids)
 
 =over 4
 
@@ -4641,11 +4641,11 @@ sub get_expression_series_summaries
 =begin html
 
 <pre>
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 </pre>
 
@@ -4653,11 +4653,11 @@ SeriesStringMap is a reference to a hash where the key is a SeriesID and the val
 
 =begin text
 
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 
 =end text
@@ -4675,10 +4675,10 @@ given a List of SeriesIDs, returns a Hash (key : SeriesID, value: Design of Seri
 sub get_expression_series_designs
 {
     my $self = shift;
-    my($seriesIDs) = @_;
+    my($series_ids) = @_;
 
     my @_bad_arguments;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_series_designs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4686,10 +4686,10 @@ sub get_expression_series_designs
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesStringMap);
+    my($series_string_map);
     #BEGIN get_expression_series_designs
-    $seriesStringMap = {}; 
-    if (0 == @{$seriesIDs})
+    $series_string_map = {}; 
+    if (0 == @{$series_ids})
     { 
         my $msg = "get_expression_series_designs requires a list of valid series ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4700,23 +4700,23 @@ sub get_expression_series_designs
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, design from Series where id in (^.
-        join(",", ("?") x @{$seriesIDs}) . ") ";
+        join(",", ("?") x @{$series_ids}) . ") ";
     my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
         $get_series_info_q . " : " .$dbh->errstr();
-    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    $get_series_info_qh->execute(@{$series_ids}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
     while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
     { 
-        $seriesStringMap->{$series_id} = $info; 
+        $series_string_map->{$series_id} = $info; 
     } 
     #END get_expression_series_designs
     my @_bad_returns;
-    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    (ref($series_string_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"series_string_map\" (value was \"$series_string_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_series_designs:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_series_designs');
     }
-    return($seriesStringMap);
+    return($series_string_map);
 }
 
 
@@ -4724,7 +4724,7 @@ sub get_expression_series_designs
 
 =head2 get_expression_series_external_source_ids
 
-  $seriesStringMap = $obj->get_expression_series_external_source_ids($seriesIDs)
+  $series_string_map = $obj->get_expression_series_external_source_ids($series_ids)
 
 =over 4
 
@@ -4733,11 +4733,11 @@ sub get_expression_series_designs
 =begin html
 
 <pre>
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 </pre>
 
@@ -4745,11 +4745,11 @@ SeriesStringMap is a reference to a hash where the key is a SeriesID and the val
 
 =begin text
 
-$seriesIDs is a SeriesIDs
-$seriesStringMap is a SeriesStringMap
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
-SeriesStringMap is a reference to a hash where the key is a SeriesID and the value is a string
+$series_ids is an ExpressionServices.series_ids
+$series_string_map is an ExpressionServices.series_string_map
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
+series_string_map is a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 
 =end text
@@ -4767,10 +4767,10 @@ given a List of SeriesIDs, returns a Hash (key : SeriesID, value: External_Sourc
 sub get_expression_series_external_source_ids
 {
     my $self = shift;
-    my($seriesIDs) = @_;
+    my($series_ids) = @_;
 
     my @_bad_arguments;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4778,10 +4778,10 @@ sub get_expression_series_external_source_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesStringMap);
+    my($series_string_map);
     #BEGIN get_expression_series_external_source_ids
-    $seriesStringMap = {}; 
-    if (0 == @{$seriesIDs})
+    $series_string_map = {}; 
+    if (0 == @{$series_ids})
     { 
         my $msg = "get_expression_series_external_source_ids requires a list of valid series ids. ";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4792,23 +4792,23 @@ sub get_expression_series_external_source_ids
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, externalSourceId from Series where id in (^.
-        join(",", ("?") x @{$seriesIDs}) . ") ";
+        join(",", ("?") x @{$series_ids}) . ") ";
     my $get_series_info_qh = $dbh->prepare($get_series_info_q) or die "Unable to prepare : get_series_info_q : ".
         $get_series_info_q . " : " .$dbh->errstr();
-    $get_series_info_qh->execute(@{$seriesIDs}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
+    $get_series_info_qh->execute(@{$series_ids}) or die "Unable to execute : get_series_info_q : ".$get_series_info_qh->errstr();
     while (my ($series_id, $info) = $get_series_info_qh->fetchrow_array()) 
     { 
-        $seriesStringMap->{$series_id} = $info; 
+        $series_string_map->{$series_id} = $info; 
     } 
     #END get_expression_series_external_source_ids
     my @_bad_returns;
-    (ref($seriesStringMap) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"seriesStringMap\" (value was \"$seriesStringMap\")");
+    (ref($series_string_map) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"series_string_map\" (value was \"$series_string_map\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_series_external_source_ids');
     }
-    return($seriesStringMap);
+    return($series_string_map);
 }
 
 
@@ -4816,7 +4816,7 @@ sub get_expression_series_external_source_ids
 
 =head2 get_expression_sample_ids_by_sample_external_source_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_sample_external_source_ids($ExternalSourceIDs)
+  $sample_ids = $obj->get_expression_sample_ids_by_sample_external_source_ids($external_source_ids)
 
 =over 4
 
@@ -4825,12 +4825,12 @@ sub get_expression_series_external_source_ids
 =begin html
 
 <pre>
-$ExternalSourceIDs is an ExternalSourceIDs
-$sampleIDs is a SampleIDs
-ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
-ExternalSourceID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$external_source_ids is an ExpressionServices.external_source_ids
+$sample_ids is an ExpressionServices.sample_ids
+external_source_ids is a reference to a list where each element is an ExpressionServices.external_source_id
+external_source_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -4838,12 +4838,12 @@ SampleID is a string
 
 =begin text
 
-$ExternalSourceIDs is an ExternalSourceIDs
-$sampleIDs is a SampleIDs
-ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
-ExternalSourceID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$external_source_ids is an ExpressionServices.external_source_ids
+$sample_ids is an ExpressionServices.sample_ids
+external_source_ids is a reference to a list where each element is an ExpressionServices.external_source_id
+external_source_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -4861,10 +4861,10 @@ get sample ids by the sample's external source id : Takes a list of sample exter
 sub get_expression_sample_ids_by_sample_external_source_ids
 {
     my $self = shift;
-    my($ExternalSourceIDs) = @_;
+    my($external_source_ids) = @_;
 
     my @_bad_arguments;
-    (ref($ExternalSourceIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ExternalSourceIDs\" (value was \"$ExternalSourceIDs\")");
+    (ref($external_source_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"external_source_ids\" (value was \"$external_source_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_sample_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4872,10 +4872,9 @@ sub get_expression_sample_ids_by_sample_external_source_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_sample_external_source_ids
-    my $external_source_ids = $ExternalSourceIDs;
-    $sampleIDs = []; 
+    $sample_ids = []; 
     if (0 == @{$external_source_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_sample_external_source_ids requires a list of valid external source ids for the sample.  ".
@@ -4894,17 +4893,17 @@ sub get_expression_sample_ids_by_sample_external_source_ids
     $get_samples_qh->execute(@{$external_source_ids}) or die "Unable to execute : get_samples_q : ".$get_samples_qh->errstr(); 
     while (my ($sample_id) = $get_samples_qh->fetchrow_array())
     {
-	push(@{$sampleIDs},$sample_id);
+	push(@{$sample_ids},$sample_id);
     } 
     #END get_expression_sample_ids_by_sample_external_source_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_sample_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -4912,7 +4911,7 @@ sub get_expression_sample_ids_by_sample_external_source_ids
 
 =head2 get_expression_sample_ids_by_platform_external_source_ids
 
-  $sampleIDs = $obj->get_expression_sample_ids_by_platform_external_source_ids($ExternalSourceIDs)
+  $sample_ids = $obj->get_expression_sample_ids_by_platform_external_source_ids($external_source_ids)
 
 =over 4
 
@@ -4921,12 +4920,12 @@ sub get_expression_sample_ids_by_sample_external_source_ids
 =begin html
 
 <pre>
-$ExternalSourceIDs is an ExternalSourceIDs
-$sampleIDs is a SampleIDs
-ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
-ExternalSourceID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$external_source_ids is an ExpressionServices.external_source_ids
+$sample_ids is an ExpressionServices.sample_ids
+external_source_ids is a reference to a list where each element is an ExpressionServices.external_source_id
+external_source_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 </pre>
 
@@ -4934,12 +4933,12 @@ SampleID is a string
 
 =begin text
 
-$ExternalSourceIDs is an ExternalSourceIDs
-$sampleIDs is a SampleIDs
-ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
-ExternalSourceID is a string
-SampleIDs is a reference to a list where each element is a SampleID
-SampleID is a string
+$external_source_ids is an ExpressionServices.external_source_ids
+$sample_ids is an ExpressionServices.sample_ids
+external_source_ids is a reference to a list where each element is an ExpressionServices.external_source_id
+external_source_id is a string
+sample_ids is a reference to a list where each element is an ExpressionServices.sample_id
+sample_id is a string
 
 
 =end text
@@ -4957,10 +4956,10 @@ get sample ids by the platform's external source id : Takes a list of platform e
 sub get_expression_sample_ids_by_platform_external_source_ids
 {
     my $self = shift;
-    my($ExternalSourceIDs) = @_;
+    my($external_source_ids) = @_;
 
     my @_bad_arguments;
-    (ref($ExternalSourceIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ExternalSourceIDs\" (value was \"$ExternalSourceIDs\")");
+    (ref($external_source_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"external_source_ids\" (value was \"$external_source_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_sample_ids_by_platform_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -4968,10 +4967,9 @@ sub get_expression_sample_ids_by_platform_external_source_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($sampleIDs);
+    my($sample_ids);
     #BEGIN get_expression_sample_ids_by_platform_external_source_ids
-    my $external_source_ids = $ExternalSourceIDs; 
-    $sampleIDs = []; 
+    $sample_ids = []; 
     if (0 == @{$external_source_ids}) 
     { 
         my $msg = "get_expression_sample_ids_by_platform_external_source_ids requires a list of valid external source ids for the platform.  ". 
@@ -4991,17 +4989,17 @@ sub get_expression_sample_ids_by_platform_external_source_ids
     $get_samples_qh->execute(@{$external_source_ids}) or die "Unable to execute : get_samples_q : ".$get_samples_qh->errstr(); 
     while (my ($sample_id) = $get_samples_qh->fetchrow_array()) 
     { 
-        push(@{$sampleIDs},$sample_id); 
+        push(@{$sample_ids},$sample_id); 
     } 
     #END get_expression_sample_ids_by_platform_external_source_ids
     my @_bad_returns;
-    (ref($sampleIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sampleIDs\" (value was \"$sampleIDs\")");
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"sample_ids\" (value was \"$sample_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_sample_ids_by_platform_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_sample_ids_by_platform_external_source_ids');
     }
-    return($sampleIDs);
+    return($sample_ids);
 }
 
 
@@ -5009,7 +5007,7 @@ sub get_expression_sample_ids_by_platform_external_source_ids
 
 =head2 get_expression_series_ids_by_series_external_source_ids
 
-  $seriesIDs = $obj->get_expression_series_ids_by_series_external_source_ids($ExternalSourceIDs)
+  $series_ids = $obj->get_expression_series_ids_by_series_external_source_ids($external_source_ids)
 
 =over 4
 
@@ -5018,12 +5016,12 @@ sub get_expression_sample_ids_by_platform_external_source_ids
 =begin html
 
 <pre>
-$ExternalSourceIDs is an ExternalSourceIDs
-$seriesIDs is a SeriesIDs
-ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
-ExternalSourceID is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
+$external_source_ids is an ExpressionServices.external_source_ids
+$series_ids is an ExpressionServices.series_ids
+external_source_ids is a reference to a list where each element is an ExpressionServices.external_source_id
+external_source_id is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
 
 </pre>
 
@@ -5031,12 +5029,12 @@ SeriesID is a string
 
 =begin text
 
-$ExternalSourceIDs is an ExternalSourceIDs
-$seriesIDs is a SeriesIDs
-ExternalSourceIDs is a reference to a list where each element is an ExternalSourceID
-ExternalSourceID is a string
-SeriesIDs is a reference to a list where each element is a SeriesID
-SeriesID is a string
+$external_source_ids is an ExpressionServices.external_source_ids
+$series_ids is an ExpressionServices.series_ids
+external_source_ids is a reference to a list where each element is an ExpressionServices.external_source_id
+external_source_id is a string
+series_ids is a reference to a list where each element is an ExpressionServices.series_id
+series_id is a string
 
 
 =end text
@@ -5054,10 +5052,10 @@ get series ids by the series's external source id : Takes a list of series exter
 sub get_expression_series_ids_by_series_external_source_ids
 {
     my $self = shift;
-    my($ExternalSourceIDs) = @_;
+    my($external_source_ids) = @_;
 
     my @_bad_arguments;
-    (ref($ExternalSourceIDs) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ExternalSourceIDs\" (value was \"$ExternalSourceIDs\")");
+    (ref($external_source_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"external_source_ids\" (value was \"$external_source_ids\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_series_ids_by_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -5065,10 +5063,9 @@ sub get_expression_series_ids_by_series_external_source_ids
     }
 
     my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($seriesIDs);
+    my($series_ids);
     #BEGIN get_expression_series_ids_by_series_external_source_ids
-    my $external_source_ids = $ExternalSourceIDs; 
-    $seriesIDs = []; 
+    $series_ids = []; 
     if (0 == @{$external_source_ids}) 
     { 
         my $msg = "get_expression_series_ids_by_series_external_source_ids requires a list of valid external source ids for the series.  ".
@@ -5087,17 +5084,17 @@ sub get_expression_series_ids_by_series_external_source_ids
     $get_series_qh->execute(@{$external_source_ids}) or die "Unable to execute : get_series_q : ".$get_series_qh->errstr(); 
     while (my ($series_id) = $get_series_qh->fetchrow_array()) 
     { 
-        push(@{$seriesIDs},$series_id); 
+        push(@{$series_ids},$series_id); 
     } 
     #END get_expression_series_ids_by_series_external_source_ids
     my @_bad_returns;
-    (ref($seriesIDs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"seriesIDs\" (value was \"$seriesIDs\")");
+    (ref($series_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"series_ids\" (value was \"$series_ids\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_expression_series_ids_by_series_external_source_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_series_ids_by_series_external_source_ids');
     }
-    return($seriesIDs);
+    return($series_ids);
 }
 
 
@@ -5105,7 +5102,7 @@ sub get_expression_series_ids_by_series_external_source_ids
 
 =head2 get_GEO_GSE
 
-  $gseObject = $obj->get_GEO_GSE($gse_input_id, $metaDataOnly)
+  $gseObject = $obj->get_GEO_GSE($gse_input_id, $meta_data_only)
 
 =over 4
 
@@ -5115,68 +5112,68 @@ sub get_expression_series_ids_by_series_external_source_ids
 
 <pre>
 $gse_input_id is a string
-$metaDataOnly is a MetaDataOnly
-$gseObject is a GseObject
-MetaDataOnly is an int
+$meta_data_only is an ExpressionServices.meta_data_only
+$gseObject is an ExpressionServices.GseObject
+meta_data_only is an int
 GseObject is a reference to a hash where the following keys are defined:
-	gseID has a value which is a string
-	gseTitle has a value which is a string
-	gseSummary has a value which is a string
-	gseDesign has a value which is a string
-	gseSubmissionDate has a value which is a string
-	pubMedID has a value which is a string
-	gseSamples has a value which is a GseSamples
-	gseWarnings has a value which is a GseWarnings
-	gseErrors has a value which is a GseErrors
-GseSamples is a reference to a hash where the key is a string and the value is a GsmObject
+	gse_id has a value which is a string
+	gse_title has a value which is a string
+	gse_summary has a value which is a string
+	gse_design has a value which is a string
+	gse_submission_date has a value which is a string
+	pub_med_id has a value which is a string
+	gse_samples has a value which is an ExpressionServices.gse_samples
+	gse_warnings has a value which is an ExpressionServices.gse_warnings
+	gse_errors has a value which is an ExpressionServices.gse_errors
+gse_samples is a reference to a hash where the key is a string and the value is an ExpressionServices.GsmObject
 GsmObject is a reference to a hash where the following keys are defined:
-	gsmID has a value which is a string
-	gsmTitle has a value which is a string
-	gsmDescription has a value which is a string
-	gsmMolecule has a value which is a string
-	gsmSubmissionDate has a value which is a string
-	gsmTaxID has a value which is a string
-	gsmSampleOrganism has a value which is a string
-	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
-	gsmProtocol has a value which is a string
-	gsmValueType has a value which is a string
-	gsmOriginalLog2Median has a value which is a float
-	gsmPlatform has a value which is a GPL
-	gsmContactPeople has a value which is a ContactPeople
-	gsmData has a value which is a GsmData
-	gsmFeatureMappingApproach has a value which is a string
-	gsmWarning has a value which is a GsmWarnings
-	gsmErrors has a value which is a GsmErrors
-GsmSampleCharacteristics is a reference to a list where each element is a string
+	gsm_id has a value which is a string
+	gsm_title has a value which is a string
+	gsm_description has a value which is a string
+	gsm_molecule has a value which is a string
+	gsm_submission_date has a value which is a string
+	gsm_tax_id has a value which is a string
+	gsm_sample_organism has a value which is a string
+	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
+	gsm_protocol has a value which is a string
+	gsm_value_type has a value which is a string
+	gsm_original_log2_median has a value which is a float
+	gsm_platform has a value which is an ExpressionServices.GPL
+	gsm_contact_people has a value which is an ExpressionServices.contact_people
+	gsm_data has a value which is an ExpressionServices.gsm_data
+	gsm_feature_mapping_approach has a value which is a string
+	gsm_warning has a value which is an ExpressionServices.gsm_warnings
+	gsm_errors has a value which is an ExpressionServices.gsm_errors
+gsm_sample_characteristics is a reference to a list where each element is a string
 GPL is a reference to a hash where the following keys are defined:
-	gplID has a value which is a string
-	gplTitle has a value which is a string
-	gplTechnology has a value which is a string
-	gplTaxID has a value which is a string
-	gplOrganism has a value which is a string
-ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
-ContactEmail is a string
+	gpl_id has a value which is a string
+	gpl_title has a value which is a string
+	gpl_technology has a value which is a string
+	gpl_tax_id has a value which is a string
+	gpl_organism has a value which is a string
+contact_people is a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
+contact_email is a string
 ContactPerson is a reference to a hash where the following keys are defined:
-	contactFirstName has a value which is a ContactFirstName
-	contactLastName has a value which is a ContactLastName
-	contactInstitution has a value which is a ContactInstitution
-ContactFirstName is a string
-ContactLastName is a string
-ContactInstitution is a string
-GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
-FeatureID is a string
+	contact_first_name has a value which is an ExpressionServices.contact_first_name
+	contact_last_name has a value which is an ExpressionServices.contact_last_name
+	contact_institution has a value which is an ExpressionServices.contact_institution
+contact_first_name is a string
+contact_last_name is a string
+contact_institution is a string
+gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+feature_id is a string
 FullMeasurement is a reference to a hash where the following keys are defined:
 	value has a value which is a float
-	N has a value which is a float
+	n has a value which is a float
 	stddev has a value which is a float
-	Z_score has a value which is a float
+	z_score has a value which is a float
 	p_value has a value which is a float
 	median has a value which is a float
 	mean has a value which is a float
-GsmWarnings is a reference to a list where each element is a string
-GsmErrors is a reference to a list where each element is a string
-GseWarnings is a reference to a list where each element is a string
-GseErrors is a reference to a list where each element is a string
+gsm_warnings is a reference to a list where each element is a string
+gsm_errors is a reference to a list where each element is a string
+gse_warnings is a reference to a list where each element is a string
+gse_errors is a reference to a list where each element is a string
 
 </pre>
 
@@ -5185,68 +5182,68 @@ GseErrors is a reference to a list where each element is a string
 =begin text
 
 $gse_input_id is a string
-$metaDataOnly is a MetaDataOnly
-$gseObject is a GseObject
-MetaDataOnly is an int
+$meta_data_only is an ExpressionServices.meta_data_only
+$gseObject is an ExpressionServices.GseObject
+meta_data_only is an int
 GseObject is a reference to a hash where the following keys are defined:
-	gseID has a value which is a string
-	gseTitle has a value which is a string
-	gseSummary has a value which is a string
-	gseDesign has a value which is a string
-	gseSubmissionDate has a value which is a string
-	pubMedID has a value which is a string
-	gseSamples has a value which is a GseSamples
-	gseWarnings has a value which is a GseWarnings
-	gseErrors has a value which is a GseErrors
-GseSamples is a reference to a hash where the key is a string and the value is a GsmObject
+	gse_id has a value which is a string
+	gse_title has a value which is a string
+	gse_summary has a value which is a string
+	gse_design has a value which is a string
+	gse_submission_date has a value which is a string
+	pub_med_id has a value which is a string
+	gse_samples has a value which is an ExpressionServices.gse_samples
+	gse_warnings has a value which is an ExpressionServices.gse_warnings
+	gse_errors has a value which is an ExpressionServices.gse_errors
+gse_samples is a reference to a hash where the key is a string and the value is an ExpressionServices.GsmObject
 GsmObject is a reference to a hash where the following keys are defined:
-	gsmID has a value which is a string
-	gsmTitle has a value which is a string
-	gsmDescription has a value which is a string
-	gsmMolecule has a value which is a string
-	gsmSubmissionDate has a value which is a string
-	gsmTaxID has a value which is a string
-	gsmSampleOrganism has a value which is a string
-	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
-	gsmProtocol has a value which is a string
-	gsmValueType has a value which is a string
-	gsmOriginalLog2Median has a value which is a float
-	gsmPlatform has a value which is a GPL
-	gsmContactPeople has a value which is a ContactPeople
-	gsmData has a value which is a GsmData
-	gsmFeatureMappingApproach has a value which is a string
-	gsmWarning has a value which is a GsmWarnings
-	gsmErrors has a value which is a GsmErrors
-GsmSampleCharacteristics is a reference to a list where each element is a string
+	gsm_id has a value which is a string
+	gsm_title has a value which is a string
+	gsm_description has a value which is a string
+	gsm_molecule has a value which is a string
+	gsm_submission_date has a value which is a string
+	gsm_tax_id has a value which is a string
+	gsm_sample_organism has a value which is a string
+	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
+	gsm_protocol has a value which is a string
+	gsm_value_type has a value which is a string
+	gsm_original_log2_median has a value which is a float
+	gsm_platform has a value which is an ExpressionServices.GPL
+	gsm_contact_people has a value which is an ExpressionServices.contact_people
+	gsm_data has a value which is an ExpressionServices.gsm_data
+	gsm_feature_mapping_approach has a value which is a string
+	gsm_warning has a value which is an ExpressionServices.gsm_warnings
+	gsm_errors has a value which is an ExpressionServices.gsm_errors
+gsm_sample_characteristics is a reference to a list where each element is a string
 GPL is a reference to a hash where the following keys are defined:
-	gplID has a value which is a string
-	gplTitle has a value which is a string
-	gplTechnology has a value which is a string
-	gplTaxID has a value which is a string
-	gplOrganism has a value which is a string
-ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
-ContactEmail is a string
+	gpl_id has a value which is a string
+	gpl_title has a value which is a string
+	gpl_technology has a value which is a string
+	gpl_tax_id has a value which is a string
+	gpl_organism has a value which is a string
+contact_people is a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
+contact_email is a string
 ContactPerson is a reference to a hash where the following keys are defined:
-	contactFirstName has a value which is a ContactFirstName
-	contactLastName has a value which is a ContactLastName
-	contactInstitution has a value which is a ContactInstitution
-ContactFirstName is a string
-ContactLastName is a string
-ContactInstitution is a string
-GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
-FeatureID is a string
+	contact_first_name has a value which is an ExpressionServices.contact_first_name
+	contact_last_name has a value which is an ExpressionServices.contact_last_name
+	contact_institution has a value which is an ExpressionServices.contact_institution
+contact_first_name is a string
+contact_last_name is a string
+contact_institution is a string
+gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+feature_id is a string
 FullMeasurement is a reference to a hash where the following keys are defined:
 	value has a value which is a float
-	N has a value which is a float
+	n has a value which is a float
 	stddev has a value which is a float
-	Z_score has a value which is a float
+	z_score has a value which is a float
 	p_value has a value which is a float
 	median has a value which is a float
 	mean has a value which is a float
-GsmWarnings is a reference to a list where each element is a string
-GsmErrors is a reference to a list where each element is a string
-GseWarnings is a reference to a list where each element is a string
-GseErrors is a reference to a list where each element is a string
+gsm_warnings is a reference to a list where each element is a string
+gsm_errors is a reference to a list where each element is a string
+gse_warnings is a reference to a list where each element is a string
+gse_errors is a reference to a list where each element is a string
 
 
 =end text
@@ -5264,11 +5261,11 @@ given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will retur
 sub get_GEO_GSE
 {
     my $self = shift;
-    my($gse_input_id, $metaDataOnly) = @_;
+    my($gse_input_id, $meta_data_only) = @_;
 
     my @_bad_arguments;
     (!ref($gse_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gse_input_id\" (value was \"$gse_input_id\")");
-    (!ref($metaDataOnly)) or push(@_bad_arguments, "Invalid type for argument \"metaDataOnly\" (value was \"$metaDataOnly\")");
+    (!ref($meta_data_only)) or push(@_bad_arguments, "Invalid type for argument \"meta_data_only\" (value was \"$meta_data_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_GEO_GSE:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -5300,7 +5297,7 @@ print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
 
 =head2 get_GEO_GSM
 
-  $gsmObject = $obj->get_GEO_GSM($gsm_input_id, $metaDataOnly)
+  $gsmObject = $obj->get_GEO_GSM($gsm_input_id, $meta_data_only)
 
 =over 4
 
@@ -5310,55 +5307,55 @@ print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
 
 <pre>
 $gsm_input_id is a string
-$metaDataOnly is a MetaDataOnly
-$gsmObject is a GsmObject
-MetaDataOnly is an int
+$meta_data_only is an ExpressionServices.meta_data_only
+$gsmObject is an ExpressionServices.GsmObject
+meta_data_only is an int
 GsmObject is a reference to a hash where the following keys are defined:
-	gsmID has a value which is a string
-	gsmTitle has a value which is a string
-	gsmDescription has a value which is a string
-	gsmMolecule has a value which is a string
-	gsmSubmissionDate has a value which is a string
-	gsmTaxID has a value which is a string
-	gsmSampleOrganism has a value which is a string
-	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
-	gsmProtocol has a value which is a string
-	gsmValueType has a value which is a string
-	gsmOriginalLog2Median has a value which is a float
-	gsmPlatform has a value which is a GPL
-	gsmContactPeople has a value which is a ContactPeople
-	gsmData has a value which is a GsmData
-	gsmFeatureMappingApproach has a value which is a string
-	gsmWarning has a value which is a GsmWarnings
-	gsmErrors has a value which is a GsmErrors
-GsmSampleCharacteristics is a reference to a list where each element is a string
+	gsm_id has a value which is a string
+	gsm_title has a value which is a string
+	gsm_description has a value which is a string
+	gsm_molecule has a value which is a string
+	gsm_submission_date has a value which is a string
+	gsm_tax_id has a value which is a string
+	gsm_sample_organism has a value which is a string
+	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
+	gsm_protocol has a value which is a string
+	gsm_value_type has a value which is a string
+	gsm_original_log2_median has a value which is a float
+	gsm_platform has a value which is an ExpressionServices.GPL
+	gsm_contact_people has a value which is an ExpressionServices.contact_people
+	gsm_data has a value which is an ExpressionServices.gsm_data
+	gsm_feature_mapping_approach has a value which is a string
+	gsm_warning has a value which is an ExpressionServices.gsm_warnings
+	gsm_errors has a value which is an ExpressionServices.gsm_errors
+gsm_sample_characteristics is a reference to a list where each element is a string
 GPL is a reference to a hash where the following keys are defined:
-	gplID has a value which is a string
-	gplTitle has a value which is a string
-	gplTechnology has a value which is a string
-	gplTaxID has a value which is a string
-	gplOrganism has a value which is a string
-ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
-ContactEmail is a string
+	gpl_id has a value which is a string
+	gpl_title has a value which is a string
+	gpl_technology has a value which is a string
+	gpl_tax_id has a value which is a string
+	gpl_organism has a value which is a string
+contact_people is a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
+contact_email is a string
 ContactPerson is a reference to a hash where the following keys are defined:
-	contactFirstName has a value which is a ContactFirstName
-	contactLastName has a value which is a ContactLastName
-	contactInstitution has a value which is a ContactInstitution
-ContactFirstName is a string
-ContactLastName is a string
-ContactInstitution is a string
-GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
-FeatureID is a string
+	contact_first_name has a value which is an ExpressionServices.contact_first_name
+	contact_last_name has a value which is an ExpressionServices.contact_last_name
+	contact_institution has a value which is an ExpressionServices.contact_institution
+contact_first_name is a string
+contact_last_name is a string
+contact_institution is a string
+gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+feature_id is a string
 FullMeasurement is a reference to a hash where the following keys are defined:
 	value has a value which is a float
-	N has a value which is a float
+	n has a value which is a float
 	stddev has a value which is a float
-	Z_score has a value which is a float
+	z_score has a value which is a float
 	p_value has a value which is a float
 	median has a value which is a float
 	mean has a value which is a float
-GsmWarnings is a reference to a list where each element is a string
-GsmErrors is a reference to a list where each element is a string
+gsm_warnings is a reference to a list where each element is a string
+gsm_errors is a reference to a list where each element is a string
 
 </pre>
 
@@ -5367,55 +5364,55 @@ GsmErrors is a reference to a list where each element is a string
 =begin text
 
 $gsm_input_id is a string
-$metaDataOnly is a MetaDataOnly
-$gsmObject is a GsmObject
-MetaDataOnly is an int
+$meta_data_only is an ExpressionServices.meta_data_only
+$gsmObject is an ExpressionServices.GsmObject
+meta_data_only is an int
 GsmObject is a reference to a hash where the following keys are defined:
-	gsmID has a value which is a string
-	gsmTitle has a value which is a string
-	gsmDescription has a value which is a string
-	gsmMolecule has a value which is a string
-	gsmSubmissionDate has a value which is a string
-	gsmTaxID has a value which is a string
-	gsmSampleOrganism has a value which is a string
-	gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
-	gsmProtocol has a value which is a string
-	gsmValueType has a value which is a string
-	gsmOriginalLog2Median has a value which is a float
-	gsmPlatform has a value which is a GPL
-	gsmContactPeople has a value which is a ContactPeople
-	gsmData has a value which is a GsmData
-	gsmFeatureMappingApproach has a value which is a string
-	gsmWarning has a value which is a GsmWarnings
-	gsmErrors has a value which is a GsmErrors
-GsmSampleCharacteristics is a reference to a list where each element is a string
+	gsm_id has a value which is a string
+	gsm_title has a value which is a string
+	gsm_description has a value which is a string
+	gsm_molecule has a value which is a string
+	gsm_submission_date has a value which is a string
+	gsm_tax_id has a value which is a string
+	gsm_sample_organism has a value which is a string
+	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
+	gsm_protocol has a value which is a string
+	gsm_value_type has a value which is a string
+	gsm_original_log2_median has a value which is a float
+	gsm_platform has a value which is an ExpressionServices.GPL
+	gsm_contact_people has a value which is an ExpressionServices.contact_people
+	gsm_data has a value which is an ExpressionServices.gsm_data
+	gsm_feature_mapping_approach has a value which is a string
+	gsm_warning has a value which is an ExpressionServices.gsm_warnings
+	gsm_errors has a value which is an ExpressionServices.gsm_errors
+gsm_sample_characteristics is a reference to a list where each element is a string
 GPL is a reference to a hash where the following keys are defined:
-	gplID has a value which is a string
-	gplTitle has a value which is a string
-	gplTechnology has a value which is a string
-	gplTaxID has a value which is a string
-	gplOrganism has a value which is a string
-ContactPeople is a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
-ContactEmail is a string
+	gpl_id has a value which is a string
+	gpl_title has a value which is a string
+	gpl_technology has a value which is a string
+	gpl_tax_id has a value which is a string
+	gpl_organism has a value which is a string
+contact_people is a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
+contact_email is a string
 ContactPerson is a reference to a hash where the following keys are defined:
-	contactFirstName has a value which is a ContactFirstName
-	contactLastName has a value which is a ContactLastName
-	contactInstitution has a value which is a ContactInstitution
-ContactFirstName is a string
-ContactLastName is a string
-ContactInstitution is a string
-GsmData is a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
-FeatureID is a string
+	contact_first_name has a value which is an ExpressionServices.contact_first_name
+	contact_last_name has a value which is an ExpressionServices.contact_last_name
+	contact_institution has a value which is an ExpressionServices.contact_institution
+contact_first_name is a string
+contact_last_name is a string
+contact_institution is a string
+gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+feature_id is a string
 FullMeasurement is a reference to a hash where the following keys are defined:
 	value has a value which is a float
-	N has a value which is a float
+	n has a value which is a float
 	stddev has a value which is a float
-	Z_score has a value which is a float
+	z_score has a value which is a float
 	p_value has a value which is a float
 	median has a value which is a float
 	mean has a value which is a float
-GsmWarnings is a reference to a list where each element is a string
-GsmErrors is a reference to a list where each element is a string
+gsm_warnings is a reference to a list where each element is a string
+gsm_errors is a reference to a list where each element is a string
 
 
 =end text
@@ -5433,11 +5430,11 @@ given a GEO GSM ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will retur
 sub get_GEO_GSM
 {
     my $self = shift;
-    my($gsm_input_id, $metaDataOnly) = @_;
+    my($gsm_input_id, $meta_data_only) = @_;
 
     my @_bad_arguments;
     (!ref($gsm_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gsm_input_id\" (value was \"$gsm_input_id\")");
-    (!ref($metaDataOnly)) or push(@_bad_arguments, "Invalid type for argument \"metaDataOnly\" (value was \"$metaDataOnly\")");
+    (!ref($meta_data_only)) or push(@_bad_arguments, "Invalid type for argument \"meta_data_only\" (value was \"$meta_data_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_GEO_GSM:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -5499,7 +5496,7 @@ sub version {
 
 
 
-=head2 FeatureID
+=head2 feature_id
 
 =over 4
 
@@ -5530,7 +5527,7 @@ a string
 
 
 
-=head2 FeatureIDs
+=head2 feature_ids
 
 =over 4
 
@@ -5546,14 +5543,14 @@ KBase list of Feature IDs , typically CDS/PEG
 =begin html
 
 <pre>
-a reference to a list where each element is a FeatureID
+a reference to a list where each element is an ExpressionServices.feature_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a FeatureID
+a reference to a list where each element is an ExpressionServices.feature_id
 
 =end text
 
@@ -5561,7 +5558,7 @@ a reference to a list where each element is a FeatureID
 
 
 
-=head2 Measurement
+=head2 measurement
 
 =over 4
 
@@ -5592,7 +5589,7 @@ a float
 
 
 
-=head2 SampleID
+=head2 sample_id
 
 =over 4
 
@@ -5623,7 +5620,7 @@ a string
 
 
 
-=head2 SampleIDs
+=head2 sample_ids
 
 =over 4
 
@@ -5639,14 +5636,14 @@ List of KBase Sample IDs
 =begin html
 
 <pre>
-a reference to a list where each element is a SampleID
+a reference to a list where each element is an ExpressionServices.sample_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a SampleID
+a reference to a list where each element is an ExpressionServices.sample_id
 
 =end text
 
@@ -5654,7 +5651,7 @@ a reference to a list where each element is a SampleID
 
 
 
-=head2 SampleIDsAveragedFrom
+=head2 sample_ids_averaged_from
 
 =over 4
 
@@ -5662,7 +5659,7 @@ a reference to a list where each element is a SampleID
 
 =item Description
 
-List of KBase Sample IDs thatt his sample was averaged from
+List of KBase Sample IDs that this sample was averaged from
 
 
 =item Definition
@@ -5670,14 +5667,14 @@ List of KBase Sample IDs thatt his sample was averaged from
 =begin html
 
 <pre>
-a reference to a list where each element is a SampleID
+a reference to a list where each element is an ExpressionServices.sample_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a SampleID
+a reference to a list where each element is an ExpressionServices.sample_id
 
 =end text
 
@@ -5685,7 +5682,7 @@ a reference to a list where each element is a SampleID
 
 
 
-=head2 SampleType
+=head2 sample_type
 
 =over 4
 
@@ -5716,7 +5713,7 @@ a string
 
 
 
-=head2 SeriesID
+=head2 series_id
 
 =over 4
 
@@ -5747,7 +5744,7 @@ a string
 
 
 
-=head2 SeriesIDs
+=head2 series_ids
 
 =over 4
 
@@ -5763,14 +5760,14 @@ list of KBase Series IDs
 =begin html
 
 <pre>
-a reference to a list where each element is a SeriesID
+a reference to a list where each element is an ExpressionServices.series_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a SeriesID
+a reference to a list where each element is an ExpressionServices.series_id
 
 =end text
 
@@ -5778,7 +5775,7 @@ a reference to a list where each element is a SeriesID
 
 
 
-=head2 ExperimentMetaID
+=head2 experiment_meta_id
 
 =over 4
 
@@ -5809,7 +5806,7 @@ a string
 
 
 
-=head2 ExperimentMetaIDs
+=head2 experiment_meta_ids
 
 =over 4
 
@@ -5825,14 +5822,14 @@ list of KBase ExperimentMeta IDs
 =begin html
 
 <pre>
-a reference to a list where each element is an ExperimentMetaID
+a reference to a list where each element is an ExpressionServices.experiment_meta_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is an ExperimentMetaID
+a reference to a list where each element is an ExpressionServices.experiment_meta_id
 
 =end text
 
@@ -5840,7 +5837,7 @@ a reference to a list where each element is an ExperimentMetaID
 
 
 
-=head2 ExperimentalUnitID
+=head2 experimental_unit_id
 
 =over 4
 
@@ -5848,7 +5845,7 @@ a reference to a list where each element is an ExperimentMetaID
 
 =item Description
 
-Kbase ExperimentalUnitID
+Kbase ExperimentalUnit ID
 
 
 =item Definition
@@ -5871,7 +5868,7 @@ a string
 
 
 
-=head2 ExperimentalUnitIDs
+=head2 experimental_unit_ids
 
 =over 4
 
@@ -5879,7 +5876,7 @@ a string
 
 =item Description
 
-list of KBase ExperimentalUnitIDs
+list of KBase ExperimentalUnit IDs
 
 
 =item Definition
@@ -5887,14 +5884,14 @@ list of KBase ExperimentalUnitIDs
 =begin html
 
 <pre>
-a reference to a list where each element is an ExperimentalUnitID
+a reference to a list where each element is an ExpressionServices.experimental_unit_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is an ExperimentalUnitID
+a reference to a list where each element is an ExpressionServices.experimental_unit_id
 
 =end text
 
@@ -5902,7 +5899,7 @@ a reference to a list where each element is an ExperimentalUnitID
 
 
 
-=head2 SamplesStringMap
+=head2 samples_string_map
 
 =over 4
 
@@ -5918,14 +5915,14 @@ Mapping between sample id and corresponding value.   Used as return for get_expr
 =begin html
 
 <pre>
-a reference to a hash where the key is a SampleID and the value is a string
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SampleID and the value is a string
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is a string
 
 =end text
 
@@ -5933,7 +5930,7 @@ a reference to a hash where the key is a SampleID and the value is a string
 
 
 
-=head2 SamplesFloatMap
+=head2 samples_float_map
 
 =over 4
 
@@ -5949,14 +5946,14 @@ Mapping between sample id and corresponding value.   Used as return for get_expr
 =begin html
 
 <pre>
-a reference to a hash where the key is a SampleID and the value is a float
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is a float
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SampleID and the value is a float
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is a float
 
 =end text
 
@@ -5964,7 +5961,7 @@ a reference to a hash where the key is a SampleID and the value is a float
 
 
 
-=head2 SeriesStringMap
+=head2 series_string_map
 
 =over 4
 
@@ -5980,14 +5977,14 @@ Mapping between sample id and corresponding value.   Used as return for get_seri
 =begin html
 
 <pre>
-a reference to a hash where the key is a SeriesID and the value is a string
+a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SeriesID and the value is a string
+a reference to a hash where the key is an ExpressionServices.series_id and the value is a string
 
 =end text
 
@@ -5995,7 +5992,7 @@ a reference to a hash where the key is a SeriesID and the value is a string
 
 
 
-=head2 DataExpressionLevelsForSample
+=head2 data_expression_levels_for_sample
 
 =over 4
 
@@ -6011,14 +6008,14 @@ mapping kbase feature id as the key and measurement as the value
 =begin html
 
 <pre>
-a reference to a hash where the key is a FeatureID and the value is a Measurement
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a FeatureID and the value is a Measurement
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
 
 =end text
 
@@ -6026,7 +6023,7 @@ a reference to a hash where the key is a FeatureID and the value is a Measuremen
 
 
 
-=head2 LabelDataMapping
+=head2 label_data_mapping
 
 =over 4
 
@@ -6042,14 +6039,14 @@ Mapping from Label (often a sample id, but free text to identify} to DataExpress
 =begin html
 
 <pre>
-a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
+a reference to a hash where the key is a string and the value is an ExpressionServices.data_expression_levels_for_sample
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a string and the value is a DataExpressionLevelsForSample
+a reference to a hash where the key is a string and the value is an ExpressionServices.data_expression_levels_for_sample
 
 =end text
 
@@ -6057,7 +6054,7 @@ a reference to a hash where the key is a string and the value is a DataExpressio
 
 
 
-=head2 ComparisonDenominatorLabel
+=head2 comparison_denominator_label
 
 =over 4
 
@@ -6089,7 +6086,7 @@ a string
 
 
 
-=head2 Log2Ratio
+=head2 log2_ratio
 
 =over 4
 
@@ -6121,7 +6118,7 @@ a float
 
 
 
-=head2 DataSampleComparison
+=head2 data_sample_comparison
 
 =over 4
 
@@ -6137,14 +6134,14 @@ mapping kbase feature id as the key and log2Ratio as the value
 =begin html
 
 <pre>
-a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.log2_ratio
 
 =end text
 
@@ -6152,7 +6149,7 @@ a reference to a hash where the key is a FeatureID and the value is a Log2Ratio
 
 
 
-=head2 DenominatorSampleComparison
+=head2 denominator_sample_comparison
 
 =over 4
 
@@ -6168,14 +6165,14 @@ mapping ComparisonDenominatorLabel to DataSampleComparison mapping
 =begin html
 
 <pre>
-a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
+a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a ComparisonDenominatorLabel and the value is a DataSampleComparison
+a reference to a hash where the key is an ExpressionServices.comparison_denominator_label and the value is an ExpressionServices.data_sample_comparison
 
 =end text
 
@@ -6183,7 +6180,7 @@ a reference to a hash where the key is a ComparisonDenominatorLabel and the valu
 
 
 
-=head2 SampleComparisonMapping
+=head2 sample_comparison_mapping
 
 =over 4
 
@@ -6199,14 +6196,14 @@ mapping Sample Id for the numerator to a DenominatorSampleComparison.  This is t
 =begin html
 
 <pre>
-a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SampleID and the value is a DenominatorSampleComparison
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.denominator_sample_comparison
 
 =end text
 
@@ -6214,7 +6211,7 @@ a reference to a hash where the key is a SampleID and the value is a Denominator
 
 
 
-=head2 SampleAnnotationID
+=head2 sample_annotation_id
 
 =over 4
 
@@ -6245,7 +6242,7 @@ a string
 
 
 
-=head2 OntologyID
+=head2 ontology_id
 
 =over 4
 
@@ -6276,7 +6273,7 @@ a string
 
 
 
-=head2 OntologyIDs
+=head2 ontology_ids
 
 =over 4
 
@@ -6292,14 +6289,14 @@ list of Kbase Ontology IDs
 =begin html
 
 <pre>
-a reference to a list where each element is an OntologyID
+a reference to a list where each element is an ExpressionServices.ontology_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is an OntologyID
+a reference to a list where each element is an ExpressionServices.ontology_id
 
 =end text
 
@@ -6307,7 +6304,7 @@ a reference to a list where each element is an OntologyID
 
 
 
-=head2 OntologyName
+=head2 ontology_name
 
 =over 4
 
@@ -6338,7 +6335,7 @@ a string
 
 
 
-=head2 OntologyDefinition
+=head2 ontology_definition
 
 =over 4
 
@@ -6386,10 +6383,10 @@ Data structure for top level information for sample annotation and ontology
 
 <pre>
 a reference to a hash where the following keys are defined:
-sampleAnnotationID has a value which is a SampleAnnotationID
-ontologyID has a value which is an OntologyID
-ontologyName has a value which is an OntologyName
-ontologyDefinition has a value which is an OntologyDefinition
+sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+ontology_id has a value which is an ExpressionServices.ontology_id
+ontology_name has a value which is an ExpressionServices.ontology_name
+ontology_definition has a value which is an ExpressionServices.ontology_definition
 
 </pre>
 
@@ -6398,10 +6395,10 @@ ontologyDefinition has a value which is an OntologyDefinition
 =begin text
 
 a reference to a hash where the following keys are defined:
-sampleAnnotationID has a value which is a SampleAnnotationID
-ontologyID has a value which is an OntologyID
-ontologyName has a value which is an OntologyName
-ontologyDefinition has a value which is an OntologyDefinition
+sample_annotation_id has a value which is an ExpressionServices.sample_annotation_id
+ontology_id has a value which is an ExpressionServices.ontology_id
+ontology_name has a value which is an ExpressionServices.ontology_name
+ontology_definition has a value which is an ExpressionServices.ontology_definition
 
 
 =end text
@@ -6410,7 +6407,7 @@ ontologyDefinition has a value which is an OntologyDefinition
 
 
 
-=head2 SampleAnnotations
+=head2 sample_annotations
 
 =over 4
 
@@ -6426,14 +6423,14 @@ list of Sample Annotations associated with the Sample
 =begin html
 
 <pre>
-a reference to a list where each element is a SampleAnnotation
+a reference to a list where each element is an ExpressionServices.SampleAnnotation
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a SampleAnnotation
+a reference to a list where each element is an ExpressionServices.SampleAnnotation
 
 =end text
 
@@ -6441,7 +6438,7 @@ a reference to a list where each element is a SampleAnnotation
 
 
 
-=head2 ExternalSourceID
+=head2 external_source_id
 
 =over 4
 
@@ -6472,7 +6469,7 @@ a string
 
 
 
-=head2 ExternalSourceIDs
+=head2 external_source_ids
 
 =over 4
 
@@ -6488,14 +6485,14 @@ list of externalSourceIDs
 =begin html
 
 <pre>
-a reference to a list where each element is an ExternalSourceID
+a reference to a list where each element is an ExpressionServices.external_source_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is an ExternalSourceID
+a reference to a list where each element is an ExpressionServices.external_source_id
 
 =end text
 
@@ -6503,7 +6500,7 @@ a reference to a list where each element is an ExternalSourceID
 
 
 
-=head2 PersonID
+=head2 person_id
 
 =over 4
 
@@ -6534,7 +6531,7 @@ a string
 
 
 
-=head2 PersonIDs
+=head2 person_ids
 
 =over 4
 
@@ -6550,14 +6547,14 @@ list of KBase PersonsIDs
 =begin html
 
 <pre>
-a reference to a list where each element is a PersonID
+a reference to a list where each element is an ExpressionServices.person_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a PersonID
+a reference to a list where each element is an ExpressionServices.person_id
 
 =end text
 
@@ -6565,7 +6562,7 @@ a reference to a list where each element is a PersonID
 
 
 
-=head2 StrainID
+=head2 strain_id
 
 =over 4
 
@@ -6596,7 +6593,7 @@ a string
 
 
 
-=head2 StrainIDs
+=head2 strain_ids
 
 =over 4
 
@@ -6612,14 +6609,14 @@ list of KBase StrainIDs
 =begin html
 
 <pre>
-a reference to a list where each element is a StrainID
+a reference to a list where each element is an ExpressionServices.strain_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a StrainID
+a reference to a list where each element is an ExpressionServices.strain_id
 
 =end text
 
@@ -6627,7 +6624,7 @@ a reference to a list where each element is a StrainID
 
 
 
-=head2 GenomeID
+=head2 genome_id
 
 =over 4
 
@@ -6658,7 +6655,7 @@ a string
 
 
 
-=head2 GenomeIDs
+=head2 genome_ids
 
 =over 4
 
@@ -6674,14 +6671,14 @@ list of KBase GenomeIDs
 =begin html
 
 <pre>
-a reference to a list where each element is a GenomeID
+a reference to a list where each element is an ExpressionServices.genome_id
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a list where each element is a GenomeID
+a reference to a list where each element is an ExpressionServices.genome_id
 
 =end text
 
@@ -6689,7 +6686,7 @@ a reference to a list where each element is a GenomeID
 
 
 
-=head2 WildTypeOnly
+=head2 wild_type_only
 
 =over 4
 
@@ -6737,41 +6734,41 @@ Data structure for all the top level metadata and value data for an expression s
 
 <pre>
 a reference to a hash where the following keys are defined:
-sampleID has a value which is a SampleID
-sourceID has a value which is a string
-sampleTitle has a value which is a string
-sampleDescription has a value which is a string
+sample_id has a value which is an ExpressionServices.sample_id
+source_id has a value which is a string
+sample_title has a value which is a string
+sample_description has a value which is a string
 molecule has a value which is a string
-sampleType has a value which is a SampleType
-dataSource has a value which is a string
-externalSourceID has a value which is a string
-externalSourceDate has a value which is a string
-kbaseSubmissionDate has a value which is a string
+sample_type has a value which is an ExpressionServices.sample_type
+data_source has a value which is a string
+external_source_id has a value which is a string
+external_source_date has a value which is a string
+kbase_submission_date has a value which is a string
 custom has a value which is a string
-originalLog2Median has a value which is a float
-strainID has a value which is a StrainID
-referenceStrain has a value which is a string
+original_log2_median has a value which is a float
+strain_id has a value which is an ExpressionServices.strain_id
+reference_strain has a value which is a string
 wildtype has a value which is a string
-strainDescription has a value which is a string
-genomeID has a value which is a GenomeID
-genomeScientificName has a value which is a string
-platformID has a value which is a string
-platformTitle has a value which is a string
-platformTechnology has a value which is a string
-experimentalUnitID has a value which is an ExperimentalUnitID
-experimentMetaID has a value which is an ExperimentMetaID
-experimentTitle has a value which is a string
-experimentDescription has a value which is a string
-environmentID has a value which is a string
-environmentDescription has a value which is a string
-protocolID has a value which is a string
-protocolDescription has a value which is a string
-protocolName has a value which is a string
-sampleAnnotations has a value which is a SampleAnnotations
-seriesIDs has a value which is a SeriesIDs
-personIDs has a value which is a PersonIDs
-sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
+strain_description has a value which is a string
+genome_id has a value which is an ExpressionServices.genome_id
+genome_scientific_name has a value which is a string
+platform_id has a value which is a string
+platform_title has a value which is a string
+platform_technology has a value which is a string
+experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+experiment_title has a value which is a string
+experiment_description has a value which is a string
+environment_id has a value which is a string
+environment_description has a value which is a string
+protocol_id has a value which is a string
+protocol_description has a value which is a string
+protocol_name has a value which is a string
+sample_annotations has a value which is an ExpressionServices.sample_annotations
+series_ids has a value which is an ExpressionServices.series_ids
+person_ids has a value which is an ExpressionServices.person_ids
+sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
 
 </pre>
 
@@ -6780,41 +6777,41 @@ dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSamp
 =begin text
 
 a reference to a hash where the following keys are defined:
-sampleID has a value which is a SampleID
-sourceID has a value which is a string
-sampleTitle has a value which is a string
-sampleDescription has a value which is a string
+sample_id has a value which is an ExpressionServices.sample_id
+source_id has a value which is a string
+sample_title has a value which is a string
+sample_description has a value which is a string
 molecule has a value which is a string
-sampleType has a value which is a SampleType
-dataSource has a value which is a string
-externalSourceID has a value which is a string
-externalSourceDate has a value which is a string
-kbaseSubmissionDate has a value which is a string
+sample_type has a value which is an ExpressionServices.sample_type
+data_source has a value which is a string
+external_source_id has a value which is a string
+external_source_date has a value which is a string
+kbase_submission_date has a value which is a string
 custom has a value which is a string
-originalLog2Median has a value which is a float
-strainID has a value which is a StrainID
-referenceStrain has a value which is a string
+original_log2_median has a value which is a float
+strain_id has a value which is an ExpressionServices.strain_id
+reference_strain has a value which is a string
 wildtype has a value which is a string
-strainDescription has a value which is a string
-genomeID has a value which is a GenomeID
-genomeScientificName has a value which is a string
-platformID has a value which is a string
-platformTitle has a value which is a string
-platformTechnology has a value which is a string
-experimentalUnitID has a value which is an ExperimentalUnitID
-experimentMetaID has a value which is an ExperimentMetaID
-experimentTitle has a value which is a string
-experimentDescription has a value which is a string
-environmentID has a value which is a string
-environmentDescription has a value which is a string
-protocolID has a value which is a string
-protocolDescription has a value which is a string
-protocolName has a value which is a string
-sampleAnnotations has a value which is a SampleAnnotations
-seriesIDs has a value which is a SeriesIDs
-personIDs has a value which is a PersonIDs
-sampleIDsAveragedFrom has a value which is a SampleIDsAveragedFrom
-dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSample
+strain_description has a value which is a string
+genome_id has a value which is an ExpressionServices.genome_id
+genome_scientific_name has a value which is a string
+platform_id has a value which is a string
+platform_title has a value which is a string
+platform_technology has a value which is a string
+experimental_unit_id has a value which is an ExpressionServices.experimental_unit_id
+experiment_meta_id has a value which is an ExpressionServices.experiment_meta_id
+experiment_title has a value which is a string
+experiment_description has a value which is a string
+environment_id has a value which is a string
+environment_description has a value which is a string
+protocol_id has a value which is a string
+protocol_description has a value which is a string
+protocol_name has a value which is a string
+sample_annotations has a value which is an ExpressionServices.sample_annotations
+series_ids has a value which is an ExpressionServices.series_ids
+person_ids has a value which is an ExpressionServices.person_ids
+sample_ids_averaged_from has a value which is an ExpressionServices.sample_ids_averaged_from
+data_expression_levels_for_sample has a value which is an ExpressionServices.data_expression_levels_for_sample
 
 
 =end text
@@ -6823,7 +6820,7 @@ dataExpressionLevelsForSample has a value which is a DataExpressionLevelsForSamp
 
 
 
-=head2 ExpressionDataSamplesMap
+=head2 expression_data_samples_map
 
 =over 4
 
@@ -6839,14 +6836,14 @@ Mapping between sampleID and ExpressionDataSample
 =begin html
 
 <pre>
-a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.ExpressionDataSample
 
 =end text
 
@@ -6854,7 +6851,7 @@ a reference to a hash where the key is a SampleID and the value is an Expression
 
 
 
-=head2 SeriesExpressionDataSamplesMapping
+=head2 series_expression_data_samples_mapping
 
 =over 4
 
@@ -6870,14 +6867,14 @@ mapping between seriesIDs and all Samples it contains
 =begin html
 
 <pre>
-a reference to a hash where the key is a SeriesID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.series_id and the value is an ExpressionServices.expression_data_samples_map
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SeriesID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.series_id and the value is an ExpressionServices.expression_data_samples_map
 
 =end text
 
@@ -6885,7 +6882,7 @@ a reference to a hash where the key is a SeriesID and the value is an Expression
 
 
 
-=head2 ExperimentalUnitExpressionDataSamplesMapping
+=head2 experimental_unit_expression_data_samples_mapping
 
 =over 4
 
@@ -6901,14 +6898,14 @@ mapping between experimentalUnitIDs and all Samples it contains
 =begin html
 
 <pre>
-a reference to a hash where the key is an ExperimentalUnitID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.experimental_unit_id and the value is an ExpressionServices.expression_data_samples_map
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is an ExperimentalUnitID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.experimental_unit_id and the value is an ExpressionServices.expression_data_samples_map
 
 =end text
 
@@ -6916,7 +6913,7 @@ a reference to a hash where the key is an ExperimentalUnitID and the value is an
 
 
 
-=head2 ExperimentMetaExpressionDataSamplesMapping
+=head2 experiment_meta_expression_data_samples_mapping
 
 =over 4
 
@@ -6932,14 +6929,14 @@ mapping between experimentMetaIDs and ExperimentalUnitExpressionDataSamplesMappi
 =begin html
 
 <pre>
-a reference to a hash where the key is an ExperimentMetaID and the value is an ExperimentalUnitExpressionDataSamplesMapping
+a reference to a hash where the key is an ExpressionServices.experiment_meta_id and the value is an ExpressionServices.experimental_unit_expression_data_samples_mapping
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is an ExperimentMetaID and the value is an ExperimentalUnitExpressionDataSamplesMapping
+a reference to a hash where the key is an ExpressionServices.experiment_meta_id and the value is an ExpressionServices.experimental_unit_expression_data_samples_mapping
 
 =end text
 
@@ -6947,7 +6944,7 @@ a reference to a hash where the key is an ExperimentMetaID and the value is an E
 
 
 
-=head2 StrainExpressionDataSamplesMapping
+=head2 strain_expression_data_samples_mapping
 
 =over 4
 
@@ -6963,14 +6960,14 @@ mapping between strainIDs and all Samples it contains
 =begin html
 
 <pre>
-a reference to a hash where the key is a StrainID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.strain_id and the value is an ExpressionServices.expression_data_samples_map
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a StrainID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.strain_id and the value is an ExpressionServices.expression_data_samples_map
 
 =end text
 
@@ -6978,7 +6975,7 @@ a reference to a hash where the key is a StrainID and the value is an Expression
 
 
 
-=head2 GenomeExpressionDataSamplesMapping
+=head2 genome_expression_data_samples_mapping
 
 =over 4
 
@@ -6994,14 +6991,14 @@ mapping between genomeIDs and all StrainExpressionDataSamplesMapping it contains
 =begin html
 
 <pre>
-a reference to a hash where the key is a GenomeID and the value is a StrainExpressionDataSamplesMapping
+a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.strain_expression_data_samples_mapping
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a GenomeID and the value is a StrainExpressionDataSamplesMapping
+a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.strain_expression_data_samples_mapping
 
 =end text
 
@@ -7009,7 +7006,7 @@ a reference to a hash where the key is a GenomeID and the value is a StrainExpre
 
 
 
-=head2 OntologyExpressionDataSampleMapping
+=head2 ontology_expression_data_sample_mapping
 
 =over 4
 
@@ -7025,14 +7022,14 @@ mapping between ontologyIDs (concatenated if searched for with the and operator)
 =begin html
 
 <pre>
-a reference to a hash where the key is an OntologyID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.ontology_id and the value is an ExpressionServices.expression_data_samples_map
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is an OntologyID and the value is an ExpressionDataSamplesMap
+a reference to a hash where the key is an ExpressionServices.ontology_id and the value is an ExpressionServices.expression_data_samples_map
 
 =end text
 
@@ -7040,7 +7037,7 @@ a reference to a hash where the key is an OntologyID and the value is an Express
 
 
 
-=head2 SampleMeasurementMapping
+=head2 sample_measurement_mapping
 
 =over 4
 
@@ -7056,14 +7053,14 @@ mapping kbase sample id as the key and a single measurement (for a scpecified fe
 =begin html
 
 <pre>
-a reference to a hash where the key is a SampleID and the value is a Measurement
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.measurement
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a SampleID and the value is a Measurement
+a reference to a hash where the key is an ExpressionServices.sample_id and the value is an ExpressionServices.measurement
 
 =end text
 
@@ -7071,7 +7068,7 @@ a reference to a hash where the key is a SampleID and the value is a Measurement
 
 
 
-=head2 FeatureSampleMeasurementMapping
+=head2 feature_sample_measurement_mapping
 
 =over 4
 
@@ -7087,14 +7084,14 @@ mapping between FeatureIds and the mappings between samples and log2level mappin
 =begin html
 
 <pre>
-a reference to a hash where the key is a FeatureID and the value is a SampleMeasurementMapping
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.sample_measurement_mapping
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a FeatureID and the value is a SampleMeasurementMapping
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.sample_measurement_mapping
 
 =end text
 
@@ -7119,11 +7116,11 @@ Data structure for a GEO Platform
 
 <pre>
 a reference to a hash where the following keys are defined:
-gplID has a value which is a string
-gplTitle has a value which is a string
-gplTechnology has a value which is a string
-gplTaxID has a value which is a string
-gplOrganism has a value which is a string
+gpl_id has a value which is a string
+gpl_title has a value which is a string
+gpl_technology has a value which is a string
+gpl_tax_id has a value which is a string
+gpl_organism has a value which is a string
 
 </pre>
 
@@ -7132,11 +7129,11 @@ gplOrganism has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-gplID has a value which is a string
-gplTitle has a value which is a string
-gplTechnology has a value which is a string
-gplTaxID has a value which is a string
-gplOrganism has a value which is a string
+gpl_id has a value which is a string
+gpl_title has a value which is a string
+gpl_technology has a value which is a string
+gpl_tax_id has a value which is a string
+gpl_organism has a value which is a string
 
 
 =end text
@@ -7145,7 +7142,7 @@ gplOrganism has a value which is a string
 
 
 
-=head2 ContactEmail
+=head2 contact_email
 
 =over 4
 
@@ -7176,7 +7173,7 @@ a string
 
 
 
-=head2 ContactFirstName
+=head2 contact_first_name
 
 =over 4
 
@@ -7207,7 +7204,7 @@ a string
 
 
 
-=head2 ContactLastName
+=head2 contact_last_name
 
 =over 4
 
@@ -7238,7 +7235,7 @@ a string
 
 
 
-=head2 ContactInstitution
+=head2 contact_institution
 
 =over 4
 
@@ -7286,9 +7283,9 @@ Data structure for GSM ContactPerson
 
 <pre>
 a reference to a hash where the following keys are defined:
-contactFirstName has a value which is a ContactFirstName
-contactLastName has a value which is a ContactLastName
-contactInstitution has a value which is a ContactInstitution
+contact_first_name has a value which is an ExpressionServices.contact_first_name
+contact_last_name has a value which is an ExpressionServices.contact_last_name
+contact_institution has a value which is an ExpressionServices.contact_institution
 
 </pre>
 
@@ -7297,9 +7294,9 @@ contactInstitution has a value which is a ContactInstitution
 =begin text
 
 a reference to a hash where the following keys are defined:
-contactFirstName has a value which is a ContactFirstName
-contactLastName has a value which is a ContactLastName
-contactInstitution has a value which is a ContactInstitution
+contact_first_name has a value which is an ExpressionServices.contact_first_name
+contact_last_name has a value which is an ExpressionServices.contact_last_name
+contact_institution has a value which is an ExpressionServices.contact_institution
 
 
 =end text
@@ -7308,7 +7305,7 @@ contactInstitution has a value which is a ContactInstitution
 
 
 
-=head2 ContactPeople
+=head2 contact_people
 
 =over 4
 
@@ -7324,14 +7321,14 @@ Mapping between key : ContactEmail and value : ContactPerson Data Structure
 =begin html
 
 <pre>
-a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a ContactEmail and the value is a ContactPerson
+a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
 
 =end text
 
@@ -7357,9 +7354,9 @@ Measurement data structure
 <pre>
 a reference to a hash where the following keys are defined:
 value has a value which is a float
-N has a value which is a float
+n has a value which is a float
 stddev has a value which is a float
-Z_score has a value which is a float
+z_score has a value which is a float
 p_value has a value which is a float
 median has a value which is a float
 mean has a value which is a float
@@ -7372,9 +7369,9 @@ mean has a value which is a float
 
 a reference to a hash where the following keys are defined:
 value has a value which is a float
-N has a value which is a float
+n has a value which is a float
 stddev has a value which is a float
-Z_score has a value which is a float
+z_score has a value which is a float
 p_value has a value which is a float
 median has a value which is a float
 mean has a value which is a float
@@ -7386,7 +7383,7 @@ mean has a value which is a float
 
 
 
-=head2 GsmData
+=head2 gsm_data
 
 =over 4
 
@@ -7402,14 +7399,14 @@ mapping kbase feature id as the key and FullMeasurement Structure as the value
 =begin html
 
 <pre>
-a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a FeatureID and the value is a FullMeasurement
+a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
 
 =end text
 
@@ -7417,7 +7414,7 @@ a reference to a hash where the key is a FeatureID and the value is a FullMeasur
 
 
 
-=head2 GsmWarnings
+=head2 gsm_warnings
 
 =over 4
 
@@ -7448,7 +7445,7 @@ a reference to a list where each element is a string
 
 
 
-=head2 GseWarnings
+=head2 gse_warnings
 
 =over 4
 
@@ -7479,7 +7476,7 @@ a reference to a list where each element is a string
 
 
 
-=head2 GsmErrors
+=head2 gsm_errors
 
 =over 4
 
@@ -7510,7 +7507,7 @@ a reference to a list where each element is a string
 
 
 
-=head2 GseErrors
+=head2 gse_errors
 
 =over 4
 
@@ -7541,7 +7538,7 @@ a reference to a list where each element is a string
 
 
 
-=head2 GsmSampleCharacteristics
+=head2 gsm_sample_characteristics
 
 =over 4
 
@@ -7589,23 +7586,23 @@ GSM OBJECT
 
 <pre>
 a reference to a hash where the following keys are defined:
-gsmID has a value which is a string
-gsmTitle has a value which is a string
-gsmDescription has a value which is a string
-gsmMolecule has a value which is a string
-gsmSubmissionDate has a value which is a string
-gsmTaxID has a value which is a string
-gsmSampleOrganism has a value which is a string
-gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
-gsmProtocol has a value which is a string
-gsmValueType has a value which is a string
-gsmOriginalLog2Median has a value which is a float
-gsmPlatform has a value which is a GPL
-gsmContactPeople has a value which is a ContactPeople
-gsmData has a value which is a GsmData
-gsmFeatureMappingApproach has a value which is a string
-gsmWarning has a value which is a GsmWarnings
-gsmErrors has a value which is a GsmErrors
+gsm_id has a value which is a string
+gsm_title has a value which is a string
+gsm_description has a value which is a string
+gsm_molecule has a value which is a string
+gsm_submission_date has a value which is a string
+gsm_tax_id has a value which is a string
+gsm_sample_organism has a value which is a string
+gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
+gsm_protocol has a value which is a string
+gsm_value_type has a value which is a string
+gsm_original_log2_median has a value which is a float
+gsm_platform has a value which is an ExpressionServices.GPL
+gsm_contact_people has a value which is an ExpressionServices.contact_people
+gsm_data has a value which is an ExpressionServices.gsm_data
+gsm_feature_mapping_approach has a value which is a string
+gsm_warning has a value which is an ExpressionServices.gsm_warnings
+gsm_errors has a value which is an ExpressionServices.gsm_errors
 
 </pre>
 
@@ -7614,23 +7611,23 @@ gsmErrors has a value which is a GsmErrors
 =begin text
 
 a reference to a hash where the following keys are defined:
-gsmID has a value which is a string
-gsmTitle has a value which is a string
-gsmDescription has a value which is a string
-gsmMolecule has a value which is a string
-gsmSubmissionDate has a value which is a string
-gsmTaxID has a value which is a string
-gsmSampleOrganism has a value which is a string
-gsmSampleCharacteristics has a value which is a GsmSampleCharacteristics
-gsmProtocol has a value which is a string
-gsmValueType has a value which is a string
-gsmOriginalLog2Median has a value which is a float
-gsmPlatform has a value which is a GPL
-gsmContactPeople has a value which is a ContactPeople
-gsmData has a value which is a GsmData
-gsmFeatureMappingApproach has a value which is a string
-gsmWarning has a value which is a GsmWarnings
-gsmErrors has a value which is a GsmErrors
+gsm_id has a value which is a string
+gsm_title has a value which is a string
+gsm_description has a value which is a string
+gsm_molecule has a value which is a string
+gsm_submission_date has a value which is a string
+gsm_tax_id has a value which is a string
+gsm_sample_organism has a value which is a string
+gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
+gsm_protocol has a value which is a string
+gsm_value_type has a value which is a string
+gsm_original_log2_median has a value which is a float
+gsm_platform has a value which is an ExpressionServices.GPL
+gsm_contact_people has a value which is an ExpressionServices.contact_people
+gsm_data has a value which is an ExpressionServices.gsm_data
+gsm_feature_mapping_approach has a value which is a string
+gsm_warning has a value which is an ExpressionServices.gsm_warnings
+gsm_errors has a value which is an ExpressionServices.gsm_errors
 
 
 =end text
@@ -7639,7 +7636,7 @@ gsmErrors has a value which is a GsmErrors
 
 
 
-=head2 GseSamples
+=head2 gse_samples
 
 =over 4
 
@@ -7655,14 +7652,14 @@ Mapping of Key GSMID to GSM Object
 =begin html
 
 <pre>
-a reference to a hash where the key is a string and the value is a GsmObject
+a reference to a hash where the key is a string and the value is an ExpressionServices.GsmObject
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a string and the value is a GsmObject
+a reference to a hash where the key is a string and the value is an ExpressionServices.GsmObject
 
 =end text
 
@@ -7687,15 +7684,15 @@ GSE OBJECT
 
 <pre>
 a reference to a hash where the following keys are defined:
-gseID has a value which is a string
-gseTitle has a value which is a string
-gseSummary has a value which is a string
-gseDesign has a value which is a string
-gseSubmissionDate has a value which is a string
-pubMedID has a value which is a string
-gseSamples has a value which is a GseSamples
-gseWarnings has a value which is a GseWarnings
-gseErrors has a value which is a GseErrors
+gse_id has a value which is a string
+gse_title has a value which is a string
+gse_summary has a value which is a string
+gse_design has a value which is a string
+gse_submission_date has a value which is a string
+pub_med_id has a value which is a string
+gse_samples has a value which is an ExpressionServices.gse_samples
+gse_warnings has a value which is an ExpressionServices.gse_warnings
+gse_errors has a value which is an ExpressionServices.gse_errors
 
 </pre>
 
@@ -7704,15 +7701,15 @@ gseErrors has a value which is a GseErrors
 =begin text
 
 a reference to a hash where the following keys are defined:
-gseID has a value which is a string
-gseTitle has a value which is a string
-gseSummary has a value which is a string
-gseDesign has a value which is a string
-gseSubmissionDate has a value which is a string
-pubMedID has a value which is a string
-gseSamples has a value which is a GseSamples
-gseWarnings has a value which is a GseWarnings
-gseErrors has a value which is a GseErrors
+gse_id has a value which is a string
+gse_title has a value which is a string
+gse_summary has a value which is a string
+gse_design has a value which is a string
+gse_submission_date has a value which is a string
+pub_med_id has a value which is a string
+gse_samples has a value which is an ExpressionServices.gse_samples
+gse_warnings has a value which is an ExpressionServices.gse_warnings
+gse_errors has a value which is an ExpressionServices.gse_errors
 
 
 =end text
@@ -7721,7 +7718,7 @@ gseErrors has a value which is a GseErrors
 
 
 
-=head2 MetaDataOnly
+=head2 meta_data_only
 
 =over 4
 

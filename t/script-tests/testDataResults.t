@@ -500,7 +500,7 @@ $result = undef;
 eval {
     $result = $client->get_top_changers({},'BOTH',10);
 };
-ok($@ =~ /The sampleComparisonMapping .1st argument, the hash was empty/,"get_top_changers({},'BOTH',10); properly throws an exception");
+ok($@ =~ /The sample_comparison_mapping .1st argument, the hash was empty/,"get_top_changers({},'BOTH',10); properly throws an exception");
 $result = undef;
 eval { 
     $result = $client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'blah',10);
