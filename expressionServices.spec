@@ -413,10 +413,7 @@ module ExpressionServices {
     /* get series ids by the series's external source id : Takes a list of series external source ids, and returns a list of series ids  */          
     funcdef get_expression_series_ids_by_series_external_source_ids(external_source_ids external_source_ids) returns (series_ids series_ids);  
 
-    /* given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files*/
-    funcdef get_GEO_GSE(string gse_input_id, meta_data_only meta_data_only) returns (GseObject gseObject);
-
-    /* given a GEO GSM ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files*/
-    funcdef get_GEO_GSM(string gsm_input_id, meta_data_only meta_data_only) returns (GsmObject gsmObject);
+    /* given a GEO GSE ID, it will return a complex data structure to be put into the upload tab files*/
+    funcdef get_GEO_GSE(string gse_input_id) returns (GseObject gseObject);
 
 }; 

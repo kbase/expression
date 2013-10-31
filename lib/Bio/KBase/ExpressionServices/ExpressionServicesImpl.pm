@@ -5102,7 +5102,7 @@ sub get_expression_series_ids_by_series_external_source_ids
 
 =head2 get_GEO_GSE
 
-  $gseObject = $obj->get_GEO_GSE($gse_input_id, $meta_data_only)
+  $gseObject = $obj->get_GEO_GSE($gse_input_id)
 
 =over 4
 
@@ -5112,9 +5112,7 @@ sub get_expression_series_ids_by_series_external_source_ids
 
 <pre>
 $gse_input_id is a string
-$meta_data_only is an ExpressionServices.meta_data_only
 $gseObject is an ExpressionServices.GseObject
-meta_data_only is an int
 GseObject is a reference to a hash where the following keys are defined:
 	gse_id has a value which is a string
 	gse_title has a value which is a string
@@ -5182,9 +5180,7 @@ gse_errors is a reference to a list where each element is a string
 =begin text
 
 $gse_input_id is a string
-$meta_data_only is an ExpressionServices.meta_data_only
 $gseObject is an ExpressionServices.GseObject
-meta_data_only is an int
 GseObject is a reference to a hash where the following keys are defined:
 	gse_id has a value which is a string
 	gse_title has a value which is a string
@@ -5252,7 +5248,7 @@ gse_errors is a reference to a list where each element is a string
 
 =item Description
 
-given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files
+given a GEO GSE ID, it will return a complex data structure to be put into the upload tab files
 
 =back
 
@@ -5261,11 +5257,10 @@ given a GEO GSE ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will retur
 sub get_GEO_GSE
 {
     my $self = shift;
-    my($gse_input_id, $meta_data_only) = @_;
+    my($gse_input_id) = @_;
 
     my @_bad_arguments;
     (!ref($gse_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gse_input_id\" (value was \"$gse_input_id\")");
-    (!ref($meta_data_only)) or push(@_bad_arguments, "Invalid type for argument \"meta_data_only\" (value was \"$meta_data_only\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_GEO_GSE:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -5279,7 +5274,6 @@ sub get_GEO_GSE
 
     # create new functionsForGEO
     my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
-print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
     $gseObject = $functionsForGEO->get_GEO_GSE_data($gse_input_id,1);
     #END get_GEO_GSE
     my @_bad_returns;
@@ -5290,169 +5284,6 @@ print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
 							       method_name => 'get_GEO_GSE');
     }
     return($gseObject);
-}
-
-
-
-
-=head2 get_GEO_GSM
-
-  $gsmObject = $obj->get_GEO_GSM($gsm_input_id, $meta_data_only)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$gsm_input_id is a string
-$meta_data_only is an ExpressionServices.meta_data_only
-$gsmObject is an ExpressionServices.GsmObject
-meta_data_only is an int
-GsmObject is a reference to a hash where the following keys are defined:
-	gsm_id has a value which is a string
-	gsm_title has a value which is a string
-	gsm_description has a value which is a string
-	gsm_molecule has a value which is a string
-	gsm_submission_date has a value which is a string
-	gsm_tax_id has a value which is a string
-	gsm_sample_organism has a value which is a string
-	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
-	gsm_protocol has a value which is a string
-	gsm_value_type has a value which is a string
-	gsm_original_log2_median has a value which is a float
-	gsm_platform has a value which is an ExpressionServices.GPL
-	gsm_contact_people has a value which is an ExpressionServices.contact_people
-	gsm_data has a value which is an ExpressionServices.gsm_data
-	gsm_feature_mapping_approach has a value which is a string
-	gsm_warning has a value which is an ExpressionServices.gsm_warnings
-	gsm_errors has a value which is an ExpressionServices.gsm_errors
-gsm_sample_characteristics is a reference to a list where each element is a string
-GPL is a reference to a hash where the following keys are defined:
-	gpl_id has a value which is a string
-	gpl_title has a value which is a string
-	gpl_technology has a value which is a string
-	gpl_tax_id has a value which is a string
-	gpl_organism has a value which is a string
-contact_people is a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
-contact_email is a string
-ContactPerson is a reference to a hash where the following keys are defined:
-	contact_first_name has a value which is an ExpressionServices.contact_first_name
-	contact_last_name has a value which is an ExpressionServices.contact_last_name
-	contact_institution has a value which is an ExpressionServices.contact_institution
-contact_first_name is a string
-contact_last_name is a string
-contact_institution is a string
-gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
-feature_id is a string
-FullMeasurement is a reference to a hash where the following keys are defined:
-	value has a value which is a float
-	n has a value which is a float
-	stddev has a value which is a float
-	z_score has a value which is a float
-	p_value has a value which is a float
-	median has a value which is a float
-	mean has a value which is a float
-gsm_warnings is a reference to a list where each element is a string
-gsm_errors is a reference to a list where each element is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$gsm_input_id is a string
-$meta_data_only is an ExpressionServices.meta_data_only
-$gsmObject is an ExpressionServices.GsmObject
-meta_data_only is an int
-GsmObject is a reference to a hash where the following keys are defined:
-	gsm_id has a value which is a string
-	gsm_title has a value which is a string
-	gsm_description has a value which is a string
-	gsm_molecule has a value which is a string
-	gsm_submission_date has a value which is a string
-	gsm_tax_id has a value which is a string
-	gsm_sample_organism has a value which is a string
-	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
-	gsm_protocol has a value which is a string
-	gsm_value_type has a value which is a string
-	gsm_original_log2_median has a value which is a float
-	gsm_platform has a value which is an ExpressionServices.GPL
-	gsm_contact_people has a value which is an ExpressionServices.contact_people
-	gsm_data has a value which is an ExpressionServices.gsm_data
-	gsm_feature_mapping_approach has a value which is a string
-	gsm_warning has a value which is an ExpressionServices.gsm_warnings
-	gsm_errors has a value which is an ExpressionServices.gsm_errors
-gsm_sample_characteristics is a reference to a list where each element is a string
-GPL is a reference to a hash where the following keys are defined:
-	gpl_id has a value which is a string
-	gpl_title has a value which is a string
-	gpl_technology has a value which is a string
-	gpl_tax_id has a value which is a string
-	gpl_organism has a value which is a string
-contact_people is a reference to a hash where the key is an ExpressionServices.contact_email and the value is an ExpressionServices.ContactPerson
-contact_email is a string
-ContactPerson is a reference to a hash where the following keys are defined:
-	contact_first_name has a value which is an ExpressionServices.contact_first_name
-	contact_last_name has a value which is an ExpressionServices.contact_last_name
-	contact_institution has a value which is an ExpressionServices.contact_institution
-contact_first_name is a string
-contact_last_name is a string
-contact_institution is a string
-gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
-feature_id is a string
-FullMeasurement is a reference to a hash where the following keys are defined:
-	value has a value which is a float
-	n has a value which is a float
-	stddev has a value which is a float
-	z_score has a value which is a float
-	p_value has a value which is a float
-	median has a value which is a float
-	mean has a value which is a float
-gsm_warnings is a reference to a list where each element is a string
-gsm_errors is a reference to a list where each element is a string
-
-
-=end text
-
-
-
-=item Description
-
-given a GEO GSM ID and a flag (1 = MetaDataOnly, 0 = IncludeData), it will return a complex data structure to be put into the upload tab files
-
-=back
-
-=cut
-
-sub get_GEO_GSM
-{
-    my $self = shift;
-    my($gsm_input_id, $meta_data_only) = @_;
-
-    my @_bad_arguments;
-    (!ref($gsm_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gsm_input_id\" (value was \"$gsm_input_id\")");
-    (!ref($meta_data_only)) or push(@_bad_arguments, "Invalid type for argument \"meta_data_only\" (value was \"$meta_data_only\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_GEO_GSM:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_GEO_GSM');
-    }
-
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
-    my($gsmObject);
-    #BEGIN get_GEO_GSM
-    #END get_GEO_GSM
-    my @_bad_returns;
-    (ref($gsmObject) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"gsmObject\" (value was \"$gsmObject\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_GEO_GSM:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_GEO_GSM');
-    }
-    return($gsmObject);
 }
 
 

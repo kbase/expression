@@ -20,11 +20,14 @@ my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new("http
 #For testing the IMP directly
 #my $client = Bio::KBase::ExpressionServices::ExpressionServicesImpl->new("http://localhost:9999"); 
 
+print "\nTime at start : ".localtime."\n";
+
 my $result;
 print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data([]);
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
-$result = $client->get_expression_samples_data(['kb|sample.2','kb|sample.3']);
+#$result = $client->get_expression_samples_data(['kb|sample.38','kb|sample.39']);
+#$result = $client->get_expression_samples_data(['kb|sample.50','kb|sample.51']);
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
@@ -32,6 +35,7 @@ print "get_expression_data_by_sample_and_features()\n";
 #					['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'], []); 
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.8'], []); 
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.52','kb|sample.53'], []); 
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\
@@ -234,10 +238,10 @@ print "get_expression_series_ids_by_series_external_source_ids()\n";
 
 #get_GEO_GSE\ 
 print "get_GEO_GSE()\n"; 
-#$result = $client->get_GEO_GSE('GSE21782',1);
-#$result = $client->get_GEO_GSE('GSE21782',0);
-#$result = $client->get_GEO_GSE('GSE39462',0);
-#$result = $client->get_GEO_GSE('GSE31535',1);
+$result = $client->get_GEO_GSE('GSE21782');
+#$result = $client->get_GEO_GSE('GSE21782');
+#$result = $client->get_GEO_GSE('GSE39462');
+#$result = $client->get_GEO_GSE('GSE31535');
 #print Dumper($result) . "\n----------------------------\n"; 
 
 
@@ -249,5 +253,7 @@ print "get_GEO_GSE()\n";
 
 print "FINAL PRINT\n".Dumper($result) . "\n----------------------------\n";
 
+
+print "\nTime at end : ".localtime."\n";
 
 
