@@ -33,7 +33,7 @@ use JSON::RPC::Client;
 
 our (@ISA,@EXPORT);
 @ISA = qw(Exporter);
-@EXPORT = qw(new get_GEO_GSE_data);
+@EXPORT = qw(new get_GEO_GSE_data get_gse_records_from_gds_list);
 
  
 sub new
@@ -1810,31 +1810,29 @@ sub get_GEO_GSE_data
     return($gseObject);
 }#End get_GEO_GSE_data
 
+
 sub get_gse_records_from_gds_list
-{ 
-    my $self = shift; 
-    my $gds_file = shift; 
-    open (GDS,$gds_file) or die "Unable to open the gds file : $gds_file.\n\n";
-    my @gds_list_lines = <GDS>; 
+{
+    my $self = shift;
+    my $gds_file = shift;
+    open (GDS,$gds_file) or die "Unable to open the gds file : $gds_file.\n\n"; 
+    my @gds_list_lines = <GDS>;
  
-    my @gse_records; 
+    my @gse_records;
     my %gse_records_hash;
     foreach my $gds_list_line (@gds_list_lines) 
     { 
-        if ($gds_list_line =~ /^Platform:/) 
+        if ($gds_list_line =~ /^Platform:/)
         { 
-            my @line_elements = split(/\s+/,$gds_list_line); 
-            my $gse_id = $line_elements[3]; 
+            my @line_elements = split(/\s+/,$gds_list_line);
+            my $gse_id = $line_elements[3];
             my $gse_number = $gse_id;
             $gse_number =~ s/GSE//; 
             $gse_records_hash{$gse_id} = $gse_number;
         } 
-    } 
-    @gse_records = (sort { $gse_records_hash{$a} <=> $gse_records_hash{$b} } keys(%gse_records_hash)); 
-    close(GDS); 
-    return \@gse_records; 
-} 
-
-
-
+    }
+    @gse_records = (sort { $gse_records_hash{$a} <=> $gse_records_hash{$b} } keys(%gse_records_hash));
+    close(GDS);
+    return \@gse_records;
+}
 1;
