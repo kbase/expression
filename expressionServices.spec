@@ -1,7 +1,12 @@
 /* Service for all different sorts of Expression data (microarray, RNA_seq, proteomics, qPCR */
 module ExpressionServices { 
 
-    /* KBase Feature ID for a feature, typically CDS/PEG */
+    /* 
+        KBase Feature ID for a feature, typically CDS/PEG
+        @id ws KB.Feature 
+
+        "ws" may change to "to" in the future 
+    */
     typedef string feature_id;
     
     /* KBase list of Feature IDs , typically CDS/PEG */
@@ -104,7 +109,25 @@ module ExpressionServices {
     /* list of externalSourceIDs */
     typedef list<external_source_id> external_source_ids;
 
-    /* Kbase Person ID */ 
+    /*
+        Data structure for Person  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+
+        @searchable ws_subset kb_id email last_name institution
+    */
+    typedef structure {
+        string kb_id;
+        string email; 
+        string first_name;
+        string last_name;
+        string institution;
+    } Person; 
+
+    /* 
+       Kbase Person ID 
+       @id ws ExpressionServices.Person
+
+       "ws" may change to "to" in the future 
+    */ 
     typedef string person_id; 
     
     /* list of KBase PersonsIDs */
@@ -116,7 +139,12 @@ module ExpressionServices {
     /* list of KBase StrainIDs */
     typedef list<strain_id> strain_ids;
     
-    /* KBase GenomeID */
+    /* 
+        KBase GenomeID 
+        @id ws KB.Genome
+
+        "ws" may change to "to" in the future 
+    */
     typedef string genome_id;
     
     /* list of KBase GenomeIDs */
@@ -185,7 +213,7 @@ module ExpressionServices {
     /*mapping between ontologyIDs (concatenated if searched for with the and operator) and all the Samples that match that term(s)*/
     typedef mapping<ontology_id ontology_id, expression_data_samples_map> ontology_expression_data_sample_mapping;
 
-    /* mapping kbase sample id as the key and a single measurement (for a scpecified feature id, one mapping higher) as the value */
+    /* mapping kbase sample id as the key and a single measurement (for a specified feature id, one mapping higher) as the value */
     typedef mapping<sample_id sampleID, measurement measurement> sample_measurement_mapping; 
     
     /*mapping between FeatureIds and the mappings between samples and log2level mapping*/
@@ -236,13 +264,19 @@ module ExpressionServices {
     } FullMeasurement;
     
     /* mapping kbase feature id as the key and FullMeasurement Structure as the value */ 
-    typedef mapping<feature_id feature_id, FullMeasurement full_measurement> gsm_data; 
+    typedef mapping<feature_id feature_id, FullMeasurement full_measurement> gsm_data_set; 
     
+    /* List of GSM Data level warnings */ 
+    typedef list<string> gsm_data_warnings; 
+
     /* List of GSM level warnings */ 
     typedef list<string> gsm_warnings;
 
     /* List of GSE level warnings */
     typedef list<string> gse_warnings;
+
+    /* List of GSM Data level errors */
+    typedef list<string> gsm_data_errors;
 
     /* List of GSM level errors */
     typedef list<string> gsm_errors;
@@ -252,6 +286,17 @@ module ExpressionServices {
 
     /* List of GSM Sample Characteristics from ch1 */
     typedef list<string> gsm_sample_characteristics;
+
+    /* Data structure that has the GSM data, warnings, errors and originalLog2Median for that GSM and Genome ID combination */    
+    typedef structure {
+        gsm_data_warnings warnings;
+        gsm_data_errors errors;
+        gsm_data_set features;
+	float originalLog2Median;
+    } GenomeDataGSM;
+
+    /* mapping kbase feature id as the key and FullMeasurement Structure as the value */ 
+    typedef mapping<genome_id genome_id, GenomeDataGSM genome_data_gsm> gsm_data; 
 
     /* GSM OBJECT */
     typedef structure {
@@ -265,11 +310,11 @@ module ExpressionServices {
         gsm_sample_characteristics gsm_sample_characteristics;
 	string gsm_protocol;
 	string gsm_value_type;
-	float gsm_original_log2_median;
 	GPL gsm_platform;
 	contact_people gsm_contact_people;
 	gsm_data gsm_data;
 	string gsm_feature_mapping_approach;
+        ontology_ids ontology_ids;
 	gsm_warnings gsm_warning;
 	gsm_errors gsm_errors;
     } GsmObject;
@@ -413,7 +458,236 @@ module ExpressionServices {
     /* get series ids by the series's external source id : Takes a list of series external source ids, and returns a list of series ids  */          
     funcdef get_expression_series_ids_by_series_external_source_ids(external_source_ids external_source_ids) returns (series_ids series_ids);  
 
-    /* given a GEO GSE ID, it will return a complex data structure to be put into the upload tab files*/
+    /* given a GEO GSE ID, it will return a complex data structure to be put int the upload tab files*/
     funcdef get_GEO_GSE(string gse_input_id) returns (GseObject gseObject);
 
+
+
+
+    /*WORKSPACE OBJECTS*/ 
+
+    /*
+      NOTE THE PROTOCOL, PERSON, PUBLICATION CREATED HERE SHOULD ALL BE HANDLED BY SOME COMMON TYPED OBJECTS SERVICE IN THE FUTURE.
+      FOR NOW I ONLY HAVE STRING IDS TO REPRESENT THE OBJECT.
+      ALSO ONTOLOGY SHOULD BE HANDLED BY SOME SORT OF ONTOLOGY SERVICE IN THE FUTURE.  I NEED TO CREATE ONE NOW FOR USE.
+    */
+
+    /*
+        Temporary workspace typed object for ontology.  Should be replaced by a ontology workspace typed object.
+        Currently supports EO, PO and ENVO ontology terms.
+
+        @searchable ws_subset expression_ontology_id expression_ontology_name expression_ontology_definition
+    */
+    typedef structure {
+        string expression_ontology_id; 
+        string expression_ontology_name; 
+        string expression_ontology_definition;         
+    } ExpressionOntology;
+
+    /* list of ExpressionsOntologies */ 
+    typedef list<ExpressionOntology> expression_ontologies; 
+
+    /*
+        Data structure for the workspace expression platform.  The ExpressionPlatform typed object.
+        source_id defaults to kb_id if not set, but typically referes to a GPL if the data is from GEO.
+
+        strain_id (eventual ws_ref)
+
+        @optional strain_id
+
+        @searchable ws_subset source_id kb_id genome_id title technology
+    */
+    typedef structure { 
+        string kb_id; 
+        string source_id;
+        genome_id genome_id;
+        string strain_id; 
+        string technology; 
+        string title; 
+    } ExpressionPlatform; 
+
+    /*
+       kb_id for the expression platform
+
+       @id ws ExpressionServices.ExpressionPlatform
+
+       "ws" may go to "to" in the future
+    */
+    typedef string expression_platform_id;
+
+    /*
+        Data structure for Protocol  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+
+        @searchable ws_subset kb_id name description
+    */
+    typedef structure {
+        string kb_id;
+        string name; 
+        string description;
+    } Protocol; 
+
+    /* 
+       Kbase Protocol ID 
+       @id ws ExpressionServices.Protocol
+
+       "ws" may change to "to" in the future 
+    */ 
+    typedef string protocol_id; 
+
+    /*
+        Data structure for Strain  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+
+        @searchable ws_subset kb_id genome_id name reference_strain
+    */
+    typedef structure {
+        string kb_id;
+        genome_id genome_id; 
+        string reference_strain;
+        string wild_type;
+        string description;
+        string name;
+    } Strain; 
+
+    /* 
+       Kbase Strain ID 
+       @id ws ExpressionServices.Strain
+
+       "ws" may change to "to" in the future 
+    */ 
+    typedef string strain_id; 
+
+    /*
+       kb_id for the expression sample
+
+       @id ws ExpressionServices.ExpressionSample
+
+       "ws" may go to "to" in the future
+    */
+    typedef string expression_sample_id;
+
+    /* list of expression sample ids */ 
+    typedef list<expression_sample_id> expression_sample_ids;
+
+
+    /* 
+       Data structure for the workspace expression sample.  The Expression Sample typed object.
+       
+       protocol, persons and strain should need to eventually have common ws objects.  I will make expression ones for now.
+       
+       we may need a link to experimentMetaID later.
+
+       @optional description title data_quality_level original_median expression_ontologies platform_id default_control_sample 
+       @optional averaged_from_samples protocol_id strain_id person_ids molecule data_source
+       
+       @searchable kb_id source_id type data_quality_level genome_id strain_id platform_id description title data_source
+    */
+    typedef structure {
+        string kb_id;
+        string source_id;
+        sample_type type;
+        string numerical_interpretaion;
+        string description;
+        string title;
+        int data_quality_level;
+        float original_median;
+	string external_source_date;
+        data_expression_levels_for_sample expression_levels; 
+	genome_id genome_id;  
+        expression_ontologies expression_ontologies; 
+        expression_platform_id platform_id; 
+        expression_sample_id default_control_sample; 
+        expression_sample_ids averaged_from_samples; 
+        string protocol_id; 
+        string strain_id; 
+        person_ids person_ids;
+        string molecule;
+        string data_source; 
+    } ExpressionSample;
+
+    /*
+        Data structure for the workspace expression series.  The ExpressionSeries typed object.
+        publication should need to eventually have ws objects, will not inclde it for now.
+
+        @optional title summary design publication_id 
+
+        @searchable kb_id source_id publication_id title summary design expression_samples?????????????
+    */
+    typedef structure { 
+        string kb_id; 
+        string source_id;
+        expression_sample_ids expression_sample_ids;
+        string title; 
+        string summary;
+        string design; 
+        string publication_id; 
+	string external_source_date;
+    } ExpressionSeries; 
+
+
+    /*
+        Functions to pull expression typed objects (into the workspace).
+    */
+
+
+    /*
+        Given an expression_ontology_id it will retrieve that ExpressionOntology typed object from the relational database
+    */ 
+    funcdef get_expression_ontology(string kb_expression_ontology_id) returns (ExpressionOntology expression_ontology); 
+
+    /*
+        Given a KBase Platfrom ID (kb_id) returns an ExpressionPlatform typed object
+    */ 
+    funcdef get_expression_platform(string kb_platform_id) returns (ExpressionPlatform expression_platform); 
+
+    /*
+        Given a KBase Sample ID (kb_id) returns an ExpressionSample typed object
+    */ 
+    funcdef get_expression_sample(string kb_sample_id) returns (ExpressionSample expression_sample);
+
+    /*
+        Given a KBase Series ID (kb_id) returns an ExpressionSeries typed object
+    */ 
+    funcdef get_expression_series(string kb_series_id) returns (ExpressionSeries expression_series); 
+
+    /* 
+       Mapping between ws_name or ws_id and their values.  This is a way to identify which workspace to use. 
+       Must contain either 'ws_name' or 'ws_id' key.
+    */
+    typedef mapping<string ws_key, string ws_value> workspace_identifying_map; 
+    
+    /*
+       A list of kbase_ids used to fetch the workspace expression typed objects (ExpressionOntology, ExpressionPlatform, ExpressionSample, ExpressionSeries)
+    */
+    typedef list<string> expression_kbase_ids;
+
+    /*
+        Given a 1) hash ref(that contain ws_name or ws_id key and value), 
+                2) typed_object type (must be single quoted string of 
+                        Must be one of the following : 'ExpressionOntology', 'ExpressionPlatform', 'ExpressionSample' or 'ExpressionSeries' 
+                3) an array ref with a list of kb_ids to be imported.
+    */  
+    funcdef ws_import_of_expression_typed_object(workspace_identifying_map workspace_identifying_map, 
+                                                 string expression_typed_object, 
+                                                 expression_kbase_ids) returns(expression_kbase_ids expression_kbase_ids) authentication required;
+
+    /*
+        get all the expression ontology ids
+    */  
+    funcdef get_all_ontology_ids() returns(expression_kbase_ids expression_kbase_ids); 
+
+    /*
+        get all the expression platform ids
+    */  
+    funcdef get_all_platform_ids() returns(expression_kbase_ids expression_kbase_ids); 
+
+    /*
+        get all the expression sample ids
+    */  
+    funcdef get_all_sample_ids() returns(expression_kbase_ids expression_kbase_ids); 
+
+    /*
+        get all the expression series ids
+    */  
+    funcdef get_all_series_ids() returns(expression_kbase_ids expression_kbase_ids); 
+ 
 }; 
