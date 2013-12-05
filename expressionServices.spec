@@ -112,10 +112,9 @@ module ExpressionServices {
     /*
         Data structure for Person  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
 
-        @searchable ws_subset kb_id email last_name institution
+##        @searchable ws_subset email last_name institution
     */
     typedef structure {
-        string kb_id;
         string email; 
         string first_name;
         string last_name;
@@ -124,9 +123,6 @@ module ExpressionServices {
 
     /* 
        Kbase Person ID 
-       @id ws ExpressionServices.Person
-
-       "ws" may change to "to" in the future 
     */ 
     typedef string person_id; 
     
@@ -475,25 +471,32 @@ module ExpressionServices {
     /*
         Temporary workspace typed object for ontology.  Should be replaced by a ontology workspace typed object.
         Currently supports EO, PO and ENVO ontology terms.
-
-        @searchable ws_subset expression_ontology_id expression_ontology_name expression_ontology_definition
     */
     typedef structure {
-        string expression_ontology_id; 
-        string expression_ontology_name; 
-        string expression_ontology_definition;         
-    } ExpressionOntology;
+        string expression_ontology_term_id; 
+        string expression_ontology_term_name; 
+        string expression_ontology_term_definition;         
+    } ExpressionOntologyTerm;
 
     /* list of ExpressionsOntologies */ 
-    typedef list<ExpressionOntology> expression_ontologies; 
+    typedef list<ExpressionOntologyTerm> expression_ontology_terms; 
+
+    /*
+        Data structure for Strain  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+    */
+    typedef structure {
+        genome_id genome_id; 
+        string reference_strain;
+        string wild_type;
+        string description;
+        string name;
+    } Strain; 
 
     /*
         Data structure for the workspace expression platform.  The ExpressionPlatform typed object.
         source_id defaults to kb_id if not set, but typically referes to a GPL if the data is from GEO.
 
-        strain_id (eventual ws_ref)
-
-        @optional strain_id
+        @optional strain
 
         @searchable ws_subset source_id kb_id genome_id title technology
     */
@@ -501,7 +504,7 @@ module ExpressionServices {
         string kb_id; 
         string source_id;
         genome_id genome_id;
-        string strain_id; 
+        Strain strain; 
         string technology; 
         string title; 
     } ExpressionPlatform; 
@@ -517,44 +520,11 @@ module ExpressionServices {
 
     /*
         Data structure for Protocol  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
-
-        @searchable ws_subset kb_id name description
     */
     typedef structure {
-        string kb_id;
         string name; 
         string description;
     } Protocol; 
-
-    /* 
-       Kbase Protocol ID 
-       @id ws ExpressionServices.Protocol
-
-       "ws" may change to "to" in the future 
-    */ 
-    typedef string protocol_id; 
-
-    /*
-        Data structure for Strain  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
-
-        @searchable ws_subset kb_id genome_id name reference_strain
-    */
-    typedef structure {
-        string kb_id;
-        genome_id genome_id; 
-        string reference_strain;
-        string wild_type;
-        string description;
-        string name;
-    } Strain; 
-
-    /* 
-       Kbase Strain ID 
-       @id ws ExpressionServices.Strain
-
-       "ws" may change to "to" in the future 
-    */ 
-    typedef string strain_id; 
 
     /*
        kb_id for the expression sample
@@ -568,6 +538,8 @@ module ExpressionServices {
     /* list of expression sample ids */ 
     typedef list<expression_sample_id> expression_sample_ids;
 
+    /* list of Persons */ 
+    typedef list<Person> persons;
 
     /* 
        Data structure for the workspace expression sample.  The Expression Sample typed object.
@@ -576,8 +548,8 @@ module ExpressionServices {
        
        we may need a link to experimentMetaID later.
 
-       @optional description title data_quality_level original_median expression_ontologies platform_id default_control_sample 
-       @optional averaged_from_samples protocol_id strain_id person_ids molecule data_source
+       @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
+       @optional averaged_from_samples protocol strain persons molecule data_source
        
        @searchable kb_id source_id type data_quality_level genome_id strain_id platform_id description title data_source
     */
@@ -592,14 +564,14 @@ module ExpressionServices {
         float original_median;
 	string external_source_date;
         data_expression_levels_for_sample expression_levels; 
-	genome_id genome_id;  
-        expression_ontologies expression_ontologies; 
+	genome_id genome_id; 
+        expression_ontology_terms expression_ontology_terms;
         expression_platform_id platform_id; 
         expression_sample_id default_control_sample; 
         expression_sample_ids averaged_from_samples; 
-        string protocol_id; 
-        string strain_id; 
-        person_ids person_ids;
+        Protocol protocol; 
+        Strain strain; 
+        persons persons;
         string molecule;
         string data_source; 
     } ExpressionSample;
@@ -628,11 +600,6 @@ module ExpressionServices {
         Functions to pull expression typed objects (into the workspace).
     */
 
-
-    /*
-        Given an expression_ontology_id it will retrieve that ExpressionOntology typed object from the relational database
-    */ 
-    funcdef get_expression_ontology(string kb_expression_ontology_id) returns (ExpressionOntology expression_ontology); 
 
     /*
         Given a KBase Platfrom ID (kb_id) returns an ExpressionPlatform typed object
