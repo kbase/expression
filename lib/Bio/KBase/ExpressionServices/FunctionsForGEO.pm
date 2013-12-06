@@ -35,6 +35,31 @@ our (@ISA,@EXPORT);
 @ISA = qw(Exporter);
 @EXPORT = qw(new get_GEO_GSE_data get_gse_records_from_gds_list);
 
+#
+#NOTE THIS REQUIRES
+#The following directories to be made (if you are doing non-metadata only)
+#/mnt/blat_files/
+#/mnt/platform_genome_mapping_files
+#
+
+
+#SUBROUTINES
+#new
+#trim      -removes beginning and trailing white space
+#column_header_checker      -Returns index position of column header you are searching for
+#parse_gse_series_portion      
+#parse_gse_platform_portion
+#parse_platform_synonyms         -creates genome_id=>{platform_id=>feature_id}
+#create_genome_synonyms_lookup   -Creates list of all synonyms for features for the genomes that match the scientific name
+#parse_blat_results         -parses blat results creates platform_id => feature_id lookup hash
+#make_platform_sequence_hash
+#parse_gse_sample_info_for_platform
+#parse_gse_sample_portion 
+#parse_sample_data
+#data_value_sanity_checks
+#get_GEO_GSE_data
+#get_gse_records_from_gds_list
+
  
 sub new
 {
@@ -234,8 +259,7 @@ sub parse_gse_platform_portion
     my $platform_table_begin = undef;
     my $platform_line_counter = 0;
 
-    my $min_number_of_probes_mapped_threshold = .5;
-
+    my $min_number_of_probes_mapped_threshold = .3;
     foreach my $line (@lines)
     {
 	if ($line =~ m/^\!Platform_title =/) 
@@ -314,7 +338,6 @@ sub parse_gse_platform_portion
 	    }
 	}
 
-        #	push(@{$platform_hash{$gplID}->{"errors"}},"THIS CURRENTLY ONLY SUPPORTS METADATA ONLY!");
 	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
 			       { RaiseError => 1, ShowErrorStatement => 1 }
 	    ); 
@@ -336,158 +359,218 @@ sub parse_gse_platform_portion
 	    while (my ($genome_id) = $get_genome_ids_qh->fetchrow_array())
 	    {
 		$genome_ids_hash{$genome_id} = 1;
+                #print "\nMatching GENOME $genome_id \n";
 	    }
-		
-	    #determine if a sequence column exists 
-	    my @platform_map_lines = @lines[$platform_table_begin..(scalar(@lines)-2)];
+            if (scalar(keys(%genome_ids_hash)) == 0)
+            {
+   	        push(@{$platform_hash{$gplID}->{"errors"}},"We do not have genomes that match the following scientific name(s) : ". join(", ",@ncbi_scientific_names));
+            }            
+
+            #CHECK TO SEE IF PROBE MAPPING FILE EXISTS HERE:
+            my $gpl_file = "/mnt/platform_genome_mapping_files/".$gplID; 
+            if (-e $gpl_file)
+            {
+                #Open GPL file get mapping method results (lets you know what genomes you need to grab data for, and do not have to attempt to map of genomes in the list)
+		open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
+		my @gpl_file_lines = (<GPL>); 
+		close(GPL); 
+                foreach my $gpl_file_line (@gpl_file_lines)
+                {
+                    my ($temp_genome_id,$temp_mapping_method) = split('\t',trim($gpl_file_line));
+                    $genome_ids_hash{$temp_genome_id} = 0;
+		    $platform_hash{$gplID}->{"genomesMappingMethod"}->{$temp_genome_id}=$temp_mapping_method;  
+                }
+            }
+
+            my $need_to_try_new_mappings = 0;
+            foreach my $genome_id (keys(%genome_ids_hash))
+            { 
+                if ($genome_ids_hash{$genome_id} == 0)
+                {
+                    if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS")
+                    {
+                         my $genome_number = $genome_id;
+                         $genome_number =~ s/kb\|//;
+                         my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+                         #check file exists if it does, die as it should be;
+                         if (-e $gpl_genome_file)
+                         {
+                             #slurp up file and make probe_id-<feature_id mappings
+                             open (GPL_GENOME,$gpl_genome_file) or die "Unable to open the gpl genome file : $gpl_genome_file.\n\n"; 
+		             my @gpl_genome_file_lines = (<GPL_GENOME>); 
+		             close(GPL_GENOME);  
+                             my %temp_hash;
+                             foreach my $gpl_genome_file_line (@gpl_genome_file_lines)
+                             {
+                                 my ($temp_probe_id,$temp_feature_id) = split('\t',trim($gpl_genome_file_line));
+                                 $temp_hash{$temp_probe_id} = $temp_feature_id;
+                             }
+                             $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id}=\%temp_hash;
+                         }
+                         else
+                         {
+                             die "\nERROR : The gpl_genome_file $gpl_genome_file should exist and it does not\n";
+                         }
+                    }
+                }
+                #else $need_to_try_new_mappings
+                elsif ($genome_ids_hash{$genome_id} == 1)
+                {
+                    $need_to_try_new_mappings = 1;
+                }             
+            }
+
+	    if ($need_to_try_new_mappings == 1)
+            {	
+	        #determine if a sequence column exists 
+    	        my @platform_map_lines = @lines[$platform_table_begin..(scalar(@lines)-2)];
 	    
-	    my ($probe_sequence_hash_ref, $probe_sequence_warning) = make_platform_sequence_hash(\@platform_map_lines);
-	    my %probe_sequence_hash = %{$probe_sequence_hash_ref};
-	    my @blat_files_to_clean_up_after;
-	    my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}
+	        my ($probe_sequence_hash_ref, $probe_sequence_warning) = make_platform_sequence_hash(\@platform_map_lines);
+	        my %probe_sequence_hash = %{$probe_sequence_hash_ref};
+	        my @blat_files_to_clean_up_after;
+	        my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}
 
-	    if (!defined($probe_sequence_warning))
-	    {
-		#It has a sequence column, prepare a blat_db file and build query file
-		my $min_probe_length = 500;  #artificially high intial value will get set
-		my $number_of_probe_sequences = scalar(keys(%probe_sequence_hash));
-		my $blat_platform_query_file = "/kb/dev_container/modules/expression/blat_files/".$gplID."_blat_query_file";
-		push(@blat_files_to_clean_up_after, $blat_platform_query_file);
-		open (BLAT_QUERY_FILE, ">".$blat_platform_query_file) or die "Unable to make $blat_platform_query_file \n";
-		foreach my $probe_id (keys(%probe_sequence_hash))
-		{
-		    my $probe_sequence = $probe_sequence_hash{$probe_id};
-		    print BLAT_QUERY_FILE ">".$probe_id."\n".$probe_sequence."\n";
-		    if (length($probe_sequence) < $min_probe_length)
+	        if (!defined($probe_sequence_warning))
+	        {
+		    #It has a sequence column, prepare a blat_db file and build query file
+		    my $min_probe_length = 500;  #artificially high intial value will get set
+		    my $number_of_probe_sequences = scalar(keys(%probe_sequence_hash));
+		    my $blat_platform_query_file = "/mnt/blat_files/".$gplID."_blat_query_file";
+		    push(@blat_files_to_clean_up_after, $blat_platform_query_file);
+		    open (BLAT_QUERY_FILE, ">".$blat_platform_query_file) or die "Unable to make $blat_platform_query_file \n";
+		    foreach my $probe_id (keys(%probe_sequence_hash))
 		    {
-			$min_probe_length = length($probe_sequence);
+		        my $probe_sequence = $probe_sequence_hash{$probe_id};
+		        print BLAT_QUERY_FILE ">".$probe_id."\n".$probe_sequence."\n";
+		        if (length($probe_sequence) < $min_probe_length)
+		        {
+		  	    $min_probe_length = length($probe_sequence);
+		        }
 		    }
-		}
-		$min_probe_length = $min_probe_length - 1; #allows for 1 base mismatch in blat
-		close (BLAT_QUERY_FILE);
-		#FOREACH MATCHING GENOME
-		#Create DB file of CDS
-		#Run blat
-		#create mapping platform_id -> feature_id
-		#remove files
-		foreach my $genome_id (keys(%genome_ids_hash))
-		{
-		    #create Blat DB File
-		    my $file_genome_id = $genome_id;
-		    $file_genome_id =~ s/kb\|//; 
-		    my $blat_genome_db_file = "/kb/dev_container/modules/expression/blat_files/".$file_genome_id."_blat_db_file";
-		    push(@blat_files_to_clean_up_after, $blat_genome_db_file);
-		    open (BLAT_DB_FILE, ">".$blat_genome_db_file) or die "Unable to make $blat_genome_db_file \n";
-		    my $fid_count = 0;
-		    my $kb = Bio::KBase->new();
-		    my $cdmi_client = $kb->central_store;
-		    my $genome_fids_hash_ref = $cdmi_client->genomes_to_fids([$genome_id],['CDS']);
-		    my $fid_sequence_hash = $cdmi_client->fids_to_dna_sequences($genome_fids_hash_ref->{$genome_id}); 
-		    foreach my $fid_key (keys(%{$fid_sequence_hash})) 
-		    { 
-			$fid_count++;
-			print BLAT_DB_FILE ">".$fid_key."\n".$fid_sequence_hash->{$fid_key}."\n"; 
-		    } 
-		    close(BLAT_DB_FILE); 
-		    # Run Blat
-		    my $blat_results_file = "/kb/dev_container/modules/expression/blat_files/".
-			$gplID."_".$file_genome_id."_blat_results.psl";
-		    my $cmd = "/usr/local/bin/blat -t=dna -q=dna -tileSize=6 -repMatch=1000000 -minIdentity=95 -fine ".
-			"-minMatch=0 -out=psl -minScore=$min_probe_length ".
-			"$blat_genome_db_file $blat_platform_query_file $blat_results_file"; #-intron=0
-                    #print "Running blat: $cmd\n"; 
-		    system($cmd) == 0 || die "Cannot run blat"; 
-		    die "blat failed" unless -e $blat_results_file; 
-		    push(@blat_files_to_clean_up_after, $blat_results_file);
-		    #Parse Blat File and create mapping from Platform ID to Feature ID
-		    my %probe_to_feature_hash =  parse_blat_results($blat_results_file);  
-		    $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id} = \%probe_to_feature_hash; 
-		    #if number of probe sequences mapped to feature ids is less than (.5 * total number of probe sequences)
-		    #add a warning.
-		    if (scalar(keys(%probe_to_feature_hash)) < 
-			($min_number_of_probes_mapped_threshold * $number_of_probe_sequences))
+		    $min_probe_length = $min_probe_length - 1; #allows for 1 base mismatch in blat
+                    if ($min_probe_length < 20)
+                    {
+                        $min_probe_length = 20;
+                    }
+		    close (BLAT_QUERY_FILE);
+		    #FOREACH MATCHING GENOME
+		    #Create DB file of CDS
+		    #Run blat
+		    #create mapping platform_id -> feature_id
+		    #remove files
+		    foreach my $genome_id (keys(%genome_ids_hash))
 		    {
-			push(@{$platform_hash{$gplID}->{"warnings"}},"For $gplID , for genome $genome_id only ".
-			     scalar(keys(%probe_to_feature_hash)). 
-			     " number of probes were able to be mapped to features out of the ".
-			     $number_of_probe_sequences . " total number of probes.");
-		    }
-		    $platform_hash{$gplID}->{"mapping_method"}="Probe Sequences Blat Resolved";
-		    #MAY want to add self so can connect to DB to resolve alternative splicings
-		}
-		foreach my $clean_up_file (@blat_files_to_clean_up_after) 
-		{ 
-		    my $rm_cmd = "rm ".$clean_up_file; 
-		    system($rm_cmd) == 0 || print "Cannot perform $rm_cmd \n"; 
-		} 
-	    }
-	    else
-	    {
-		#no sequence column exists, see if a locus tag/aliases column exists
-		#create mapping platform_id -> feature_id
-		my $genome_synonyms_lookup_ref;  #key Genome ID ->{synonym->{featureIDS->[external Synonym DB IDs]}
-		#                 'feature_coverage_percentage'->number} 
-		($genome_synonyms_lookup_ref) = create_genome_synonyms_lookup(\%genome_ids_hash);
-		#%genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}  
-		my ($temp_hash_ref,$warnings_arr_ref, $errors_arr_ref) = parse_platform_synonyms(\@platform_map_lines,$genome_synonyms_lookup_ref);
-		%genome_probe_to_feature_id_hash = %{$temp_hash_ref};
-		my $passed_synonyms_mapping = 0;
-		my %represented_genome_ids;  #keep track of genomes that passed.  May have errors with other genomes to report warnings on.
-		foreach my $test_genome_id (keys(%genome_probe_to_feature_id_hash))
-		{
-		    my %probe_to_feature_hash = %{$genome_probe_to_feature_id_hash{$test_genome_id}};
-		    if (scalar(keys(%probe_to_feature_hash)) > 1)
-		    {
-			$passed_synonyms_mapping = 1;
-		    }
-		    #if number of probe sequences mapped to feature ids is less than (.5 * total number of probe sequences) 
-		    #add a warning.   
-		    if (scalar(keys(%probe_to_feature_hash)) <
-			($min_number_of_probes_mapped_threshold * (scalar(@platform_map_lines) - 1))) 
-		    { 
-			push(@{$platform_hash{$gplID}->{"warnings"}},"For $gplID , for genome $test_genome_id only ".
-			     scalar(keys(%probe_to_feature_hash)). 
-			     " number of probes were able to be mapped to features out of the ". 
-			     (scalar(@platform_map_lines) - 1) . " total number of platform lines."); 
-		    } 
-		    foreach my $temp_warning (@{$warnings_arr_ref})
-		    {
-			if ($temp_warning =~ m/ $test_genome_id /) {
-			    push(@{$platform_hash{$gplID}->{"warnings"}},"Warning for Platform $gplID and genome $test_genome_id : ".
-				 $temp_warning);
-			} 
-		    }
-		    $represented_genome_ids{$test_genome_id}=1;
-		}
+                        if($genome_ids_hash{$genome_id} == 1)
+		        {
+                            #create Blat DB File
+		            my $file_genome_id = $genome_id;
+		            $file_genome_id =~ s/kb\|//; 
+		            my $blat_genome_db_file = "/mnt/blat_files/".$file_genome_id."_blat_db_file";
+		            push(@blat_files_to_clean_up_after, $blat_genome_db_file);
+		            open (BLAT_DB_FILE, ">".$blat_genome_db_file) or die "Unable to make $blat_genome_db_file \n";
+		            my $fid_count = 0;
+		            my $kb = Bio::KBase->new();
+		            my $cdmi_client = $kb->central_store;
+		            my $genome_fids_hash_ref = $cdmi_client->genomes_to_fids([$genome_id],['CDS']);
+		            my $fid_sequence_hash = $cdmi_client->fids_to_dna_sequences($genome_fids_hash_ref->{$genome_id}); 
+		            foreach my $fid_key (keys(%{$fid_sequence_hash})) 
+		            { 
+			        $fid_count++;
+			        print BLAT_DB_FILE ">".$fid_key."\n".$fid_sequence_hash->{$fid_key}."\n"; 
+		            } 
+		            close(BLAT_DB_FILE); 
+		            # Run Blat
+		            my $blat_results_file = "/kb/dev_container/modules/expression/blat_files/".
+			        $gplID."_".$file_genome_id."_blat_results.psl";
+		            my $cmd = "/usr/local/bin/blat -t=dna -q=dna -tileSize=6 -repMatch=1000000 -minIdentity=95 -fine ".
+			              "-minMatch=0 -out=psl -minScore=$min_probe_length ".
+			              "$blat_genome_db_file $blat_platform_query_file $blat_results_file"; #-intron=0
+                            #print "Running blat: $cmd\n"; 
+		            system($cmd) == 0 || die "Cannot run blat"; 
+		            die "blat failed" unless -e $blat_results_file; 
+		            push(@blat_files_to_clean_up_after, $blat_results_file);
+		            #Parse Blat File and create mapping from Platform ID to Feature ID
+		            my %probe_to_feature_hash =  parse_blat_results($blat_results_file);  
+		            $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id} = \%probe_to_feature_hash; 
 
-		foreach my $genome_id (keys(%genome_ids_hash)) 
-		{ 
-		    unless(defined($represented_genome_ids{$genome_id})) #Error with other genomes captured for reporting purposes
+		            #if number of probe sequences mapped to feature ids is greater than (.3 * total number of probe sequences) it passes.
+		            if (scalar(keys(%probe_to_feature_hash)) > 
+			       ($min_number_of_probes_mapped_threshold * $number_of_probe_sequences))
+		            {
+                                $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="Probe Sequences Blat Resolved";
+                                my $genome_number = $genome_id;
+                                $genome_number =~ s/kb\|//;
+                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+                                make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);
+		            }
+                            else
+                            {
+                                $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
+                            }
+		            #MAY want to add self so can connect to DB to resolve alternative splicings
+		        }#if genome needs to be done.
+                    }#foreach genome   
+		    foreach my $clean_up_file (@blat_files_to_clean_up_after) 
+		    { 
+		        my $rm_cmd = "rm ".$clean_up_file; 
+		        system($rm_cmd) == 0 || print "Cannot perform $rm_cmd \n"; 
+		    } 
+	        }#end of if sequence exists (Blat mapping)
+	        else
+	        {
+		    #no sequence column exists, see if a locus tag/aliases column exists
+		    #create mapping platform_id -> feature_id
+		    my $genome_synonyms_lookup_ref;  #key Genome ID ->{synonym->{featureIDS->[external Synonym DB IDs]}
+                                           		    #                 'feature_coverage_percentage'->number} 
+                    my %genomes_to_be_processed;
+                    foreach my $genome_id (keys(%genome_ids_hash))
+                    { 
+                        if ($genome_ids_hash{$genome_id} == 1)
+                        {
+                            $genomes_to_be_processed{$genome_id} = 1;
+			}
+                    } 
+                    ($genome_synonyms_lookup_ref) = create_genome_synonyms_lookup(\%genomes_to_be_processed);
+		    #%genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}  
+		    my ($temp_hash_ref,$warnings_arr_ref, $errors_arr_ref) = parse_platform_synonyms(\@platform_map_lines,$genome_synonyms_lookup_ref);
+		    %genome_probe_to_feature_id_hash = %{$temp_hash_ref};
+		    my %represented_genome_ids;  #keep track of genomes that passed.  May have errors with other genomes to report warnings on.
+		    foreach my $test_genome_id (keys(%{$genome_synonyms_lookup_ref}))
 		    {
-			foreach my $temp_error (@{$errors_arr_ref}) 
-			{
-			    if ($temp_error =~ /\Q$genome_id \E/) 
-			    { 
-				push(@{$platform_hash{$gplID}->{"warnings"}},"ERROR for Platform $gplID and genome $genome_id : ". 
-				     $temp_error);
-			    }
-			} 
+		        if (!(exists($genome_probe_to_feature_id_hash{$test_genome_id})))
+                        {
+                            $platform_hash{$gplID}->{"genomesMappingMethod"}->{$test_genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
+			}
+                        else
+                        {
+                            my %probe_to_feature_hash = %{$genome_probe_to_feature_id_hash{$test_genome_id}};
+                            if (scalar(keys(%probe_to_feature_hash)) > 
+                                 ($min_number_of_probes_mapped_threshold * (scalar(@platform_map_lines) - 1)))
+                            {  
+                                $platform_hash{$gplID}->{"genomesMappingMethod"}->{$test_genome_id}="Platform External IDs Translated";
+		                $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$test_genome_id} =  \%probe_to_feature_hash;
+                                my $genome_number = $test_genome_id;
+                                $genome_number =~ s/kb\|//;
+                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+                                make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);   
+		            }
+                            else
+                            {
+                                $platform_hash{$gplID}->{"genomesMappingMethod"}->{$test_genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
+                            }
+                        }
 		    }
-		}
-		if ($passed_synonyms_mapping == 1) 
-		{
-		    $platform_hash{$gplID}->{"mapping_method"}="Platform External IDs Translation";
-		    $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id} = \%genome_probe_to_feature_id_hash; 
-		}
-		else
-		{
-		    $platform_hash{$gplID}->{"mapping_method"}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";
-		    push(@{$platform_hash{$gplID}->{"errors"}},"UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS");        
-		}
-	    }
-	}
-    }
-    #ADD ALL SORTS OF MAPPING (by sequence or gene aliases) OF PROBES TO FEATURES LOGIC IN HERE
+	        }#end if probe sequences/ else do synonym lookup
+            }#end need to do new mappings
+	}#end looping through tax_ids
+        my $gpl_out_file = "/mnt/platform_genome_mapping_files/".$gplID; 
+        open(GPL_OUT_FILE, ">".$gpl_out_file) or die "Unable to make $gpl_out_file \n";
+        foreach my $mapping_genome_id (keys(%{$platform_hash{$gplID}->{"genomesMappingMethod"}}))
+        {
+            print GPL_OUT_FILE $mapping_genome_id . "\t" . $platform_hash{$gplID}->{"genomesMappingMethod"}->{$mapping_genome_id} . "\n";
+        }
+        close(GPL_OUT_FILE);
+    }#end meta data check
     #PLATFORM TABLE is located in @lines[$platform_table_start..(scalar(@lines))]
     #Will populate the     $platform_hash{$gplID}->{"id_to_feature_mappings"}={id from Platform section mapped to the feature_id};
     #Will populate the     $platform_hash{$gplID}->{"mapping_approach"}=text "sequence" or "alias";
@@ -942,6 +1025,7 @@ sub parse_gse_sample_portion
 {
     my $metaDataOnly = shift;
     my $platform_hash_ref = shift;
+    my %platform_hash = %{$platform_hash_ref};
     my $platform_tax_genome_probe_feature_hash_ref = shift;
     my $lines_array_ref = shift;
     my @lines = @{$lines_array_ref};
@@ -968,8 +1052,6 @@ sub parse_gse_sample_portion
 
     my $sample_table_start = undef;
     my $sample_line_counter = 0;
-
-    #print "\nPARSE_GSE_SAMPLE_PORTION Platform hash : ". Dumper($platform_hash_ref)."\n";
 
     foreach my $line (@lines)
     { 
@@ -1172,17 +1254,18 @@ sub parse_gse_sample_portion
                                                "contactLastName" => $gsm_contact_last_name, 
                                                "contactInstitution" => $gsm_contact_institution}); 
     $gsm_hash{$gsm_id}->{"contactPeople"}=\%contact_hash; 
-
-
+    $gsm_hash{$gsm_id}->{"gsmOntologies"}=[];  
+    my $platform_passed = 0;
     #GET Platform Info (propogate platfrom warnings and errors)
-    my $platform_passed = 1;
     if(!(defined($gpl_id)))
     {
-        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The sample does not have a platform");
+#        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The sample does not have a platform");
+        push(@{$gsm_hash{$gsm_id}->{"errors"}},"The sample does not have a platform");
     }
-    elsif(!defined($platform_hash_ref->{$gpl_id}))
+    elsif(!defined($platform_hash{$gpl_id}))
     {
-        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The platform $gpl_id was not found in the platform hash");
+#        push(@{$gsm_hash{$gsm_id}->{"warnings"}},"The platform $gpl_id was not found in the platform hash");
+        push(@{$gsm_hash{$gsm_id}->{"errors"}},"The platform $gpl_id was not found in the platform hash");
     }
     else
     {
@@ -1198,15 +1281,33 @@ sub parse_gse_sample_portion
 		}
 	    }
 	}
-	my %gpl_hash = ("gplID" => $gpl_id,
-		     "gplTitle" => $platform_hash_ref->{$gpl_id}->{"gplTitle"},
-		     "gplTaxID" => $platform_hash_ref->{$gpl_id}->{"gplTaxID"},
-		     "gplTechnology" => $platform_hash_ref->{$gpl_id}->{"gplTechnology"},
-		     "gplOrganism" => $platform_hash_ref->{$gpl_id}->{"gplOrganism"});
-	$gsm_hash{$gsm_id}->{"gsmPlatform"}=\%gpl_hash;
-	$gsm_hash{$gsm_id}->{"gsmFeatureMappingApproach"} = $platform_hash_ref->{$gpl_id}->{"mapping_method"};
-    }
 
+	my %gpl_hash = ("gplID" => $gpl_id,
+		     "gplTitle" => $platform_hash{$gpl_id}->{"gplTitle"},
+		     "gplTaxID" => $platform_hash{$gpl_id}->{"gplTaxID"},
+		     "gplTechnology" => $platform_hash{$gpl_id}->{"gplTechnology"},
+		     "gplOrganism" => $platform_hash{$gpl_id}->{"gplOrganism"},
+                     "genomesMappingMethod" => $platform_hash{$gpl_id}->{"genomesMappingMethod"},
+                     );
+
+	$gsm_hash{$gsm_id}{"gsmPlatform"}=\%gpl_hash;
+
+        foreach my $temp_genome_id (keys(%{$gpl_hash{"genomesMappingMethod"}}))
+        {
+            if ($gpl_hash{"genomesMappingMethod"}{$temp_genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS")
+            {
+                $platform_passed = 1;
+            }
+        }
+        if (($platform_passed == 0) && ($metaDataOnly eq '0'))
+        {
+	    push(@{$gsm_hash{$gsm_id}->{"errors"}},"None of the Genomes were able to be mapped to this platform.");
+        }
+#        if (scalar(@{$gpl_hash{"errors"}} > 0))
+#        {
+#            push(@{$gsm_hash{$gsm_id}->{"errors"}},@{$gpl_hash{"errors"}});
+#        }
+    }
 
     #PARSE GEO SAMPLE DATA
     #print "\nAT PARSE GEO SAMPLE DATA \n";
@@ -1220,10 +1321,19 @@ sub parse_gse_sample_portion
 	my @sample_data_lines = @lines[$sample_table_start..(scalar(@lines)-2)];
 
 	my $genome_probe_feature_hash_ref = $platform_tax_genome_probe_feature_hash_ref->{$gpl_id}->{$gsm_tax_id};
-        #print "GENOME PROBE FEATURE HASH : ".Dumper($genome_probe_feature_hash_ref);
         my ($gsm_data_hash_ref,$gsm_value_type,$temp_gsm_value_errors_ref) = 
 	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,\@sample_data_lines);
-
+        foreach my $temp_genome_id (keys(%{$gsm_data_hash_ref}))
+        {
+            if ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "Probe Sequences Blat Resolved")
+            {
+                $gsm_data_hash_ref->{temp_genome_id}->{"dataQualityLevel"}=2;
+            }
+            elsif ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "Platform External IDs Translated")
+            {
+                $gsm_data_hash_ref->{temp_genome_id}->{"dataQualityLevel"}=3;
+            }
+        }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
 	$gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type;	
         push(@{$gsm_hash{$gsm_id}->{"errors"}},@{$temp_gsm_value_errors_ref});
@@ -1310,6 +1420,7 @@ sub parse_sample_data
 #ONLY HERE DUE TO PROBLEM WITH TEST FILE
 #$gsm_treatment="intensity";
 #$gsm_value_multiplier = "log2";
+#########################
 
     my $id_ref_row_index = undef;
     my $value_row_index = undef;
@@ -1331,6 +1442,7 @@ sub parse_sample_data
     #print "\n\nGenome Probe Feature Hash : ". Dumper(\%genome_probe_feature_hash) ;
 
     #Calculate data for all genomes 
+    my $has_good_data_set = 0;
     foreach my $genome_id (keys(%genome_probe_feature_hash))
     {
 	my %feature_id_data_hash; 
@@ -1428,6 +1540,7 @@ sub parse_sample_data
 	}
 	else
 	{
+            $has_good_data_set = 1;
 	    #Data looks good go ahead and determine the values
 	    my @feature_intensity_means;
 	    foreach my $temp_feature_id (keys(%feature_id_data_hash))
@@ -1476,6 +1589,10 @@ sub parse_sample_data
 		    $gsm_data_hash{$genome_id}->{"features"}->{$temp_feature_id}->{"mean"} - $original_log2_median; 
 	    }
 	}
+    }
+    if ($has_good_data_set == 0)
+    {
+        push(@errors,"None of the Genomes had data that passed the data sanity checks."); 
     }
     return (\%gsm_data_hash,$gsm_value_type,\@errors);
 }
@@ -1731,18 +1848,6 @@ sub get_GEO_GSE_data
 			$platform_tax_genome_probe_feature_hash{$temp_gpl_id}=$temp_plt_tax_genome_probe_feat_hash_ref->{$temp_gpl_id};
 		    }
 		}
-		foreach my $temp_gpl_id (keys(%platform_hash))
-		{
-#
-#
-#THIS ERROR CHECK IS WRONG NEEDS TO BE FIXED
-#PROCESSED CHECK
-#
-		    if ($platform_hash{$temp_gpl_id}->{"processed"} == 0)
-		    {
-			push(@{$gseObject->{"gseErrors"}},"GEO Platform $temp_gpl_id was not able to processed");
-		    }
-		}
 	    }
             if ($gse_line =~ m/^\^SAMPLE = /)
             { 
@@ -1759,7 +1864,7 @@ sub get_GEO_GSE_data
                 $looking_for_start = 1; 
             } 
             $line_count++; 
-        } 
+        }
         if($looking_for_start == 0) 
         { 
             push(@sample_end_lines,($line_count-1));
@@ -1778,10 +1883,17 @@ sub get_GEO_GSE_data
 	    for (my $sample_counter = 0; $sample_counter < scalar(@sample_start_lines); $sample_counter++) 
 	    { 
 		my @gse_sample_lines = @gse_lines[$sample_start_lines[$sample_counter]..$sample_end_lines[$sample_counter]]; 
-		my %sample_hash = %{parse_gse_sample_portion($metaDataOnly,\%platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines)}; 
-		my ($gsm_id) = keys(%sample_hash);
-		$gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash{$gsm_id};
-		my @sample_errors = @{$sample_hash{$gsm_id}->{"errors"}};
+                #print "\n\n\n\n\n\n\n\n\n\n\n\nGSE SAMPLE LINES : \n".Dumper(\@gse_sample_lines);
+                my %copy_platform_hash = %platform_hash;
+		my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines); 
+		my ($gsm_id) = keys(%{$sample_hash_ref});
+		$gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash_ref->{$gsm_id};
+
+		my @sample_errors;
+                if(defined($sample_hash_ref->{$gsm_id}->{"errors"}))
+		{
+                    @sample_errors = @{$sample_hash_ref->{$gsm_id}->{"errors"}};
+                }
 		if (scalar(@sample_errors) == 0)
 		{
 		    $has_passing_gsm = 1;
@@ -1808,6 +1920,7 @@ sub get_GEO_GSE_data
 							       method_name => 'get_GEO_GSE');
     }
     return($gseObject);
+#    return({});
 }#End get_GEO_GSE_data
 
 
@@ -1834,5 +1947,52 @@ sub get_gse_records_from_gds_list
     @gse_records = (sort { $gse_records_hash{$a} <=> $gse_records_hash{$b} } keys(%gse_records_hash));
     close(GDS);
     return \@gse_records;
+}
+
+
+sub get_gse_records_from_gse_list
+{
+    my $self = shift;
+    my $gds_file = shift;
+    open (GDS,$gds_file) or die "Unable to open the gds file : $gds_file.\n\n"; 
+    my @gds_list_lines = <GDS>;
+ 
+    my @gse_records;
+    my %gse_records_hash;
+    foreach my $gds_list_line (@gds_list_lines) 
+    {
+        if ($gds_list_line =~ /^Series/) 
+        { 
+	    $_ = $gds_list_line;
+            my @word_array = m/(\w+)/g;
+            foreach my $word (@word_array)
+            {
+                if ($word =~ /GSE\d+/)
+                {
+                    my $gse_number = $word;
+                    $gse_number =~ s/GSE//; 
+                    $gse_records_hash{$word}=$gse_number;
+                }
+            } 
+        } 
+    }
+    @gse_records = (sort { $gse_records_hash{$a} <=> $gse_records_hash{$b} } keys(%gse_records_hash));
+    close(GDS);
+    return \@gse_records;
+}
+
+
+sub make_gpl_genome_file
+{
+    my ($gpl_genome_file,$probe_feature_hash_ref) = @_;
+    my %probe_feature_hash = %{$probe_feature_hash_ref};
+    
+    open(FILE, ">".$gpl_genome_file) or die "Unable to make $gpl_genome_file \n"; 
+    
+    foreach my $probe_id (keys(%probe_feature_hash))
+    {
+        print FILE $probe_id . "\t" . $probe_feature_hash{$probe_id}."\n";
+    }
+    close(FILE)
 }
 1;
