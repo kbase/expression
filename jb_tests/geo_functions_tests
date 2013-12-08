@@ -13,7 +13,14 @@ my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',0);
 
 #MORGAN'S FILE
-my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',0);
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',1);
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',0);
+
+
+#ROSS'S FILE
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE27219',1);
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE27219',0);
+
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE10039',1);
 #GSE100039 good for all failures test
 
@@ -21,7 +28,23 @@ my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',0);
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE10247',1);
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE13641',1);
 
+#BOVINE NO GENOME TEST
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE21782');
+
+my $gseObject = $functionsForGEO->get_gse_records_from_gse_list('ecoli_gses.txt');
+
+
+
 print "GSE OBJECT ". Dumper($gseObject);
+
+
+#print "\n\n3GSE_GSM782755 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782755'}->{'gsmPlatform'})."\n\n";
+#print "\n\n3GSE_GSM782756 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782756'}->{'gsmPlatform'})."\n\n";
+#print "\n\n3GSE_GSM782757 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782757'}->{'gsmPlatform'})."\n\n";
+#print "\n\n3GSE_GSM782758 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782758'}->{'gsmPlatform'})."\n\n";
+#print "\n\n3GSE_GSM782759 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782759'}->{'gsmPlatform'})."\n\n";
+#print "\n\n3GSE_GSM782760 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782760'}->{'gsmPlatform'})."\n\n";
+
 
 
 #my $blat_results_file = '/kb/dev_container/modules/expression/blat_files/GPL14177_g.20848_blat_results.psl';
