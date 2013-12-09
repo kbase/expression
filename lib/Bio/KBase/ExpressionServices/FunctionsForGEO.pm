@@ -1327,11 +1327,11 @@ sub parse_gse_sample_portion
         {
             if ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "Probe Sequences Blat Resolved")
             {
-                $gsm_data_hash_ref->{temp_genome_id}->{"dataQualityLevel"}=2;
+                $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=2;
             }
             elsif ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "Platform External IDs Translated")
             {
-                $gsm_data_hash_ref->{temp_genome_id}->{"dataQualityLevel"}=3;
+                $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=3;
             }
         }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
