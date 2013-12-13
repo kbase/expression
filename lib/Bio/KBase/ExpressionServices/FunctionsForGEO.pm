@@ -302,13 +302,13 @@ sub parse_gse_platform_portion
 
     unless(defined($gplTaxID))
     {
-	push(@{$platform_hash{$gplID}->{"warnings"}},"The platform has no taxID");
+	push(@{$platform_hash{$gplID}->{"errors"}},"The platform has no taxID");
     } 
     $platform_hash{$gplID}->{"gplTaxID"}=$gplTaxID;
 
     unless(defined($gplOrganism)) 
     { 
-        push(@{$platform_hash{$gplID}->{"warnings"}},"The platform has no listed organism");
+        push(@{$platform_hash{$gplID}->{"errors"}},"The platform has no listed organism");
     } 
     $platform_hash{$gplID}->{"gplOrganism"}=$gplOrganism;
     
@@ -993,7 +993,8 @@ sub parse_gse_sample_info_for_platform
     my $gsm_id = undef;
     my %gsm_platform_info_hash; #Hash that has GSMID as key (or "ALL_GSMS" as single key) -> {"organism"=>value,          
                                 #                                                             "taxID"=>value,      
-                                #                                                             "platform"=>GPLID}       
+                                #                                                             "platform"=>GPLID,
+                                #                                                             "error"=>value}       
     foreach my $line (@lines) 
     {
         if ($line =~ m/^\^SAMPLE = /)
@@ -1008,6 +1009,10 @@ sub parse_gse_sample_info_for_platform
         } 
         if ($line =~ m/^\!Sample_organism_ch1 = /)
         { 
+	    if (exists($gsm_platform_info_hash{$gsm_id}->{"organism"}))
+	    {
+		$gsm_platform_info_hash{$gsm_id}->{"error"} = "More than one organism for channel 1 for this GSM"; 
+	    }
             my @temp_arr = split(/\s*=\s*/,$line);
             $gsm_platform_info_hash{$gsm_id}->{"organism"} = trim($temp_arr[1]); 
         }
@@ -1887,9 +1892,12 @@ sub get_GEO_GSE_data
                 my %copy_platform_hash = %platform_hash;
 		my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines); 
 		my ($gsm_id) = keys(%{$sample_hash_ref});
-		$gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash_ref->{$gsm_id};
 
 		my @sample_errors;
+		if(exists($gsm_platform_info_hash{$gsm_id}{"error"}))
+		{
+		    push(@{$sample_hash_ref->{$gsm_id}->{"errors"}},$gsm_platform_info_hash{$gsm_id}{"error"});
+		}
                 if(defined($sample_hash_ref->{$gsm_id}->{"errors"}))
 		{
                     @sample_errors = @{$sample_hash_ref->{$gsm_id}->{"errors"}};
@@ -1898,6 +1906,7 @@ sub get_GEO_GSE_data
 		{
 		    $has_passing_gsm = 1;
 		}
+		$gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash_ref->{$gsm_id};
 		delete $listed_gsm_hash_ref->{$gsm_id};
 	    } 
 	    foreach my $not_parsed_gsm (keys(%{$listed_gsm_hash_ref}))

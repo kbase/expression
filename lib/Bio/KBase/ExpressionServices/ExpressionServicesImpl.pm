@@ -1,4 +1,4 @@
-package Bio::KBase::ExpressionServices::ExpressionServicesImpl;
+package ExpressionServicesImpl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
@@ -301,7 +301,7 @@ sub get_expression_samples_data
 							       method_name => 'get_expression_samples_data');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($expression_data_samples_map);
     #BEGIN get_expression_samples_data
     $expression_data_samples_map = {};
@@ -565,7 +565,7 @@ sub get_expression_data_by_samples_and_features
 							       method_name => 'get_expression_data_by_samples_and_features');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($label_data_mapping);
     #BEGIN get_expression_data_by_samples_and_features
     $label_data_mapping = {};
@@ -790,7 +790,7 @@ sub get_expression_samples_data_by_series_ids
 							       method_name => 'get_expression_samples_data_by_series_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($series_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_series_ids
     $series_expression_data_samples_mapping = {};
@@ -911,7 +911,7 @@ sub get_expression_sample_ids_by_series_ids
 							       method_name => 'get_expression_sample_ids_by_series_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_series_ids
     if (0 == @{$series_ids}) 
@@ -1133,7 +1133,7 @@ sub get_expression_samples_data_by_experimental_unit_ids
 							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($experimental_unit_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_experimental_unit_ids
     $experimental_unit_expression_data_samples_mapping = {};
@@ -1256,7 +1256,7 @@ sub get_expression_sample_ids_by_experimental_unit_ids
 							       method_name => 'get_expression_sample_ids_by_experimental_unit_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_experimental_unit_ids
     $sample_ids = [];
@@ -1477,7 +1477,7 @@ sub get_expression_samples_data_by_experiment_meta_ids
 							       method_name => 'get_expression_samples_data_by_experiment_meta_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($experiment_meta_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_experiment_meta_ids
     $experiment_meta_expression_data_samples_mapping = {}; 
@@ -1596,7 +1596,7 @@ sub get_expression_sample_ids_by_experiment_meta_ids
 							       method_name => 'get_expression_sample_ids_by_experiment_meta_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_experiment_meta_ids
     $sample_ids = [];
@@ -1822,7 +1822,7 @@ sub get_expression_samples_data_by_strain_ids
 							       method_name => 'get_expression_samples_data_by_strain_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($strain_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_strain_ids
     $strain_expression_data_samples_mapping = {};
@@ -1965,7 +1965,7 @@ sub get_expression_sample_ids_by_strain_ids
 							       method_name => 'get_expression_sample_ids_by_strain_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_strain_ids
     $sample_ids = [];
@@ -2218,7 +2218,7 @@ sub get_expression_samples_data_by_genome_ids
 							       method_name => 'get_expression_samples_data_by_genome_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($genome_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_genome_ids
     $genome_expression_data_samples_mapping = {};
@@ -2376,7 +2376,7 @@ sub get_expression_sample_ids_by_genome_ids
 							       method_name => 'get_expression_sample_ids_by_genome_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_genome_ids
     $sample_ids = [];
@@ -2640,7 +2640,7 @@ sub get_expression_samples_data_by_ontology_ids
 							       method_name => 'get_expression_samples_data_by_ontology_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($ontology_expression_data_sample_mapping);
     #BEGIN get_expression_samples_data_by_ontology_ids
     $ontology_expression_data_sample_mapping = {}; 
@@ -2862,7 +2862,7 @@ sub get_expression_sample_ids_by_ontology_ids
 							       method_name => 'get_expression_sample_ids_by_ontology_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_ontology_ids
     $sample_ids = [];
@@ -3057,7 +3057,7 @@ sub get_expression_data_by_feature_ids
 							       method_name => 'get_expression_data_by_feature_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($feature_sample_measurement_mapping);
     #BEGIN get_expression_data_by_feature_ids
     $feature_sample_measurement_mapping = {};
@@ -3206,7 +3206,7 @@ sub compare_samples
 							       method_name => 'compare_samples');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_comparison_mapping);
     #BEGIN compare_samples
     $sample_comparison_mapping = {};
@@ -3385,7 +3385,7 @@ sub compare_samples_vs_default_controls
 							       method_name => 'compare_samples_vs_default_controls');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_comparison_mapping);
     #BEGIN compare_samples_vs_default_controls
     $sample_comparison_mapping = {};
@@ -3531,7 +3531,7 @@ sub compare_samples_vs_the_average
 							       method_name => 'compare_samples_vs_the_average');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_comparison_mapping);
     #BEGIN compare_samples_vs_the_average
     if((scalar(@{$numerator_sample_ids}) == 0) || (scalar(@{$denominator_sample_ids}) == 0))
@@ -3673,7 +3673,7 @@ sub get_on_off_calls
 							       method_name => 'get_on_off_calls');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($on_off_mappings);
     #BEGIN get_on_off_calls
     if (scalar(keys(%{$sample_comparison_mapping})) == 0)
@@ -3819,7 +3819,7 @@ sub get_top_changers
 							       method_name => 'get_top_changers');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($top_changers_mappings);
     #BEGIN get_top_changers
     if (scalar(keys(%{$sample_comparison_mapping})) == 0) 
@@ -3948,7 +3948,7 @@ sub get_expression_samples_titles
 							       method_name => 'get_expression_samples_titles');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($samples_titles_map);
     #BEGIN get_expression_samples_titles
     $samples_titles_map = {}; 
@@ -4040,7 +4040,7 @@ sub get_expression_samples_descriptions
 							       method_name => 'get_expression_samples_descriptions');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($samples_descriptions_map);
     #BEGIN get_expression_samples_descriptions
     $samples_descriptions_map = {}; 
@@ -4132,7 +4132,7 @@ sub get_expression_samples_molecules
 							       method_name => 'get_expression_samples_molecules');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($samples_molecules_map);
     #BEGIN get_expression_samples_molecules
     $samples_molecules_map = {}; 
@@ -4224,7 +4224,7 @@ sub get_expression_samples_types
 							       method_name => 'get_expression_samples_types');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($samples_types_map);
     #BEGIN get_expression_samples_types
     $samples_types_map = {}; 
@@ -4316,7 +4316,7 @@ sub get_expression_samples_external_source_ids
 							       method_name => 'get_expression_samples_external_source_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($samples_external_source_id_map);
     #BEGIN get_expression_samples_external_source_ids
     $samples_external_source_id_map = {}; 
@@ -4408,7 +4408,7 @@ sub get_expression_samples_original_log2_medians
 							       method_name => 'get_expression_samples_original_log2_medians');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($samples_float_map);
     #BEGIN get_expression_samples_original_log2_medians
     $samples_float_map = {}; 
@@ -4501,7 +4501,7 @@ sub get_expression_series_titles
 							       method_name => 'get_expression_series_titles');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_titles
     $series_string_map = {}; 
@@ -4593,7 +4593,7 @@ sub get_expression_series_summaries
 							       method_name => 'get_expression_series_summaries');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_summaries
     $series_string_map = {}; 
@@ -4685,7 +4685,7 @@ sub get_expression_series_designs
 							       method_name => 'get_expression_series_designs');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_designs
     $series_string_map = {}; 
@@ -4777,7 +4777,7 @@ sub get_expression_series_external_source_ids
 							       method_name => 'get_expression_series_external_source_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_external_source_ids
     $series_string_map = {}; 
@@ -4871,7 +4871,7 @@ sub get_expression_sample_ids_by_sample_external_source_ids
 							       method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_sample_external_source_ids
     $sample_ids = []; 
@@ -4966,7 +4966,7 @@ sub get_expression_sample_ids_by_platform_external_source_ids
 							       method_name => 'get_expression_sample_ids_by_platform_external_source_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_platform_external_source_ids
     $sample_ids = []; 
@@ -5062,7 +5062,7 @@ sub get_expression_series_ids_by_series_external_source_ids
 							       method_name => 'get_expression_series_ids_by_series_external_source_ids');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($series_ids);
     #BEGIN get_expression_series_ids_by_series_external_source_ids
     $series_ids = []; 
@@ -5135,11 +5135,11 @@ GsmObject is a reference to a hash where the following keys are defined:
 	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
 	gsm_protocol has a value which is a string
 	gsm_value_type has a value which is a string
-	gsm_original_log2_median has a value which is a float
 	gsm_platform has a value which is an ExpressionServices.GPL
 	gsm_contact_people has a value which is an ExpressionServices.contact_people
 	gsm_data has a value which is an ExpressionServices.gsm_data
 	gsm_feature_mapping_approach has a value which is a string
+	ontology_ids has a value which is an ExpressionServices.ontology_ids
 	gsm_warning has a value which is an ExpressionServices.gsm_warnings
 	gsm_errors has a value which is an ExpressionServices.gsm_errors
 gsm_sample_characteristics is a reference to a list where each element is a string
@@ -5158,7 +5158,16 @@ ContactPerson is a reference to a hash where the following keys are defined:
 contact_first_name is a string
 contact_last_name is a string
 contact_institution is a string
-gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+gsm_data is a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.GenomeDataGSM
+genome_id is a string
+GenomeDataGSM is a reference to a hash where the following keys are defined:
+	warnings has a value which is an ExpressionServices.gsm_data_warnings
+	errors has a value which is an ExpressionServices.gsm_data_errors
+	features has a value which is an ExpressionServices.gsm_data_set
+	originalLog2Median has a value which is a float
+gsm_data_warnings is a reference to a list where each element is a string
+gsm_data_errors is a reference to a list where each element is a string
+gsm_data_set is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
 feature_id is a string
 FullMeasurement is a reference to a hash where the following keys are defined:
 	value has a value which is a float
@@ -5168,6 +5177,8 @@ FullMeasurement is a reference to a hash where the following keys are defined:
 	p_value has a value which is a float
 	median has a value which is a float
 	mean has a value which is a float
+ontology_ids is a reference to a list where each element is an ExpressionServices.ontology_id
+ontology_id is a string
 gsm_warnings is a reference to a list where each element is a string
 gsm_errors is a reference to a list where each element is a string
 gse_warnings is a reference to a list where each element is a string
@@ -5203,11 +5214,11 @@ GsmObject is a reference to a hash where the following keys are defined:
 	gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
 	gsm_protocol has a value which is a string
 	gsm_value_type has a value which is a string
-	gsm_original_log2_median has a value which is a float
 	gsm_platform has a value which is an ExpressionServices.GPL
 	gsm_contact_people has a value which is an ExpressionServices.contact_people
 	gsm_data has a value which is an ExpressionServices.gsm_data
 	gsm_feature_mapping_approach has a value which is a string
+	ontology_ids has a value which is an ExpressionServices.ontology_ids
 	gsm_warning has a value which is an ExpressionServices.gsm_warnings
 	gsm_errors has a value which is an ExpressionServices.gsm_errors
 gsm_sample_characteristics is a reference to a list where each element is a string
@@ -5226,7 +5237,16 @@ ContactPerson is a reference to a hash where the following keys are defined:
 contact_first_name is a string
 contact_last_name is a string
 contact_institution is a string
-gsm_data is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+gsm_data is a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.GenomeDataGSM
+genome_id is a string
+GenomeDataGSM is a reference to a hash where the following keys are defined:
+	warnings has a value which is an ExpressionServices.gsm_data_warnings
+	errors has a value which is an ExpressionServices.gsm_data_errors
+	features has a value which is an ExpressionServices.gsm_data_set
+	originalLog2Median has a value which is a float
+gsm_data_warnings is a reference to a list where each element is a string
+gsm_data_errors is a reference to a list where each element is a string
+gsm_data_set is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
 feature_id is a string
 FullMeasurement is a reference to a hash where the following keys are defined:
 	value has a value which is a float
@@ -5236,6 +5256,8 @@ FullMeasurement is a reference to a hash where the following keys are defined:
 	p_value has a value which is a float
 	median has a value which is a float
 	mean has a value which is a float
+ontology_ids is a reference to a list where each element is an ExpressionServices.ontology_id
+ontology_id is a string
 gsm_warnings is a reference to a list where each element is a string
 gsm_errors is a reference to a list where each element is a string
 gse_warnings is a reference to a list where each element is a string
@@ -5248,7 +5270,7 @@ gse_errors is a reference to a list where each element is a string
 
 =item Description
 
-given a GEO GSE ID, it will return a complex data structure to be put into the upload tab files
+given a GEO GSE ID, it will return a complex data structure to be put int the upload tab files
 
 =back
 
@@ -5267,7 +5289,7 @@ sub get_GEO_GSE
 							       method_name => 'get_GEO_GSE');
     }
 
-    my $ctx = $Bio::KBase::ExpressionServices::Service::CallContext;
+    my $ctx = $ExpressionServicesServer::CallContext;
     my($gseObject);
     #BEGIN get_GEO_GSE
     $gseObject ={};
@@ -5284,6 +5306,659 @@ sub get_GEO_GSE
 							       method_name => 'get_GEO_GSE');
     }
     return($gseObject);
+}
+
+
+
+
+=head2 get_expression_platform
+
+  $expression_platform = $obj->get_expression_platform($kb_platform_id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$kb_platform_id is a string
+$expression_platform is an ExpressionServices.ExpressionPlatform
+ExpressionPlatform is a reference to a hash where the following keys are defined:
+	kb_id has a value which is a string
+	source_id has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	strain has a value which is an ExpressionServices.Strain
+	technology has a value which is a string
+	title has a value which is a string
+genome_id is a string
+Strain is a reference to a hash where the following keys are defined:
+	genome_id has a value which is an ExpressionServices.genome_id
+	reference_strain has a value which is a string
+	wild_type has a value which is a string
+	description has a value which is a string
+	name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$kb_platform_id is a string
+$expression_platform is an ExpressionServices.ExpressionPlatform
+ExpressionPlatform is a reference to a hash where the following keys are defined:
+	kb_id has a value which is a string
+	source_id has a value which is a string
+	genome_id has a value which is an ExpressionServices.genome_id
+	strain has a value which is an ExpressionServices.Strain
+	technology has a value which is a string
+	title has a value which is a string
+genome_id is a string
+Strain is a reference to a hash where the following keys are defined:
+	genome_id has a value which is an ExpressionServices.genome_id
+	reference_strain has a value which is a string
+	wild_type has a value which is a string
+	description has a value which is a string
+	name has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Given a KBase Platfrom ID (kb_id) returns an ExpressionPlatform typed object
+
+=back
+
+=cut
+
+sub get_expression_platform
+{
+    my $self = shift;
+    my($kb_platform_id) = @_;
+
+    my @_bad_arguments;
+    (!ref($kb_platform_id)) or push(@_bad_arguments, "Invalid type for argument \"kb_platform_id\" (value was \"$kb_platform_id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_platform:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_platform');
+    }
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_platform);
+    #BEGIN get_expression_platform
+    #END get_expression_platform
+    my @_bad_returns;
+    (ref($expression_platform) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"expression_platform\" (value was \"$expression_platform\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_platform:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_platform');
+    }
+    return($expression_platform);
+}
+
+
+
+
+=head2 get_expression_sample
+
+  $expression_sample = $obj->get_expression_sample($kb_sample_id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$kb_sample_id is a string
+$expression_sample is an ExpressionServices.ExpressionSample
+ExpressionSample is a reference to a hash where the following keys are defined:
+	kb_id has a value which is a string
+	source_id has a value which is a string
+	type has a value which is an ExpressionServices.sample_type
+	numerical_interpretation has a value which is a string
+	description has a value which is a string
+	title has a value which is a string
+	data_quality_level has a value which is an int
+	original_median has a value which is a float
+	external_source_date has a value which is a string
+	expression_levels has a value which is an ExpressionServices.data_expression_levels_for_sample
+	genome_id has a value which is an ExpressionServices.genome_id
+	expression_ontology_terms has a value which is an ExpressionServices.expression_ontology_terms
+	platform_id has a value which is an ExpressionServices.expression_platform_id
+	default_control_sample has a value which is an ExpressionServices.expression_sample_id
+	averaged_from_samples has a value which is an ExpressionServices.expression_sample_ids
+	protocol has a value which is an ExpressionServices.Protocol
+	strain has a value which is an ExpressionServices.Strain
+	persons has a value which is an ExpressionServices.persons
+	molecule has a value which is a string
+	data_source has a value which is a string
+sample_type is a string
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
+genome_id is a string
+expression_ontology_terms is a reference to a list where each element is an ExpressionServices.ExpressionOntologyTerm
+ExpressionOntologyTerm is a reference to a hash where the following keys are defined:
+	expression_ontology_term_id has a value which is a string
+	expression_ontology_term_name has a value which is a string
+	expression_ontology_term_definition has a value which is a string
+expression_platform_id is a string
+expression_sample_id is a string
+expression_sample_ids is a reference to a list where each element is an ExpressionServices.expression_sample_id
+Protocol is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	description has a value which is a string
+Strain is a reference to a hash where the following keys are defined:
+	genome_id has a value which is an ExpressionServices.genome_id
+	reference_strain has a value which is a string
+	wild_type has a value which is a string
+	description has a value which is a string
+	name has a value which is a string
+persons is a reference to a list where each element is an ExpressionServices.Person
+Person is a reference to a hash where the following keys are defined:
+	email has a value which is a string
+	first_name has a value which is a string
+	last_name has a value which is a string
+	institution has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$kb_sample_id is a string
+$expression_sample is an ExpressionServices.ExpressionSample
+ExpressionSample is a reference to a hash where the following keys are defined:
+	kb_id has a value which is a string
+	source_id has a value which is a string
+	type has a value which is an ExpressionServices.sample_type
+	numerical_interpretation has a value which is a string
+	description has a value which is a string
+	title has a value which is a string
+	data_quality_level has a value which is an int
+	original_median has a value which is a float
+	external_source_date has a value which is a string
+	expression_levels has a value which is an ExpressionServices.data_expression_levels_for_sample
+	genome_id has a value which is an ExpressionServices.genome_id
+	expression_ontology_terms has a value which is an ExpressionServices.expression_ontology_terms
+	platform_id has a value which is an ExpressionServices.expression_platform_id
+	default_control_sample has a value which is an ExpressionServices.expression_sample_id
+	averaged_from_samples has a value which is an ExpressionServices.expression_sample_ids
+	protocol has a value which is an ExpressionServices.Protocol
+	strain has a value which is an ExpressionServices.Strain
+	persons has a value which is an ExpressionServices.persons
+	molecule has a value which is a string
+	data_source has a value which is a string
+sample_type is a string
+data_expression_levels_for_sample is a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.measurement
+feature_id is a string
+measurement is a float
+genome_id is a string
+expression_ontology_terms is a reference to a list where each element is an ExpressionServices.ExpressionOntologyTerm
+ExpressionOntologyTerm is a reference to a hash where the following keys are defined:
+	expression_ontology_term_id has a value which is a string
+	expression_ontology_term_name has a value which is a string
+	expression_ontology_term_definition has a value which is a string
+expression_platform_id is a string
+expression_sample_id is a string
+expression_sample_ids is a reference to a list where each element is an ExpressionServices.expression_sample_id
+Protocol is a reference to a hash where the following keys are defined:
+	name has a value which is a string
+	description has a value which is a string
+Strain is a reference to a hash where the following keys are defined:
+	genome_id has a value which is an ExpressionServices.genome_id
+	reference_strain has a value which is a string
+	wild_type has a value which is a string
+	description has a value which is a string
+	name has a value which is a string
+persons is a reference to a list where each element is an ExpressionServices.Person
+Person is a reference to a hash where the following keys are defined:
+	email has a value which is a string
+	first_name has a value which is a string
+	last_name has a value which is a string
+	institution has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+Given a KBase Sample ID (kb_id) returns an ExpressionSample typed object
+
+=back
+
+=cut
+
+sub get_expression_sample
+{
+    my $self = shift;
+    my($kb_sample_id) = @_;
+
+    my @_bad_arguments;
+    (!ref($kb_sample_id)) or push(@_bad_arguments, "Invalid type for argument \"kb_sample_id\" (value was \"$kb_sample_id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_sample:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample');
+    }
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_sample);
+    #BEGIN get_expression_sample
+    #END get_expression_sample
+    my @_bad_returns;
+    (ref($expression_sample) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"expression_sample\" (value was \"$expression_sample\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_sample:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_sample');
+    }
+    return($expression_sample);
+}
+
+
+
+
+=head2 get_expression_series
+
+  $expression_series = $obj->get_expression_series($kb_series_id)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$kb_series_id is a string
+$expression_series is an ExpressionServices.ExpressionSeries
+ExpressionSeries is a reference to a hash where the following keys are defined:
+	kb_id has a value which is a string
+	source_id has a value which is a string
+	expression_sample_ids has a value which is an ExpressionServices.expression_sample_ids
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	publication_id has a value which is a string
+	external_source_date has a value which is a string
+expression_sample_ids is a reference to a list where each element is an ExpressionServices.expression_sample_id
+expression_sample_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$kb_series_id is a string
+$expression_series is an ExpressionServices.ExpressionSeries
+ExpressionSeries is a reference to a hash where the following keys are defined:
+	kb_id has a value which is a string
+	source_id has a value which is a string
+	expression_sample_ids has a value which is an ExpressionServices.expression_sample_ids
+	title has a value which is a string
+	summary has a value which is a string
+	design has a value which is a string
+	publication_id has a value which is a string
+	external_source_date has a value which is a string
+expression_sample_ids is a reference to a list where each element is an ExpressionServices.expression_sample_id
+expression_sample_id is a string
+
+
+=end text
+
+
+
+=item Description
+
+Given a KBase Series ID (kb_id) returns an ExpressionSeries typed object
+
+=back
+
+=cut
+
+sub get_expression_series
+{
+    my $self = shift;
+    my($kb_series_id) = @_;
+
+    my @_bad_arguments;
+    (!ref($kb_series_id)) or push(@_bad_arguments, "Invalid type for argument \"kb_series_id\" (value was \"$kb_series_id\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_series:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series');
+    }
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_series);
+    #BEGIN get_expression_series
+    #END get_expression_series
+    my @_bad_returns;
+    (ref($expression_series) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"expression_series\" (value was \"$expression_series\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_series:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_series');
+    }
+    return($expression_series);
+}
+
+
+
+
+=head2 ws_import_of_expression_typed_object
+
+  $expression_kbase_ids = $obj->ws_import_of_expression_typed_object($workspace_identifying_map, $expression_typed_object, $expression_kbase_ids)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$workspace_identifying_map is an ExpressionServices.workspace_identifying_map
+$expression_typed_object is a string
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+workspace_identifying_map is a reference to a hash where the key is a string and the value is a string
+expression_kbase_ids is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$workspace_identifying_map is an ExpressionServices.workspace_identifying_map
+$expression_typed_object is a string
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+workspace_identifying_map is a reference to a hash where the key is a string and the value is a string
+expression_kbase_ids is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+Given a 1) hash ref(that contain ws_name or ws_id key and value), 
+        2) typed_object type (must be single quoted string of 
+                Must be one of the following : 'ExpressionOntology', 'ExpressionPlatform', 'ExpressionSample' or 'ExpressionSeries' 
+        3) an array ref with a list of kb_ids to be imported.
+
+=back
+
+=cut
+
+sub ws_import_of_expression_typed_object
+{
+    my $self = shift;
+    my($workspace_identifying_map, $expression_typed_object, $expression_kbase_ids) = @_;
+
+    my @_bad_arguments;
+    (ref($workspace_identifying_map) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"workspace_identifying_map\" (value was \"$workspace_identifying_map\")");
+    (!ref($expression_typed_object)) or push(@_bad_arguments, "Invalid type for argument \"expression_typed_object\" (value was \"$expression_typed_object\")");
+    (ref($expression_kbase_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"expression_kbase_ids\" (value was \"$expression_kbase_ids\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to ws_import_of_expression_typed_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'ws_import_of_expression_typed_object');
+    }
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_kbase_ids);
+    #BEGIN ws_import_of_expression_typed_object
+    #END ws_import_of_expression_typed_object
+    my @_bad_returns;
+    (ref($expression_kbase_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"expression_kbase_ids\" (value was \"$expression_kbase_ids\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to ws_import_of_expression_typed_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'ws_import_of_expression_typed_object');
+    }
+    return($expression_kbase_ids);
+}
+
+
+
+
+=head2 get_all_ontology_ids
+
+  $expression_kbase_ids = $obj->get_all_ontology_ids()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+get all the expression ontology ids
+
+=back
+
+=cut
+
+sub get_all_ontology_ids
+{
+    my $self = shift;
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_kbase_ids);
+    #BEGIN get_all_ontology_ids
+    #END get_all_ontology_ids
+    my @_bad_returns;
+    (ref($expression_kbase_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"expression_kbase_ids\" (value was \"$expression_kbase_ids\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_all_ontology_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_all_ontology_ids');
+    }
+    return($expression_kbase_ids);
+}
+
+
+
+
+=head2 get_all_platform_ids
+
+  $expression_kbase_ids = $obj->get_all_platform_ids()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+get all the expression platform ids
+
+=back
+
+=cut
+
+sub get_all_platform_ids
+{
+    my $self = shift;
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_kbase_ids);
+    #BEGIN get_all_platform_ids
+    #END get_all_platform_ids
+    my @_bad_returns;
+    (ref($expression_kbase_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"expression_kbase_ids\" (value was \"$expression_kbase_ids\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_all_platform_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_all_platform_ids');
+    }
+    return($expression_kbase_ids);
+}
+
+
+
+
+=head2 get_all_sample_ids
+
+  $expression_kbase_ids = $obj->get_all_sample_ids()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+get all the expression sample ids
+
+=back
+
+=cut
+
+sub get_all_sample_ids
+{
+    my $self = shift;
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_kbase_ids);
+    #BEGIN get_all_sample_ids
+    #END get_all_sample_ids
+    my @_bad_returns;
+    (ref($expression_kbase_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"expression_kbase_ids\" (value was \"$expression_kbase_ids\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_all_sample_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_all_sample_ids');
+    }
+    return($expression_kbase_ids);
+}
+
+
+
+
+=head2 get_all_series_ids
+
+  $expression_kbase_ids = $obj->get_all_series_ids()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$expression_kbase_ids is an ExpressionServices.expression_kbase_ids
+expression_kbase_ids is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+get all the expression series ids
+
+=back
+
+=cut
+
+sub get_all_series_ids
+{
+    my $self = shift;
+
+    my $ctx = $ExpressionServicesServer::CallContext;
+    my($expression_kbase_ids);
+    #BEGIN get_all_series_ids
+    #END get_all_series_ids
+    my @_bad_returns;
+    (ref($expression_kbase_ids) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"expression_kbase_ids\" (value was \"$expression_kbase_ids\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_all_series_ids:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_all_series_ids');
+    }
+    return($expression_kbase_ids);
 }
 
 
@@ -5336,6 +6011,9 @@ sub version {
 =item Description
 
 KBase Feature ID for a feature, typically CDS/PEG
+@id ws KB.Feature 
+
+"ws" may change to "to" in the future
 
 
 =item Definition
@@ -6331,6 +7009,49 @@ a reference to a list where each element is an ExpressionServices.external_sourc
 
 
 
+=head2 Person
+
+=over 4
+
+
+
+=item Description
+
+Data structure for Person  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+
+##        @searchable ws_subset email last_name institution
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+email has a value which is a string
+first_name has a value which is a string
+last_name has a value which is a string
+institution has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+email has a value which is a string
+first_name has a value which is a string
+last_name has a value which is a string
+institution has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 person_id
 
 =over 4
@@ -6463,7 +7184,10 @@ a reference to a list where each element is an ExpressionServices.strain_id
 
 =item Description
 
-KBase GenomeID
+KBase GenomeID 
+@id ws KB.Genome
+
+"ws" may change to "to" in the future
 
 
 =item Definition
@@ -6876,7 +7600,7 @@ a reference to a hash where the key is an ExpressionServices.ontology_id and the
 
 =item Description
 
-mapping kbase sample id as the key and a single measurement (for a scpecified feature id, one mapping higher) as the value
+mapping kbase sample id as the key and a single measurement (for a specified feature id, one mapping higher) as the value
 
 
 =item Definition
@@ -7214,7 +7938,7 @@ mean has a value which is a float
 
 
 
-=head2 gsm_data
+=head2 gsm_data_set
 
 =over 4
 
@@ -7238,6 +7962,37 @@ a reference to a hash where the key is an ExpressionServices.feature_id and the 
 =begin text
 
 a reference to a hash where the key is an ExpressionServices.feature_id and the value is an ExpressionServices.FullMeasurement
+
+=end text
+
+=back
+
+
+
+=head2 gsm_data_warnings
+
+=over 4
+
+
+
+=item Description
+
+List of GSM Data level warnings
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
 
 =end text
 
@@ -7285,6 +8040,37 @@ a reference to a list where each element is a string
 =item Description
 
 List of GSE level warnings
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 gsm_data_errors
+
+=over 4
+
+
+
+=item Description
+
+List of GSM Data level errors
 
 
 =item Definition
@@ -7400,6 +8186,78 @@ a reference to a list where each element is a string
 
 
 
+=head2 GenomeDataGSM
+
+=over 4
+
+
+
+=item Description
+
+Data structure that has the GSM data, warnings, errors and originalLog2Median for that GSM and Genome ID combination
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+warnings has a value which is an ExpressionServices.gsm_data_warnings
+errors has a value which is an ExpressionServices.gsm_data_errors
+features has a value which is an ExpressionServices.gsm_data_set
+originalLog2Median has a value which is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+warnings has a value which is an ExpressionServices.gsm_data_warnings
+errors has a value which is an ExpressionServices.gsm_data_errors
+features has a value which is an ExpressionServices.gsm_data_set
+originalLog2Median has a value which is a float
+
+
+=end text
+
+=back
+
+
+
+=head2 gsm_data
+
+=over 4
+
+
+
+=item Description
+
+mapping kbase feature id as the key and FullMeasurement Structure as the value
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.GenomeDataGSM
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is an ExpressionServices.genome_id and the value is an ExpressionServices.GenomeDataGSM
+
+=end text
+
+=back
+
+
+
 =head2 GsmObject
 
 =over 4
@@ -7427,11 +8285,11 @@ gsm_sample_organism has a value which is a string
 gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
 gsm_protocol has a value which is a string
 gsm_value_type has a value which is a string
-gsm_original_log2_median has a value which is a float
 gsm_platform has a value which is an ExpressionServices.GPL
 gsm_contact_people has a value which is an ExpressionServices.contact_people
 gsm_data has a value which is an ExpressionServices.gsm_data
 gsm_feature_mapping_approach has a value which is a string
+ontology_ids has a value which is an ExpressionServices.ontology_ids
 gsm_warning has a value which is an ExpressionServices.gsm_warnings
 gsm_errors has a value which is an ExpressionServices.gsm_errors
 
@@ -7452,11 +8310,11 @@ gsm_sample_organism has a value which is a string
 gsm_sample_characteristics has a value which is an ExpressionServices.gsm_sample_characteristics
 gsm_protocol has a value which is a string
 gsm_value_type has a value which is a string
-gsm_original_log2_median has a value which is a float
 gsm_platform has a value which is an ExpressionServices.GPL
 gsm_contact_people has a value which is an ExpressionServices.contact_people
 gsm_data has a value which is an ExpressionServices.gsm_data
 gsm_feature_mapping_approach has a value which is a string
+ontology_ids has a value which is an ExpressionServices.ontology_ids
 gsm_warning has a value which is an ExpressionServices.gsm_warnings
 gsm_errors has a value which is an ExpressionServices.gsm_errors
 
@@ -7573,6 +8431,543 @@ an int
 =begin text
 
 an int
+
+=end text
+
+=back
+
+
+
+=head2 ExpressionOntologyTerm
+
+=over 4
+
+
+
+=item Description
+
+Temporary workspace typed object for ontology.  Should be replaced by a ontology workspace typed object.
+Currently supports EO, PO and ENVO ontology terms.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+expression_ontology_term_id has a value which is a string
+expression_ontology_term_name has a value which is a string
+expression_ontology_term_definition has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+expression_ontology_term_id has a value which is a string
+expression_ontology_term_name has a value which is a string
+expression_ontology_term_definition has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 expression_ontology_terms
+
+=over 4
+
+
+
+=item Description
+
+list of ExpressionsOntologies
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ExpressionServices.ExpressionOntologyTerm
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ExpressionServices.ExpressionOntologyTerm
+
+=end text
+
+=back
+
+
+
+=head2 Strain
+
+=over 4
+
+
+
+=item Description
+
+Data structure for Strain  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+genome_id has a value which is an ExpressionServices.genome_id
+reference_strain has a value which is a string
+wild_type has a value which is a string
+description has a value which is a string
+name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+genome_id has a value which is an ExpressionServices.genome_id
+reference_strain has a value which is a string
+wild_type has a value which is a string
+description has a value which is a string
+name has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExpressionPlatform
+
+=over 4
+
+
+
+=item Description
+
+Data structure for the workspace expression platform.  The ExpressionPlatform typed object.
+source_id defaults to kb_id if not set, but typically referes to a GPL if the data is from GEO.
+
+@optional strain
+
+@searchable ws_subset source_id kb_id genome_id title technology
+@searchable strain.genome_id  strain.reference_strain strain.wild_type
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+kb_id has a value which is a string
+source_id has a value which is a string
+genome_id has a value which is an ExpressionServices.genome_id
+strain has a value which is an ExpressionServices.Strain
+technology has a value which is a string
+title has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+kb_id has a value which is a string
+source_id has a value which is a string
+genome_id has a value which is an ExpressionServices.genome_id
+strain has a value which is an ExpressionServices.Strain
+technology has a value which is a string
+title has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 expression_platform_id
+
+=over 4
+
+
+
+=item Description
+
+kb_id for the expression platform
+
+@id ws ExpressionServices.ExpressionPlatform
+
+"ws" may go to "to" in the future
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 Protocol
+
+=over 4
+
+
+
+=item Description
+
+Data structure for Protocol  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 expression_sample_id
+
+=over 4
+
+
+
+=item Description
+
+kb_id for the expression sample
+
+@id ws ExpressionServices.ExpressionSample
+
+"ws" may go to "to" in the future
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 expression_sample_ids
+
+=over 4
+
+
+
+=item Description
+
+list of expression sample ids
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ExpressionServices.expression_sample_id
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ExpressionServices.expression_sample_id
+
+=end text
+
+=back
+
+
+
+=head2 persons
+
+=over 4
+
+
+
+=item Description
+
+list of Persons
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ExpressionServices.Person
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ExpressionServices.Person
+
+=end text
+
+=back
+
+
+
+=head2 ExpressionSample
+
+=over 4
+
+
+
+=item Description
+
+Data structure for the workspace expression sample.  The Expression Sample typed object.
+
+protocol, persons and strain should need to eventually have common ws objects.  I will make expression ones for now.
+
+we may need a link to experimentMetaID later.
+
+@optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
+@optional averaged_from_samples protocol strain persons molecule data_source
+
+@searchable kb_id source_id type data_quality_level genome_id strain_id platform_id description title data_source keys_of(expression_levels) 
+@searchable persons.[*].email persons.[*].last_name persons.[*].institution  
+@searchable strain.genome_id strain.reference_strain strain.wild_type          
+@searchable protocol.name protocol.description 
+@searchable expression_ontology_terms.[*].expression_ontology_term_id expression_ontology_terms.[*].expression_ontology_term_name
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+kb_id has a value which is a string
+source_id has a value which is a string
+type has a value which is an ExpressionServices.sample_type
+numerical_interpretation has a value which is a string
+description has a value which is a string
+title has a value which is a string
+data_quality_level has a value which is an int
+original_median has a value which is a float
+external_source_date has a value which is a string
+expression_levels has a value which is an ExpressionServices.data_expression_levels_for_sample
+genome_id has a value which is an ExpressionServices.genome_id
+expression_ontology_terms has a value which is an ExpressionServices.expression_ontology_terms
+platform_id has a value which is an ExpressionServices.expression_platform_id
+default_control_sample has a value which is an ExpressionServices.expression_sample_id
+averaged_from_samples has a value which is an ExpressionServices.expression_sample_ids
+protocol has a value which is an ExpressionServices.Protocol
+strain has a value which is an ExpressionServices.Strain
+persons has a value which is an ExpressionServices.persons
+molecule has a value which is a string
+data_source has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+kb_id has a value which is a string
+source_id has a value which is a string
+type has a value which is an ExpressionServices.sample_type
+numerical_interpretation has a value which is a string
+description has a value which is a string
+title has a value which is a string
+data_quality_level has a value which is an int
+original_median has a value which is a float
+external_source_date has a value which is a string
+expression_levels has a value which is an ExpressionServices.data_expression_levels_for_sample
+genome_id has a value which is an ExpressionServices.genome_id
+expression_ontology_terms has a value which is an ExpressionServices.expression_ontology_terms
+platform_id has a value which is an ExpressionServices.expression_platform_id
+default_control_sample has a value which is an ExpressionServices.expression_sample_id
+averaged_from_samples has a value which is an ExpressionServices.expression_sample_ids
+protocol has a value which is an ExpressionServices.Protocol
+strain has a value which is an ExpressionServices.Strain
+persons has a value which is an ExpressionServices.persons
+molecule has a value which is a string
+data_source has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExpressionSeries
+
+=over 4
+
+
+
+=item Description
+
+Data structure for the workspace expression series.  The ExpressionSeries typed object.
+publication should need to eventually have ws objects, will not inclde it for now.
+
+@optional title summary design publication_id 
+
+@searchable kb_id source_id publication_id title summary design expression_samples?????????????
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+kb_id has a value which is a string
+source_id has a value which is a string
+expression_sample_ids has a value which is an ExpressionServices.expression_sample_ids
+title has a value which is a string
+summary has a value which is a string
+design has a value which is a string
+publication_id has a value which is a string
+external_source_date has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+kb_id has a value which is a string
+source_id has a value which is a string
+expression_sample_ids has a value which is an ExpressionServices.expression_sample_ids
+title has a value which is a string
+summary has a value which is a string
+design has a value which is a string
+publication_id has a value which is a string
+external_source_date has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 workspace_identifying_map
+
+=over 4
+
+
+
+=item Description
+
+Mapping between ws_name or ws_id and their values.  This is a way to identify which workspace to use. 
+Must contain either 'ws_name' or 'ws_id' key.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a string and the value is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a string and the value is a string
+
+=end text
+
+=back
+
+
+
+=head2 expression_kbase_ids
+
+=over 4
+
+
+
+=item Description
+
+A list of kbase_ids used to fetch the workspace expression typed objects (ExpressionOntology, ExpressionPlatform, ExpressionSample, ExpressionSeries)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
 
 =end text
 

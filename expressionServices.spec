@@ -562,7 +562,7 @@ module ExpressionServices {
         string kb_id;
         string source_id;
         sample_type type;
-        string numerical_interpretaion;
+        string numerical_interpretation;
         string description;
         string title;
         int data_quality_level;

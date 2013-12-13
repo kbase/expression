@@ -4,6 +4,7 @@ use Data::Dumper;
 #FOLLOWING TWO LINES IF WANT TO TEST DIRECTLY IN OTHER WAYS 
 #use Bio::KBase::ExpressionServices::ExpressionServicesImpl; 
 use Bio::KBase::ExpressionServices::FunctionsForGEO; 
+use Bio::KBase::ExpressionServices::GEO2TypedObjects; 
 
 my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
 #print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO);
@@ -14,8 +15,7 @@ my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
 
 #MORGAN'S FILE
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',1);
-#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',0);
-
+my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE39462',0);
 
 #ROSS'S FILE
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE27219',1);
@@ -29,13 +29,20 @@ my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
 #my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE13641',1);
 
 #BOVINE NO GENOME TEST
-#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE21782');
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE21782','0');
 
-my $gseObject = $functionsForGEO->get_gse_records_from_gse_list('ecoli_gses.txt');
+#my $gseObject = $functionsForGEO->get_gse_records_from_gse_list('ecoli_gses.txt');
 
 
 
-print "GSE OBJECT ". Dumper($gseObject);
+#print "GSE OBJECT ". Dumper($gseObject);
+
+my $geo2TypedObject = Bio::KBase::ExpressionServices::GEO2TypedObjects->new();
+
+my $test_hash_ref = $geo2TypedObject->geo2TypedObjects($gseObject,"test");
+
+print "\n\nTestHash : ".Dumper($test_hash_ref)."\n";
+
 
 
 #print "\n\n3GSE_GSM782755 : \n".Dumper($gseObject->{"gseSamples"}->{'GSM782755'}->{'gsmPlatform'})."\n\n";
