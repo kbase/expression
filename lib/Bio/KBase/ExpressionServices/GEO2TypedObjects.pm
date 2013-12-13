@@ -1,4 +1,4 @@
-package Bio::KBase::ExpressionServices::GEO2TypedObject;
+package Bio::KBase::ExpressionServices::GEO2TypedObjects;
 use strict;
 use Statistics::Descriptive;
 #use Bio::KBase::Exceptions;
