@@ -3,7 +3,7 @@ module ExpressionServices {
 
     /* 
         KBase Feature ID for a feature, typically CDS/PEG
-        @id ws KB.Feature 
+        id ws KB.Feature 
 
         "ws" may change to "to" in the future 
     */
@@ -137,7 +137,7 @@ module ExpressionServices {
     
     /* 
         KBase GenomeID 
-        @id ws KB.Genome
+        id ws KB.Genome
 
         "ws" may change to "to" in the future 
     */
@@ -499,7 +499,7 @@ module ExpressionServices {
         @optional strain
 
         @searchable ws_subset source_id kb_id genome_id title technology
-        @searchable strain.genome_id  strain.reference_strain strain.wild_type          
+        @searchable ws_subset strain.genome_id  strain.reference_strain strain.wild_type          
     */
     typedef structure { 
         string kb_id; 
@@ -552,11 +552,11 @@ module ExpressionServices {
        @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
        @optional averaged_from_samples protocol strain persons molecule data_source
        
-       @searchable kb_id source_id type data_quality_level genome_id strain_id platform_id description title data_source keys_of(expression_levels) 
-       @searchable persons.[*].email persons.[*].last_name persons.[*].institution  
-       @searchable strain.genome_id strain.reference_strain strain.wild_type          
-       @searchable protocol.name protocol.description 
-       @searchable expression_ontology_terms.[*].expression_ontology_term_id expression_ontology_terms.[*].expression_ontology_term_name
+       @searchable ws_subset kb_id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
+       @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
+       @searchable ws_subset strain.genome_id strain.reference_strain strain.wild_type          
+       @searchable ws_subset protocol.name protocol.description 
+       @searchable ws_subset expression_ontology_terms.[*].expression_ontology_term_id expression_ontology_terms.[*].expression_ontology_term_name
     */
     typedef structure {
         string kb_id;
@@ -587,7 +587,7 @@ module ExpressionServices {
 
         @optional title summary design publication_id 
 
-        @searchable kb_id source_id publication_id title summary design expression_samples?????????????
+        @searchable ws_subset kb_id source_id publication_id title summary design expression_sample_ids
     */
     typedef structure { 
         string kb_id; 
