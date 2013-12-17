@@ -6011,7 +6011,7 @@ sub version {
 =item Description
 
 KBase Feature ID for a feature, typically CDS/PEG
-@id ws KB.Feature 
+id ws KB.Feature 
 
 "ws" may change to "to" in the future
 
@@ -7185,7 +7185,7 @@ a reference to a list where each element is an ExpressionServices.strain_id
 =item Description
 
 KBase GenomeID 
-@id ws KB.Genome
+id ws KB.Genome
 
 "ws" may change to "to" in the future
 
@@ -8566,7 +8566,7 @@ source_id defaults to kb_id if not set, but typically referes to a GPL if the da
 @optional strain
 
 @searchable ws_subset source_id kb_id genome_id title technology
-@searchable strain.genome_id  strain.reference_strain strain.wild_type
+@searchable ws_subset strain.genome_id  strain.reference_strain strain.wild_type
 
 
 =item Definition
@@ -8789,11 +8789,11 @@ we may need a link to experimentMetaID later.
 @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
 @optional averaged_from_samples protocol strain persons molecule data_source
 
-@searchable kb_id source_id type data_quality_level genome_id strain_id platform_id description title data_source keys_of(expression_levels) 
-@searchable persons.[*].email persons.[*].last_name persons.[*].institution  
-@searchable strain.genome_id strain.reference_strain strain.wild_type          
-@searchable protocol.name protocol.description 
-@searchable expression_ontology_terms.[*].expression_ontology_term_id expression_ontology_terms.[*].expression_ontology_term_name
+@searchable ws_subset kb_id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
+@searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
+@searchable ws_subset strain.genome_id strain.reference_strain strain.wild_type          
+@searchable ws_subset protocol.name protocol.description 
+@searchable ws_subset expression_ontology_terms.[*].expression_ontology_term_id expression_ontology_terms.[*].expression_ontology_term_name
 
 
 =item Definition
@@ -8871,7 +8871,7 @@ publication should need to eventually have ws objects, will not inclde it for no
 
 @optional title summary design publication_id 
 
-@searchable kb_id source_id publication_id title summary design expression_samples?????????????
+@searchable ws_subset kb_id source_id publication_id title summary design expression_sample_ids
 
 
 =item Definition
