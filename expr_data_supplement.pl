@@ -101,14 +101,19 @@ $Data::Dumper::Purity = 1;
 
 # restore hash from the input file
 open(FILE, "<$inpfile");
-undef $/;
-my $str = <FILE>;
-my $href = eval $str;
-print "Expression object not read\n" if(!defined($href));
+#undef $/;
+#my $str = <FILE>;
+my $str = "";
+while(<FILE>) {
+	$str .= $_;
+}
 close FILE;
+$str =~ s/^GSE OBJECT //;
+my $href = eval $str; warn $@ if $@;#eval{$str;};warn $@ if $@;
+print "Expression object not read\n" if(!defined($href));
 
 #redefine the default file read delimiter
-$/ = "\n";
+#$/ = "\n";
 
 # read ontology file
 open(IN, "<$ontfile");
@@ -143,5 +148,6 @@ foreach my $k (keys(%{$href->{'gseSamples'}})) {
 # turn off STDOUT buffering i.e. flush immediately
 #$| = 1;
 
+print O "GSE OBJECT ";
 print O Dumper $href;
 close O;
