@@ -284,7 +284,8 @@ sub geo2TypedObjects
                         #grab kbase_platform_id for it                        
 #			my $platform_prefix = "kb|platform_test";  #if want to test it do it for sample and series as well. Then comment out next line.
 			my $platform_prefix = "kb|platform";
-			my $kb_gpl_id = $platform_prefix .".".$id_server->allocate_id_range( $platform_prefix, 1 ); 
+			my $temp_id_hash_ref = $id_server->register_ids($prefix,"GEO",[$gpl_id]); 
+			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
                         $gpl_object_hash{$gpl_id}={"kb_id" =>$kb_gpl_id,
 						   "source_id" => $gpl_id,
 						   "genome_id" => $genome_id_selected,
@@ -456,7 +457,9 @@ sub geo2TypedObjects
                         #grab kbase_sample_id for it
 #			my $sample_prefix = "kb|sample_test";
 			my $sample_prefix = "kb|sample";
-			my $gsm_kb_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 ); 
+			my $sample_id_key = $gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
+                        my $temp_id_hash_ref = $id_server->register_ids($prefix,"GEO",[$sample_id_key]);
+                        my $gsm_kb_id = $temp_id_hash_ref->{$sample_id_key};
 			#add gsm_kb_id to gse_list
 			push(@gsm_kb_id_array,$gsm_kb_id);
 			#new sample - push kb_id onto new_gsm_kb_idarray;
@@ -628,7 +631,9 @@ sub geo2TypedObjects
             #GRAB NEW SERIES KB ID
 #	    my $series_prefix = "kb|series_test";
 	    my $series_prefix = "kb|series";
-	    $series_kb_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 ); 
+	    my $temp_id_hash_ref = $id_server->register_ids($prefix,"GEO",[$gse_object_ref->{'gseID'}]);
+	    $series_kb_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
+#	    $series_kb_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 ); 
             #resolve result
 	    my $result = "Full Success";
 	    if ($passing_gsm_count == 0)
