@@ -123,7 +123,7 @@ sub geo2TypedObjects
     #Takes in a GSE Object and a data source
     #returns a "1"  if successful or a "0 - error_string" if failed
     
-    #This does checking for existing Platforms, Samples and Series being created by looking in the contents
+    #This does checking for existing Platform, Samples and Series being created by looking in the contents
     #of the platforms, samples and series files located in /mnt/geo_results 
 
     #The typed objects will be stored in json format in /mnt/typed_objects
@@ -282,9 +282,8 @@ sub geo2TypedObjects
 			    $genome_id_selected = $genome_keys[0];
 			}
                         #grab kbase_platform_id for it                        
-#			my $platform_prefix = "kb|platform_test";  #if want to test it do it for sample and series as well. Then comment out next line.
 			my $platform_prefix = "kb|platform";
-			my $temp_id_hash_ref = $id_server->register_ids($prefix,"GEO",[$gpl_id]); 
+			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
 			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
                         $gpl_object_hash{$gpl_id}={"kb_id" =>$kb_gpl_id,
 						   "source_id" => $gpl_id,
@@ -455,10 +454,9 @@ sub geo2TypedObjects
 			}
 			#within sample loop			
                         #grab kbase_sample_id for it
-#			my $sample_prefix = "kb|sample_test";
 			my $sample_prefix = "kb|sample";
 			my $sample_id_key = $gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
-                        my $temp_id_hash_ref = $id_server->register_ids($prefix,"GEO",[$sample_id_key]);
+                        my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
                         my $gsm_kb_id = $temp_id_hash_ref->{$sample_id_key};
 			#add gsm_kb_id to gse_list
 			push(@gsm_kb_id_array,$gsm_kb_id);
@@ -477,6 +475,7 @@ sub geo2TypedObjects
                         #BUILD UP FULL SAMPLE OBJECT
 			#note "default_control_sample"
                         # and "averaged_from_samples" are not set by this (those are custom fields that require users to set that data)
+			$dataQualityLevel = $dataQualityLevel + 0;#To coerce back to an integer
 			my $sample_object_ref = {"kb_id" =>$gsm_kb_id,
 						 "source_id" => $gsm_id,
 						 "type"=>$gsm_type,
@@ -629,11 +628,9 @@ sub geo2TypedObjects
 	{
 	    #means brand new series and can append to series geo results file.
             #GRAB NEW SERIES KB ID
-#	    my $series_prefix = "kb|series_test";
 	    my $series_prefix = "kb|series";
-	    my $temp_id_hash_ref = $id_server->register_ids($prefix,"GEO",[$gse_object_ref->{'gseID'}]);
+	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
 	    $series_kb_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
-#	    $series_kb_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 ); 
             #resolve result
 	    my $result = "Full Success";
 	    if ($passing_gsm_count == 0)
