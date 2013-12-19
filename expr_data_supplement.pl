@@ -151,9 +151,19 @@ my $gseobj = from_json($jsonobj);
 # supplement expression object with ontology and write it out to the file
 open(O, ">$outfile");
 foreach my $k (keys(%{$gseobj->{'gseSamples'}})) {
-	my @onts = split(',', $ont{$k});
+	my @onts = ();
+	my $o = $ont{$k};
+	if(defined($o)) {
+		@onts = split(',', $o);
+	}
         $gseobj->{'gseSamples'}->{$k}->{'gsmOntologies'} = \@onts;
-        $gseobj->{'gseSamples'}->{$k}->{'gsmReplicateId'} = $rep{$k} if(defined $repfile);
+	if(defined($repfile)) {
+        	my $r = $rep{$k};
+		if(!defined($r)) {
+			$r = "";
+		}
+		$gseobj->{'gseSamples'}->{$k}->{'gsmReplicateId'} = $r;
+	}
 }
 
 # turn off STDOUT buffering i.e. flush immediately
