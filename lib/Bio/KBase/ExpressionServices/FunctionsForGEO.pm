@@ -28,12 +28,13 @@ use Bio::DB::Taxonomy;
 use Bio::KBase;
 use Bio::KBase::CDMI::CDMIClient; 
 use JSON::RPC::Client; 
+use JSON;
 
 #require Exporter;
 
 our (@ISA,@EXPORT);
 @ISA = qw(Exporter);
-@EXPORT = qw(new get_GEO_GSE_data get_gse_records_from_gds_list);
+@EXPORT = qw(new get_GEO_GSE_data make_GSE_object_file get_gse_records_from_gds_list get_gse_records_from_gse_list);
 
 #
 #NOTE THIS REQUIRES
@@ -58,6 +59,7 @@ our (@ISA,@EXPORT);
 #parse_sample_data
 #data_value_sanity_checks
 #get_GEO_GSE_data
+#make_GSE_object_file
 #get_gse_records_from_gds_list
 
  
@@ -242,6 +244,8 @@ sub parse_gse_platform_portion
                                 #                                                             "taxID"=>value,
                                 #                                                             "platform"=>GPLID}
                                 #  NOTE THIS GETS VERY COMPLICATED IF NOT METADATA ONLY.  Remember multiple GPLs can exist per GSE
+    my $blat_files_directory = shift;
+    my $platform_genome_mappings_directory = shift;
     my $self = shift; 
     my %platform_tax_probe_feature_hash; #  Need to return a map for probe mapping for the GPL to use if this is not metadata only
                                 #  key {gplID->{taxID->{genome_id->{platform id value->feature_id it maps to}}}} 
@@ -367,7 +371,8 @@ sub parse_gse_platform_portion
             }            
 
             #CHECK TO SEE IF PROBE MAPPING FILE EXISTS HERE:
-            my $gpl_file = "/mnt/platform_genome_mapping_files/".$gplID; 
+#            my $gpl_file = "/mnt/platform_genome_mapping_files/".$gplID; 
+            my $gpl_file = $platform_genome_mappings_directory."/".$gplID; 
             if (-e $gpl_file)
             {
                 #Open GPL file get mapping method results (lets you know what genomes you need to grab data for, and do not have to attempt to map of genomes in the list)
@@ -391,7 +396,8 @@ sub parse_gse_platform_portion
                     {
                          my $genome_number = $genome_id;
                          $genome_number =~ s/kb\|//;
-                         my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+#                         my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+                         my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                          #check file exists if it does, die as it should be;
                          if (-e $gpl_genome_file)
                          {
@@ -435,7 +441,8 @@ sub parse_gse_platform_portion
 		    #It has a sequence column, prepare a blat_db file and build query file
 		    my $min_probe_length = 500;  #artificially high intial value will get set
 		    my $number_of_probe_sequences = scalar(keys(%probe_sequence_hash));
-		    my $blat_platform_query_file = "/mnt/blat_files/".$gplID."_blat_query_file";
+#		    my $blat_platform_query_file = "/mnt/blat_files/".$gplID."_blat_query_file";
+		    my $blat_platform_query_file = $blat_files_directory."/".$gplID."_blat_query_file";
 		    push(@blat_files_to_clean_up_after, $blat_platform_query_file);
 		    open (BLAT_QUERY_FILE, ">".$blat_platform_query_file) or die "Unable to make $blat_platform_query_file \n";
 		    foreach my $probe_id (keys(%probe_sequence_hash))
@@ -465,7 +472,8 @@ sub parse_gse_platform_portion
                             #create Blat DB File
 		            my $file_genome_id = $genome_id;
 		            $file_genome_id =~ s/kb\|//; 
-		            my $blat_genome_db_file = "/mnt/blat_files/".$file_genome_id."_blat_db_file";
+#		            my $blat_genome_db_file = "/mnt/blat_files/".$file_genome_id."_blat_db_file";
+		            my $blat_genome_db_file = $blat_files_directory."/".$file_genome_id."_blat_db_file";
 		            push(@blat_files_to_clean_up_after, $blat_genome_db_file);
 		            open (BLAT_DB_FILE, ">".$blat_genome_db_file) or die "Unable to make $blat_genome_db_file \n";
 		            my $fid_count = 0;
@@ -500,7 +508,8 @@ sub parse_gse_platform_portion
                                 $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="Probe Sequences Blat Resolved";
                                 my $genome_number = $genome_id;
                                 $genome_number =~ s/kb\|//;
-                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+#                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+                                my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                                 make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);
 		            }
                             else
@@ -551,7 +560,8 @@ sub parse_gse_platform_portion
 		                $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$test_genome_id} =  \%probe_to_feature_hash;
                                 my $genome_number = $test_genome_id;
                                 $genome_number =~ s/kb\|//;
-                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+#                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+                                my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                                 make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);   
 		            }
                             else
@@ -563,7 +573,8 @@ sub parse_gse_platform_portion
 	        }#end if probe sequences/ else do synonym lookup
             }#end need to do new mappings
 	}#end looping through tax_ids
-        my $gpl_out_file = "/mnt/platform_genome_mapping_files/".$gplID; 
+#        my $gpl_out_file = "/mnt/platform_genome_mapping_files/".$gplID; 
+        my $gpl_out_file = $platform_genome_mappings_directory."/".$gplID; 
         open(GPL_OUT_FILE, ">".$gpl_out_file) or die "Unable to make $gpl_out_file \n";
         foreach my $mapping_genome_id (keys(%{$platform_hash{$gplID}->{"genomesMappingMethod"}}))
         {
@@ -1671,7 +1682,7 @@ sub data_value_sanity_checks
 sub get_GEO_GSE_data
 {
     my $self = shift;
-    my($gse_input_id, $metaDataOnly) = @_;
+    my($gse_input_id, $metaDataOnly, $blat_files_directory, $platform_genome_mappings_directory) = @_;     
 
     my @_bad_arguments;
     (!ref($gse_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gse_input_id\" (value was \"$gse_input_id\")");
@@ -1847,6 +1858,8 @@ sub get_GEO_GSE_data
 														  $metaDataOnly,
 														  \@gse_platform_lines,
 														  \%gsm_platform_info_hash, 
+														  $blat_files_directory,
+														  $platform_genome_mappings_directory,
 														  $self);
 			%platform_hash = %{$platform_hash_ref};
 		        my ($temp_gpl_id) = keys(%{$temp_plt_tax_genome_probe_feat_hash_ref});
@@ -1932,6 +1945,18 @@ sub get_GEO_GSE_data
 #    return({});
 }#End get_GEO_GSE_data
 
+
+sub make_GSE_object_file
+{ 
+    my $self = shift;
+    my($gse_input_id, $metaDataOnly, $blat_files_directory, $platform_genome_mappings_directory,$gse_object_directory) = @_;
+    my $gse_object = get_GEO_GSE_data($self,$gse_input_id,$metaDataOnly,$blat_files_directory,$platform_genome_mappings_directory); 
+    my $file_name = $gse_object_directory."/".$gse_input_id;
+    open(FILE, ">".$file_name) or die "Unable to make to $file_name \n"; 
+    print FILE to_json($gse_object); 
+    close(FILE); 
+    return 1;
+}
 
 sub get_gse_records_from_gds_list
 {
