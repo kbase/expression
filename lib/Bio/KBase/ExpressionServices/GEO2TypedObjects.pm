@@ -35,15 +35,6 @@ our (@ISA,@EXPORT);
 @ISA = qw(Exporter);
 @EXPORT = qw(new geo2TypedObjects);
 
-#
-#NOTE THIS REQUIRES
-#The following directories to be made (if you are doing non-metadata only)
-#/mnt/blat_files/
-#/mnt/platform_genome_mapping_files
-#/mnt/geo_results
-#
-
-
 
 #SUBROUTINES
 #new
@@ -120,21 +111,32 @@ sub trim($)
 
 sub geo2TypedObjects
 {
-    #Takes in a GSE Object and a data source
+    #Takes in 2 arguements :
+    # 1) a file path and name to a GSE Object in JSON format 
+    # 2) data source
+    # 3) directory of geo_results (running list of files storing ids and results of geo objects)
+    # 4) directory where to write the workspace typed objects in json format
     #returns a "1"  if successful or a "0 - error_string" if failed
     
     #This does checking for existing Platform, Samples and Series being created by looking in the contents
-    #of the platforms, samples and series files located in /mnt/geo_results 
+    #of the platforms, samples and series files located in $geo_results_directory (arg3)
 
-    #The typed objects will be stored in json format in /mnt/typed_objects
+    #The typed objects will be stored in json format in $typed_objects_directory (arg4)
 
     my $self = shift;
-    my $gse_object_ref = shift;
+    my $gse_object_file = shift;
     my $data_source = shift;
+    my $geo_results_directory = shift;
+    my $typed_objects_directory = shift;
 
-    my $gse_results_file = "/mnt/geo_results/gse_results";
-    my $gpl_results_file = "/mnt/geo_results/gpl_results";
-    my $gsm_results_file = "/mnt/geo_results/gsm_results";
+    open (JSON_FILE,$gse_object_file) or die "0 - Unable to open $gse_object_file , it was supposed to exist"; 
+    my ($json_result,@temp_array)= (<JSON_FILE>); 
+    close(JSON_FILE);
+    my $gse_object_ref = from_json($json_result);
+
+    my $gse_results_file = $geo_results_directory."/gse_results";
+    my $gpl_results_file = $geo_results_directory."/gpl_results";
+    my $gsm_results_file = $geo_results_directory."/gsm_results";
 
     my $id_server = Bio::KBase::IDServer::Client->new("http://kbase.us/services/idserver"); 
 
@@ -282,9 +284,11 @@ sub geo2TypedObjects
 			    $genome_id_selected = $genome_keys[0];
 			}
                         #grab kbase_platform_id for it                        
-			my $platform_prefix = "kb|platform";
-			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
-			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
+			my $platform_prefix = "kb|platform_test";  #if want to test it do it for sample and series as well. Then comment out next line.
+			my $kb_gpl_id = $platform_prefix .".".$id_server->allocate_id_range( $platform_prefix, 1 );
+#			my $platform_prefix = "kb|platform";
+#			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
+#			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
                         $gpl_object_hash{$gpl_id}={"kb_id" =>$kb_gpl_id,
 						   "source_id" => $gpl_id,
 						   "genome_id" => $genome_id_selected,
@@ -313,7 +317,7 @@ sub geo2TypedObjects
 		#CREATE JSON OBJECT FILE
 		my $temp_platform_file_name = $gpl_object_hash{$gpl_id}{"kb_id"};
 		$temp_platform_file_name =~ s/kb\|//; 
-		my $platform_file_name = "/mnt/typed_objects/".$temp_platform_file_name;
+		my $platform_file_name = $typed_objects_directory."/".$temp_platform_file_name;
 		open(PLATFORM_FILE, ">".$platform_file_name) or return "0 - Unable to make to $platform_file_name \n";             
 		print PLATFORM_FILE to_json($gpl_object_hash{$gpl_id});
 		close(PLATFORM_FILE);
@@ -454,10 +458,12 @@ sub geo2TypedObjects
 			}
 			#within sample loop			
                         #grab kbase_sample_id for it
-			my $sample_prefix = "kb|sample";
-			my $sample_id_key = $gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
-                        my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
-                        my $gsm_kb_id = $temp_id_hash_ref->{$sample_id_key};
+			my $sample_prefix = "kb|sample_test";  
+			my $gsm_kb_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 );
+#			my $sample_prefix = "kb|sample";
+#			my $sample_id_key = $gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
+#                       my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
+#                       my $gsm_kb_id = $temp_id_hash_ref->{$sample_id_key};
 			#add gsm_kb_id to gse_list
 			push(@gsm_kb_id_array,$gsm_kb_id);
 			#new sample - push kb_id onto new_gsm_kb_idarray;
@@ -519,7 +525,7 @@ sub geo2TypedObjects
 			#CREATE JSON OBJECT FILE          
 			my $temp_sample_file_name = $gsm_kb_id; 
 			$temp_sample_file_name =~ s/kb\|//; 
-			my $sample_file_name = "/mnt/typed_objects/".$temp_sample_file_name; 
+			my $sample_file_name = $typed_objects_directory."/".$temp_sample_file_name; 
 			open(SAMPLE_FILE, ">".$sample_file_name) or return "0 - Unable to make to $sample_file_name \n";
 			print SAMPLE_FILE to_json($sample_object_ref); 
 			close(SAMPLE_FILE); 
@@ -570,6 +576,7 @@ sub geo2TypedObjects
 	    #need to make the full SERIES typed object again using existing kb_id
 	    #merged set between @gsm_kb_id_array and %sample_kb_ids_already_in_series
 	    $series_kb_id = $processed_gse_hash{$current_gse_id}{"kb_id"};
+	    #print "\nIN IF : Existing series\n";
 	    foreach my $temp_kb_sample_id (keys(%sample_kb_ids_already_in_series))
 	    {
 		$sample_kb_ids_in_series{$temp_kb_sample_id}=1;
@@ -628,9 +635,12 @@ sub geo2TypedObjects
 	{
 	    #means brand new series and can append to series geo results file.
             #GRAB NEW SERIES KB ID
-	    my $series_prefix = "kb|series";
-	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
-	    $series_kb_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
+            #print "\nIN ELSE : Brand new series\n";
+	    my $series_prefix = "kb|series_test";  
+	    $series_kb_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 );
+#	    my $series_prefix = "kb|series";
+#	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
+#	    $series_kb_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
             #resolve result
 	    my $result = "Full Success";
 	    if ($passing_gsm_count == 0)
@@ -662,7 +672,7 @@ sub geo2TypedObjects
 	#CREATE JSON OBJECT FILE   
 	my $temp_series_file_name = $series_kb_id;
 	$temp_series_file_name =~ s/kb\|//;
-	my $series_file_name = "/mnt/typed_objects/".$temp_series_file_name;
+	my $series_file_name = $typed_objects_directory."/".$temp_series_file_name;
 	open(SERIES_FILE, ">".$series_file_name) or return "0 - Unable to make to $series_file_name \n"; 
 	print SERIES_FILE to_json($series_object_ref);
 	close(SERIES_FILE);
