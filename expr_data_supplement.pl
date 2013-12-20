@@ -9,7 +9,7 @@ expr_data_supplement.pl - supplements expression data object with additional inf
 =head1 SYNOPSIS
 
  expr_data_supplement.pl [--? --m] --i --s --r --o
-   --i <input expression object file (hash dump)>
+   --i <input expression object file (JSON format)>
    --s <input supplemental information file (sample ontology)>
    --r <input supplemental information file (sample relicate ID)>
    --o <output file name>
@@ -25,7 +25,7 @@ This scripts supplemnets expression object with sample ontology information.
 =item B<--i>
 
         Required parameter to input expression data object file. The file must be
-        the perl hash structure dump.
+        in JSON format.
 
 =item B<--s>
 
@@ -33,6 +33,7 @@ This scripts supplemnets expression object with sample ontology information.
         delimited ASCII text file (sample_id\tcomma-separated_list_of_PO/EO_Ids).
 
 =item B<--r>
+
 	Optional input parameter to supplement expression metadata with sample
 	replicate information. The input file must be tab delimited ASCII text
 	file (sample_id\tsample_short_description\tsample_replicate_id).
@@ -40,7 +41,7 @@ This scripts supplemnets expression object with sample ontology information.
 =item B<--o>
 
 	Output file name where this script would dump the expression data
-	object (hash structure dump).
+	object (in JSON format).
 
 =item B<--help or -? or -h>
 
@@ -71,10 +72,13 @@ How to use expr_data_supplement.pl
 #------------------------------------------------------------------------------#
 # Import Section: Import perl modules on which this script depends             #
 #------------------------------------------------------------------------------#
+use strict;
 use Getopt::Long;
 use Pod::Usage;
 use warnings;
 use Data::Dumper;
+use Bio::KBase::ExpressionServices::FunctionsForGEO; 
+use JSON; 
 
 #------------------------------------------------------------------------------#
 # Boiler plate code for extracting command-line options & displaying help/man  #
@@ -97,20 +101,20 @@ my $outfile = $opts{'o'} || die "Output file required\n".pod2usage(1);
 # Start: expr_data_supplement.pl Main Logic                                    #
 #------------------------------------------------------------------------------#
 
-$Data::Dumper::Purity = 1;
+#$Data::Dumper::Purity = 1;
 
 # restore hash from the input file
-open(FILE, "<$inpfile");
-#undef $/;
-#my $str = <FILE>;
-my $str = "";
-while(<FILE>) {
-	$str .= $_;
-}
-close FILE;
-$str =~ s/^GSE OBJECT //;
-my $href = eval $str; warn $@ if $@;#eval{$str;};warn $@ if $@;
-print "Expression object not read\n" if(!defined($href));
+#open(FILE, "<$inpfile");
+##undef $/;
+##my $str = <FILE>;
+#my $str = "";
+#while(<FILE>) {
+#	$str .= $_;
+#}
+#close FILE;
+#$str =~ s/^GSE OBJECT //;
+#my $href = eval $str; warn $@ if $@;#eval{$str;};warn $@ if $@;
+#print "Expression object not read\n" if(!defined($href));
 
 #redefine the default file read delimiter
 #$/ = "\n";
@@ -137,17 +141,37 @@ if(defined $repfile) {
 	close IN;
 }
 
+# read GSE object from the JSON input file
+my $geofunc = Bio::KBase::ExpressionServices::FunctionsForGEO->new();
+open(GEO, "<$inpfile") || die "Unable to open GSE Object file: $inpfile\n";
+my ($jsonobj,@temp)= (<GEO>);
+close(GEO);
+my $gseobj = from_json($jsonobj);
+
 # supplement expression object with ontology and write it out to the file
 open(O, ">$outfile");
-foreach my $k (keys(%{$href->{'gseSamples'}})) {
-	my @onts = split(',', $ont{$k});
-        $href->{'gseSamples'}->{$k}->{'gsmOntologies'} = \@onts;
-        $href->{'gseSamples'}->{$k}->{'gsmReplicateId'} = $rep{$k} if(defined $repfile);
+foreach my $k (keys(%{$gseobj->{'gseSamples'}})) {
+	my @onts = ();
+	my $o = $ont{$k};
+	if(defined($o)) {
+		@onts = split(',', $o);
+	}
+        $gseobj->{'gseSamples'}->{$k}->{'gsmOntologies'} = \@onts;
+	if(defined($repfile)) {
+        	my $r = $rep{$k};
+		if(!defined($r)) {
+			$r = "";
+		}
+		$gseobj->{'gseSamples'}->{$k}->{'gsmReplicateId'} = $r;
+	}
 }
 
 # turn off STDOUT buffering i.e. flush immediately
 #$| = 1;
 
-print O "GSE OBJECT ";
-print O Dumper $href;
+print O to_json($gseobj);
 close O;
+
+#print O "GSE OBJECT ";
+#print O Dumper $href;
+#close O;
