@@ -2260,6 +2260,15 @@
 			</Index>
 		</Indexes>	
 	</Entity>
+	<Entity name="ReplicateGroup" keyType"string">
+	  	<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" row="10" col="5" />
+		</DisplayInfo>
+		<Notes>Keeps track of Replicate Groups of Expression Samples.  Has only an ID.  Relationship is the important part.
+		</Notes>
+		<Fields>
+		</Fields>
+	</Entity>
   </Entities>
   <Relationships>
   	<Relationship name="ImplementsReaction" from="Feature" to="ReactionInstance"
@@ -3899,6 +3908,13 @@
                 <Notes>The Default control for samples to compare against.  (Log2 measurments of Test Sample)/(Log2 measurements of Default Control).
 		Really minus instead of divide since the values are already in Log2 Space.</Notes>
         </Relationship>
+	<Relationship name="SamplesInReplicateGroup" arity="MM" from="Sample" to="ReplicateGroup" converse="ReplicateGroupsForSample">
+		<DisplayInfo theme="cyan">
+			<RegionInfo name="Expression_v2" caption="Samples\nIn\nReplicate\nGroup"
+				col="5" row="9" fixed="1" />
+		</DisplayInfo>
+		<Notes>Custom averaging of samples (typically replicates).</Notes>
+	</Relationship>
 	<Relationship name="OntologyForSample" from="Ontology" to="SampleAnnotation" arity="1M" converse="SampleHasOntology">
 		<DisplayInfo theme="cyan">
 			<RegionInfo name="Expression_v2" col="6" row="3" fixed="1"

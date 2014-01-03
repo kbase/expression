@@ -583,7 +583,7 @@ module ExpressionServices {
 
     /*
         Data structure for the workspace expression series.  The ExpressionSeries typed object.
-        publication should need to eventually have ws objects, will not inclde it for now.
+        publication should need to eventually have ws objects, will not include it for now.
 
         @optional title summary design publication_id 
 
@@ -600,66 +600,14 @@ module ExpressionServices {
 	string external_source_date;
     } ExpressionSeries; 
 
-
     /*
-        Functions to pull expression typed objects (into the workspace).
+        Simple Grouping of Samples that belong to the same replicate group.  ExpressionReplicateGroup yuped object.
+
+        @searchable ws_subset kb_id expression_sample_ids
     */
+    typedef structure {
+        string kb_id;
+        expression_sample_ids expression_sample_ids;
+    } ExpressionReplicateGroup;
 
-
-    /*
-        Given a KBase Platfrom ID (kb_id) returns an ExpressionPlatform typed object
-    */ 
-    funcdef get_expression_platform(string kb_platform_id) returns (ExpressionPlatform expression_platform); 
-
-    /*
-        Given a KBase Sample ID (kb_id) returns an ExpressionSample typed object
-    */ 
-    funcdef get_expression_sample(string kb_sample_id) returns (ExpressionSample expression_sample);
-
-    /*
-        Given a KBase Series ID (kb_id) returns an ExpressionSeries typed object
-    */ 
-    funcdef get_expression_series(string kb_series_id) returns (ExpressionSeries expression_series); 
-
-    /* 
-       Mapping between ws_name or ws_id and their values.  This is a way to identify which workspace to use. 
-       Must contain either 'ws_name' or 'ws_id' key.
-    */
-    typedef mapping<string ws_key, string ws_value> workspace_identifying_map; 
-    
-    /*
-       A list of kbase_ids used to fetch the workspace expression typed objects (ExpressionOntology, ExpressionPlatform, ExpressionSample, ExpressionSeries)
-    */
-    typedef list<string> expression_kbase_ids;
-
-    /*
-        Given a 1) hash ref(that contain ws_name or ws_id key and value), 
-                2) typed_object type (must be single quoted string of 
-                        Must be one of the following : 'ExpressionOntology', 'ExpressionPlatform', 'ExpressionSample' or 'ExpressionSeries' 
-                3) an array ref with a list of kb_ids to be imported.
-    */  
-    funcdef ws_import_of_expression_typed_object(workspace_identifying_map workspace_identifying_map, 
-                                                 string expression_typed_object, 
-                                                 expression_kbase_ids) returns(expression_kbase_ids expression_kbase_ids) authentication required;
-
-    /*
-        get all the expression ontology ids
-    */  
-    funcdef get_all_ontology_ids() returns(expression_kbase_ids expression_kbase_ids); 
-
-    /*
-        get all the expression platform ids
-    */  
-    funcdef get_all_platform_ids() returns(expression_kbase_ids expression_kbase_ids); 
-
-    /*
-        get all the expression sample ids
-    */  
-    funcdef get_all_sample_ids() returns(expression_kbase_ids expression_kbase_ids); 
-
-    /*
-        get all the expression series ids
-    */  
-    funcdef get_all_series_ids() returns(expression_kbase_ids expression_kbase_ids); 
- 
 }; 
