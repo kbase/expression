@@ -436,12 +436,14 @@ sub parse_gse_platform_portion
 	        my @blat_files_to_clean_up_after;
 	        my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}
 
+		#print "\nIN TRIED TO DO NEW MAPPINGS\n";
+
 	        if (!defined($probe_sequence_warning))
 	        {
+		    #print "\nIN BLAT TRY\n";
 		    #It has a sequence column, prepare a blat_db file and build query file
 		    my $min_probe_length = 500;  #artificially high intial value will get set
 		    my $number_of_probe_sequences = scalar(keys(%probe_sequence_hash));
-#		    my $blat_platform_query_file = "/mnt/blat_files/".$gplID."_blat_query_file";
 		    my $blat_platform_query_file = $blat_files_directory."/".$gplID."_blat_query_file";
 		    push(@blat_files_to_clean_up_after, $blat_platform_query_file);
 		    open (BLAT_QUERY_FILE, ">".$blat_platform_query_file) or die "Unable to make $blat_platform_query_file \n";
@@ -472,7 +474,6 @@ sub parse_gse_platform_portion
                             #create Blat DB File
 		            my $file_genome_id = $genome_id;
 		            $file_genome_id =~ s/kb\|//; 
-#		            my $blat_genome_db_file = "/mnt/blat_files/".$file_genome_id."_blat_db_file";
 		            my $blat_genome_db_file = $blat_files_directory."/".$file_genome_id."_blat_db_file";
 		            push(@blat_files_to_clean_up_after, $blat_genome_db_file);
 		            open (BLAT_DB_FILE, ">".$blat_genome_db_file) or die "Unable to make $blat_genome_db_file \n";
@@ -508,12 +509,12 @@ sub parse_gse_platform_portion
                                 $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="Probe Sequences Blat Resolved";
                                 my $genome_number = $genome_id;
                                 $genome_number =~ s/kb\|//;
-#                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
                                 my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                                 make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);
 		            }
                             else
                             {
+#				push(@{$platform_hash{$gplID}->{"errors"}},"UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS");
                                 $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
                             }
 		            #MAY want to add self so can connect to DB to resolve alternative splicings
@@ -548,6 +549,7 @@ sub parse_gse_platform_portion
 		    {
 		        if (!(exists($genome_probe_to_feature_id_hash{$test_genome_id})))
                         {
+#			    push(@{$platform_hash{$gplID}->{"errors"}},"UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS");
                             $platform_hash{$gplID}->{"genomesMappingMethod"}->{$test_genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
 			}
                         else
@@ -560,12 +562,12 @@ sub parse_gse_platform_portion
 		                $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$test_genome_id} =  \%probe_to_feature_hash;
                                 my $genome_number = $test_genome_id;
                                 $genome_number =~ s/kb\|//;
-#                                my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
                                 my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                                 make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);   
 		            }
                             else
                             {
+#				push(@{$platform_hash{$gplID}->{"errors"}},"UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS");
                                 $platform_hash{$gplID}->{"genomesMappingMethod"}->{$test_genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
                             }
                         }
@@ -573,7 +575,6 @@ sub parse_gse_platform_portion
 	        }#end if probe sequences/ else do synonym lookup
             }#end need to do new mappings
 	}#end looping through tax_ids
-#        my $gpl_out_file = "/mnt/platform_genome_mapping_files/".$gplID; 
         my $gpl_out_file = $platform_genome_mappings_directory."/".$gplID; 
         open(GPL_OUT_FILE, ">".$gpl_out_file) or die "Unable to make $gpl_out_file \n";
         foreach my $mapping_genome_id (keys(%{$platform_hash{$gplID}->{"genomesMappingMethod"}}))
@@ -825,7 +826,14 @@ sub create_genome_synonyms_lookup
 		} 
 	    } 
 	}
-	$synonym_kbase_id_hash{'feature_coverage_percentage'}=(scalar(keys(%feature_id_coverage_hash)) / scalar(@feature_ids)) * 100;
+	if (scalar(@feature_ids) == 0)
+	{
+	    $synonym_kbase_id_hash{'feature_coverage_percentage'}=0;
+	}
+	else
+	{
+	    $synonym_kbase_id_hash{'feature_coverage_percentage'}=(scalar(keys(%feature_id_coverage_hash)) / scalar(@feature_ids)) * 100;
+	}
 	$genome_synonyms_lookup{$genome_id}=\%synonym_kbase_id_hash;	
     }
     return \%genome_synonyms_lookup;
@@ -1907,6 +1915,7 @@ sub get_GEO_GSE_data
 		my ($gsm_id) = keys(%{$sample_hash_ref});
 
 		my @sample_errors;
+
 		if(exists($gsm_platform_info_hash{$gsm_id}{"error"}))
 		{
 		    push(@{$sample_hash_ref->{$gsm_id}->{"errors"}},$gsm_platform_info_hash{$gsm_id}{"error"});
@@ -1934,6 +1943,7 @@ sub get_GEO_GSE_data
 	#print "FINAL LINE COUNT $line_count \n"; 
 	#print "GSM LISTED HASH : \n".Dumper($listed_gsm_hash_ref);
     } 
+    #print "\nGSE OBJECT : ".Dumper($gseObject)."\n";
     my @_bad_returns;
     (ref($gseObject) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"gseObject\" (value was \"$gseObject\")");
     if (@_bad_returns) {

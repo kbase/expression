@@ -494,15 +494,15 @@ module ExpressionServices {
 
     /*
         Data structure for the workspace expression platform.  The ExpressionPlatform typed object.
-        source_id defaults to kb_id if not set, but typically referes to a GPL if the data is from GEO.
+        source_id defaults to id if not set, but typically referes to a GPL if the data is from GEO.
 
         @optional strain
 
-        @searchable ws_subset source_id kb_id genome_id title technology
+        @searchable ws_subset source_id id genome_id title technology
         @searchable ws_subset strain.genome_id  strain.reference_strain strain.wild_type          
     */
     typedef structure { 
-        string kb_id; 
+        string id; 
         string source_id;
         genome_id genome_id;
         Strain strain; 
@@ -511,7 +511,7 @@ module ExpressionServices {
     } ExpressionPlatform; 
 
     /*
-       kb_id for the expression platform
+       id for the expression platform
 
        @id ws ExpressionServices.ExpressionPlatform
 
@@ -528,7 +528,7 @@ module ExpressionServices {
     } Protocol; 
 
     /*
-       kb_id for the expression sample
+       id for the expression sample
 
        @id ws ExpressionServices.ExpressionSample
 
@@ -552,14 +552,14 @@ module ExpressionServices {
        @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
        @optional averaged_from_samples protocol strain persons molecule data_source
        
-       @searchable ws_subset kb_id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
+       @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
        @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
        @searchable ws_subset strain.genome_id strain.reference_strain strain.wild_type          
        @searchable ws_subset protocol.name protocol.description 
        @searchable ws_subset expression_ontology_terms.[*].expression_ontology_term_id expression_ontology_terms.[*].expression_ontology_term_name
     */
     typedef structure {
-        string kb_id;
+        string id;
         string source_id;
         sample_type type;
         string numerical_interpretation;
@@ -587,10 +587,10 @@ module ExpressionServices {
 
         @optional title summary design publication_id 
 
-        @searchable ws_subset kb_id source_id publication_id title summary design expression_sample_ids
+        @searchable ws_subset id source_id publication_id title summary design expression_sample_ids
     */
     typedef structure { 
-        string kb_id; 
+        string id; 
         string source_id;
         expression_sample_ids expression_sample_ids;
         string title; 
@@ -603,10 +603,10 @@ module ExpressionServices {
     /*
         Simple Grouping of Samples that belong to the same replicate group.  ExpressionReplicateGroup yuped object.
 
-        @searchable ws_subset kb_id expression_sample_ids
+        @searchable ws_subset id expression_sample_ids
     */
     typedef structure {
-        string kb_id;
+        string id;
         expression_sample_ids expression_sample_ids;
     } ExpressionReplicateGroup;
 

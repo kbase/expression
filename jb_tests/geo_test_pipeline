@@ -1,0 +1,39 @@
+use strict; 
+use Bio::KBase::ExpressionServices::FunctionsForGEO; 
+use Bio::KBase::ExpressionServices::GEO2TypedObjects; 
+use Bio::KBase::ExpressionServices::GEO2ReplicateGroups; 
+ 
+use Data::Dumper; 
+ 
+my $functionsForGEO = Bio::KBase::ExpressionServices::FunctionsForGEO->new(); 
+ 
+ 
+#my @gses = qw(GSE39462); 
+ 
+my @gses = qw(GSE44606); #created nothing?
+#my @gses = qw(GSE34096); #blat cannot run because CDMI points to new database where that genome has been deleted.
+# GSE30507 GSE26195 GSE21481); 
+
+#my @gses = qw(GSE10019 GSE10039 GSE10247 GSE10248 GSE10322 GSE10324 GSE10414 GSE10464 GSE10496 GSE10497); 
+ 
+foreach my $gse (@gses) 
+{ 
+  #note the 3 file directories should be different and exist 
+print "\nBefore call : ".localtime."\n\n";
+  $functionsForGEO->make_GSE_object_file($gse,0,"/mnt/blat_files","/mnt/platform_genome_mapping_files/","/mnt/gse_objects/"); 
+print "\nBefore call : ".localtime."\n\n";
+  my $file_name = "/mnt/gse_objects/".$gse; 
+  system("perl /kb/dev_container/modules/expression/expr_data_supplement.pl --i=$file_name --s=/mnt/sunita_test_files/test.ont --o=$file_name"); 
+  my $geo2TypedObject = Bio::KBase::ExpressionServices::GEO2TypedObjects->new(); 
+  my $test_hash_ref = $geo2TypedObject->geo2TypedObjects($file_name,"GEO","/mnt/geo_results/","/mnt/typed_objects/"); 
+  print "\nGEO2TypedObject: ".Dumper($test_hash_ref); 
+} 
+my $geo2ReplicateGroups = Bio::KBase::ExpressionServices::GEO2ReplicateGroups->new(); 
+my $rep_file = "/mnt/geo_results/gsm_rep_ath_ptr"; 
+my $gsm_results_file = "/mnt/geo_results/gsm_results"; 
+my $typed_objects_dir = "/mnt/typed_objects/"; 
+my $rep_warnings_file = "/mnt/geo_results/rep_warnings"; 
+my $rep_test_hash_ref = $geo2ReplicateGroups->geo2ReplicateGroups($rep_file,$gsm_results_file,$typed_objects_dir,$rep_warnings_file); 
+print "\nREP Portion : ".Dumper($rep_test_hash_ref);
+ 
+system("perl /kb/dev_container/modules/expression/jb_tests/workspace_test2 http://140.221.84.209:7058 KBASE_Expression /mnt/typed_objects/"); 

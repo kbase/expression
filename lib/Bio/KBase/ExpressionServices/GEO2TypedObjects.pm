@@ -140,22 +140,26 @@ sub geo2TypedObjects
 
     my $id_server = Bio::KBase::IDServer::Client->new("http://kbase.us/services/idserver"); 
 
-    my %processed_gse_hash = get_processed_gse_hash($gse_results_file); #returns a hash key gse_id => {"kb_id" => kb|series.#,
+    my %processed_gse_hash = get_processed_gse_hash($gse_results_file); #returns a hash key gse_id => {"id" => kb|series.#,
                                                                         #                              "result" => result}
     my %processed_gpl_hash = get_processed_gpl_hash($gpl_results_file); #returns a hash key gpl_id => value kb|platform.#
     my %processed_gsm_hash = get_processed_gsm_hash($gsm_results_file); 
                       #returns a hash key gsm_id => {genome => {data_quality_level => value kb|sample.#
 
     my $current_gse_id = $gse_object_ref->{'gseID'};
-    my %sample_kb_ids_already_in_series;
+    my %sample_ids_already_in_series;
 
-    if(exists($processed_gse_hash{$current_gse_id}{"sample_kb_ids"}))
+    if(exists($processed_gse_hash{$current_gse_id}{"sample_ids"}))
     {
-	my @sample_kb_ids_array = split("\s*,\s*",$processed_gse_hash{$current_gse_id}{"sample_kb_ids"});
-	foreach my $sample_kb_id (@sample_kb_ids_array)
+	my @sample_ids_array = split("\s*,\s*",$processed_gse_hash{$current_gse_id}{"sample_ids"});
+	foreach my $sample_id (@sample_ids_array)
 	{
-	    $sample_kb_ids_already_in_series{$sample_kb_id} = 1;
+	    $sample_ids_already_in_series{$sample_id} = 1;
 	}
+    }
+    else
+    {
+	delete($processed_gse_hash{$current_gse_id});
     }
 
     #check if GSE has errors
@@ -166,13 +170,17 @@ sub geo2TypedObjects
 	{
 	    return "1";
 	}
+	else
+	{
+	    delete($processed_gse_hash{$current_gse_id});
+	}
         #write out gse record result
         open (GSE_RESULTS_FILE, ">>".$gse_results_file) or return "0 - Unable to make/append to $gse_results_file \n"; 
         #the first column is the GSE_ID      
         #the second column is the KBase Series ID (if it exists) 
         #the third column is the upload result (3 possible values "Full Success","Partial Success"(some of GSMs passed, but not all),"Failure"  
         #the fourth column is the warning and error messages (separated by "___", 3 underscores)                                             
-	#the fifth column is comma separated list of kb_ids for the samples that the series contains.
+	#the fifth column is comma separated list of ids for the samples that the series contains.
 
         #GRAB ERRORS REMOVE "\n", concatenate with 3 underscores
         my $gse_error_message = join("___",@gse_errors);
@@ -214,7 +222,7 @@ sub geo2TypedObjects
     {
         #PROCESS PLATFORMS
         #the GSE passed and at least 1 gsm passed
-        my %gpl_object_hash;  #key = gpl_id, value = platform typedef structure { kb_id => val,
+        my %gpl_object_hash;  #key = gpl_id, value = platform typedef structure { id => val,
                               #                                                   source_id => val,
                               #                                                   genome_id => val,
                               #                                                   technology => val,
@@ -289,7 +297,7 @@ sub geo2TypedObjects
 #			my $platform_prefix = "kb|platform";
 #			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
 #			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
-                        $gpl_object_hash{$gpl_id}={"kb_id" =>$kb_gpl_id,
+                        $gpl_object_hash{$gpl_id}={"id" =>$kb_gpl_id,
 						   "source_id" => $gpl_id,
 						   "genome_id" => $genome_id_selected,
                                                    "technology" => $gpl_hash{"gplTechnology"},
@@ -310,12 +318,12 @@ sub geo2TypedObjects
 	    foreach my $gpl_id (keys(%gpl_object_hash))
 	    {
 		#add it to the %processed_gpl_hash (used later for looking up kb_platform_ids for building the GSM)
-		$processed_gpl_hash{$gpl_id} = $gpl_object_hash{$gpl_id}{"kb_id"};
+		$processed_gpl_hash{$gpl_id} = $gpl_object_hash{$gpl_id}{"id"};
 		#write the GPL info in the file
-		print GPL_RESULTS_FILE $gpl_id . "\t".$gpl_object_hash{$gpl_id}{"kb_id"}."\n";
+		print GPL_RESULTS_FILE $gpl_id . "\t".$gpl_object_hash{$gpl_id}{"id"}."\n";
 
 		#CREATE JSON OBJECT FILE
-		my $temp_platform_file_name = $gpl_object_hash{$gpl_id}{"kb_id"};
+		my $temp_platform_file_name = $gpl_object_hash{$gpl_id}{"id"};
 		$temp_platform_file_name =~ s/kb\|//; 
 		my $platform_file_name = $typed_objects_directory."/".$temp_platform_file_name;
 		open(PLATFORM_FILE, ">".$platform_file_name) or return "0 - Unable to make to $platform_file_name \n";             
@@ -327,8 +335,8 @@ sub geo2TypedObjects
 
         #PROCESS SAMPLES
         #get sample kbase IDS for later use in the series Objects
-        my @gsm_kb_id_array; #array of Sample Kbase IDs associated with the Series (could be both new and old GSMs)      
-	my @new_gsm_kb_id_array; #Array of new kb_id of new GSMs to be added. : new gsm = distinct (GSM - Genome - DataQualityLevel combination).
+        my @gsm_id_array; #array of Sample Kbase IDs associated with the Series (could be both new and old GSMs)      
+	my @new_gsm_id_array; #Array of new id of new GSMs to be added. : new gsm = distinct (GSM - Genome - DataQualityLevel combination).
 	                         #If at least one new one and the GSE already exist, need to save a new verion of the GSE 
                                  #(extra entries in the sample list)
 
@@ -402,7 +410,7 @@ sub geo2TypedObjects
 						     'expression_ontology_term_name'=>$temp_term_name,
 						     'expression_ontology_term_definition'=>$temp_term_definition});  
                 }				   
-                #genome specific data : kb_id, genome_id, expression_levels, original_median, data_quality_level, strain (all of strain)
+                #genome specific data : id, genome_id, expression_levels, original_median, data_quality_level, strain (all of strain)
 		#loop through each passing GENOME        
                 my @genome_ids = keys(%{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}});
 		foreach my $temp_genome_id (@genome_ids)
@@ -416,10 +424,10 @@ sub geo2TypedObjects
 		    if($temp_kbase_id ne "")
 		    {
 			#means the sample already exists just need to add the sample kbase_id to the list of samples for the 
-			push(@gsm_kb_id_array,$temp_kbase_id);
-			unless (exists($sample_kb_ids_already_in_series{$temp_kbase_id}))
+			push(@gsm_id_array,$temp_kbase_id);
+			unless (exists($sample_ids_already_in_series{$temp_kbase_id}))
 			{
-			    push(@new_gsm_kb_id_array,$temp_kbase_id); 
+			    push(@new_gsm_id_array,$temp_kbase_id); 
 			}
 			$passing_gsm_count++;
 		    }
@@ -459,15 +467,15 @@ sub geo2TypedObjects
 			#within sample loop			
                         #grab kbase_sample_id for it
 			my $sample_prefix = "kb|sample_test";  
-			my $gsm_kb_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 );
+			my $gsm_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 );
 #			my $sample_prefix = "kb|sample";
 #			my $sample_id_key = $gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
 #                       my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
-#                       my $gsm_kb_id = $temp_id_hash_ref->{$sample_id_key};
-			#add gsm_kb_id to gse_list
-			push(@gsm_kb_id_array,$gsm_kb_id);
-			#new sample - push kb_id onto new_gsm_kb_idarray;
-			push(@new_gsm_kb_id_array,$gsm_kb_id); 
+#                       my $gsm_id = $temp_id_hash_ref->{$sample_id_key};
+			#add gsm_id to gse_list
+			push(@gsm_id_array,$gsm_id);
+			#new sample - push id onto new_gsm_id_array;
+			push(@new_gsm_id_array,$gsm_id); 
 			$passing_gsm_count++;
 			#write out the samples in the processed_gsm_file   
 			my $gsm_warning_message = "";
@@ -476,13 +484,13 @@ sub geo2TypedObjects
 			    $gsm_warning_message = join("___",@{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'warnings'}}); 
 			    $gsm_warning_message =~ s/\n/ /g;
 			}
-			print GSM_RESULTS_FILE $gsm_id . "\t".$temp_genome_id."\t".$dataQualityLevel."\t".$gsm_kb_id."\t".$gsm_warning_message."\n"; 
+			print GSM_RESULTS_FILE $gsm_id . "\t".$temp_genome_id."\t".$dataQualityLevel."\t".$gsm_id."\t".$gsm_warning_message."\n"; 
 
                         #BUILD UP FULL SAMPLE OBJECT
 			#note "default_control_sample"
                         # and "averaged_from_samples" are not set by this (those are custom fields that require users to set that data)
 			$dataQualityLevel = $dataQualityLevel + 0;#To coerce back to an integer
-			my $sample_object_ref = {"kb_id" =>$gsm_kb_id,
+			my $sample_object_ref = {"id" =>$gsm_id,
 						 "source_id" => $gsm_id,
 						 "type"=>$gsm_type,
 						 "numerical_interpretation"=>$gsm_numerical_interpretation,
@@ -523,7 +531,7 @@ sub geo2TypedObjects
 			}
 			#Write out object
 			#CREATE JSON OBJECT FILE          
-			my $temp_sample_file_name = $gsm_kb_id; 
+			my $temp_sample_file_name = $gsm_id; 
 			$temp_sample_file_name =~ s/kb\|//; 
 			my $sample_file_name = $typed_objects_directory."/".$temp_sample_file_name; 
 			open(SAMPLE_FILE, ">".$sample_file_name) or return "0 - Unable to make to $sample_file_name \n";
@@ -560,26 +568,26 @@ sub geo2TypedObjects
         #(TO INCLUDE THE NEW SAMPLE_IDS)(CAN GET SAMPLE_IDS_THEN)
         #grab series data, write it to file, build up return typed object
 
-	#check to see if it exists all ready.  If it does, get the kb_id for it and the list of SampleIDs associated with it.
-	#if it does not get new kb_id.
+	#check to see if it exists all ready.  If it does, get the id for it and the list of SampleIDs associated with it.
+	#if it does not get new id.
     
-	my $series_kb_id;
-	my %sample_kb_ids_in_series;
-	foreach my $temp_kb_sample_id (@gsm_kb_id_array)
+	my $series_id;
+	my %sample_ids_in_series;
+	foreach my $temp_kb_sample_id (@gsm_id_array)
 	{
-	    $sample_kb_ids_in_series{$temp_kb_sample_id}=1;
+	    $sample_ids_in_series{$temp_kb_sample_id}=1;
 	}
 
-	if (exists($processed_gse_hash{$current_gse_id}{"kb_id"}))
+	if (exists($processed_gse_hash{$current_gse_id}{"id"}))
 	{
 	    #means the GSE exists but new sample_ids need to be added to it.
-	    #need to make the full SERIES typed object again using existing kb_id
-	    #merged set between @gsm_kb_id_array and %sample_kb_ids_already_in_series
-	    $series_kb_id = $processed_gse_hash{$current_gse_id}{"kb_id"};
+	    #need to make the full SERIES typed object again using existing id
+	    #merged set between @gsm_id_array and %sample_ids_already_in_series
+	    $series_id = $processed_gse_hash{$current_gse_id}{"id"};
 	    #print "\nIN IF : Existing series\n";
-	    foreach my $temp_kb_sample_id (keys(%sample_kb_ids_already_in_series))
+	    foreach my $temp_kb_sample_id (keys(%sample_ids_already_in_series))
 	    {
-		$sample_kb_ids_in_series{$temp_kb_sample_id}=1;
+		$sample_ids_in_series{$temp_kb_sample_id}=1;
 	    }	    
 	    #need to change geo results file and overwrite the previous entry (new list of sample_ids)
 	    if ($passing_gsm_count == 0)
@@ -605,7 +613,7 @@ sub geo2TypedObjects
 	    my $old_messages = "";
 	    foreach my $gse_result_line (@gse_results_lines) 
 	    { 
-		my ($gse_id,$kbase_id,$result,$messages,$sample_kb_ids) = split('\t',trim($gse_result_line));
+		my ($gse_id,$kbase_id,$result,$messages,$sample_ids) = split('\t',trim($gse_result_line));
 		if ($current_gse_id ne $gse_id)
 		{
 		    print GSE_RESULTS_FILE $gse_result_line;
@@ -627,8 +635,8 @@ sub geo2TypedObjects
 		    $warning_messages = $old_messages;
 		}
 	    }
-	    print GSE_RESULTS_FILE $current_gse_id . "\t" . $series_kb_id . "\t".$result."\t".$warning_messages."\t".
-		join(",",sort(keys(%sample_kb_ids_in_series)))."\n";  
+	    print GSE_RESULTS_FILE $current_gse_id . "\t" . $series_id . "\t".$result."\t".$warning_messages."\t".
+		join(",",sort(keys(%sample_ids_in_series)))."\n";  
 	    close (GSE_RESULTS_FILE);
 	}
 	else
@@ -637,10 +645,10 @@ sub geo2TypedObjects
             #GRAB NEW SERIES KB ID
             #print "\nIN ELSE : Brand new series\n";
 	    my $series_prefix = "kb|series_test";  
-	    $series_kb_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 );
+	    $series_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 );
 #	    my $series_prefix = "kb|series";
 #	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
-#	    $series_kb_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
+#	    $series_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
             #resolve result
 	    my $result = "Full Success";
 	    if ($passing_gsm_count == 0)
@@ -654,13 +662,13 @@ sub geo2TypedObjects
             my @gse_warnings = @{$gse_object_ref->{'gseWarnings'}}; 
             my $warning_messages = join("___",@gse_warnings); 
 	    open (GSE_RESULTS_FILE, ">>".$gse_results_file) or return "0 - Unable to make/append to $gse_results_file \n";
-	    print GSE_RESULTS_FILE $current_gse_id . "\t" . $series_kb_id . "\t".$result."\t".$warning_messages."\t".
-		join(",",sort(keys(%sample_kb_ids_in_series)))."\n";  
+	    print GSE_RESULTS_FILE $current_gse_id . "\t" . $series_id . "\t".$result."\t".$warning_messages."\t".
+		join(",",sort(keys(%sample_ids_in_series)))."\n";  
 	    close (GSE_RESULTS_FILE);
 	}
-	my @gse_sample_ids = sort(keys(%sample_kb_ids_in_series));
+	my @gse_sample_ids = sort(keys(%sample_ids_in_series));
 	#BUILD UP SERIES OBJECT and WRITE OUT SERIES OBJECT
-	my $series_object_ref = {"kb_id"=>$series_kb_id,
+	my $series_object_ref = {"id"=>$series_id,
 				 "source_id"=>$gse_object_ref->{'gseID'},
 				 "expression_sample_ids"=>\@gse_sample_ids,
 				 "title"=>$gse_object_ref->{'gseTitle'},
@@ -670,7 +678,7 @@ sub geo2TypedObjects
 				 "external_source_date"=>$gse_object_ref->{'gseSubmissionDate'}};
 	#Write out object  
 	#CREATE JSON OBJECT FILE   
-	my $temp_series_file_name = $series_kb_id;
+	my $temp_series_file_name = $series_id;
 	$temp_series_file_name =~ s/kb\|//;
 	my $series_file_name = $typed_objects_directory."/".$temp_series_file_name;
 	open(SERIES_FILE, ">".$series_file_name) or return "0 - Unable to make to $series_file_name \n"; 
@@ -693,18 +701,18 @@ sub get_processed_gse_hash
         #the second column is the KBase Series ID (if it exists)
         #the third column is the upload result (3 possible values "Full Success","Partial Success"(some of GSMs passed, but not all),"Failure"
         #the fourth column is the warning and error messages (separated by "___", 3 underscores)
-	#the fifth column is comma separated list of kb_ids for the samples that the series contains.
+	#the fifth column is comma separated list of ids for the samples that the series contains.
         open (GSE_RESULTS,$gse_results_file) or return "0 - Unable to open $gse_results_file , it was supposed to exist";
         my @gse_results_lines = (<GSE_RESULTS>);
         foreach my $gse_result_line (@gse_results_lines)
         {
-	    my ($gse_id,$kbase_id,$result,$messages,$sample_kb_ids) = split('\t',trim($gse_result_line));
+	    my ($gse_id,$kbase_id,$result,$messages,$sample_ids) = split('\t',trim($gse_result_line));
             if (($result ne "Failure") && (trim($kbase_id) ne '') && (trim($gse_id) ne ''))
             {
-		$return_hash{$gse_id}{"kb_id"} = trim($kbase_id);
+		$return_hash{$gse_id}{"id"} = trim($kbase_id);
             }
 	    $return_hash{$gse_id}{"result"} = trim($result);
-	    $return_hash{$gse_id}{"sample_kb_ids"} = trim($sample_kb_ids);
+	    $return_hash{$gse_id}{"sample_ids"} = trim($sample_ids);
         }
         close(GSE_RESULTS);
     }

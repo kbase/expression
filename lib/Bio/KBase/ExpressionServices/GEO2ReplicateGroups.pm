@@ -212,7 +212,7 @@ sub geo2ReplicateGroups
 #               my $kb_rep_group_id = $temp_id_hash_ref->{$replicate_group_key}; 
  
 		#make replicate group data structure
-		my $rep_group_object_hash = {"kb_id" => $kb_rep_group_id,
+		my $rep_group_object_hash = {"id" => $kb_rep_group_id,
 					     "expression_sample_ids" => \@sample_ids};
 		#CREATE JSON OBJECT FILE                                                                                              
                 my $temp_rep_group_file_name = $kb_rep_group_id;   
