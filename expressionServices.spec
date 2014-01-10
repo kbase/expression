@@ -539,6 +539,10 @@ module ExpressionServices {
     /* list of expression sample ids */ 
     typedef list<expression_sample_id> expression_sample_ids;
 
+    /* map between genome ids and a list of samples from that genome in this sample */
+    typedef mapping<genome_id genome_id, expression_sample_ids> genome_expression_sample_ids_map; 
+    
+
     /* list of Persons */ 
     typedef list<Person> persons;
 
@@ -587,12 +591,12 @@ module ExpressionServices {
 
         @optional title summary design publication_id 
 
-        @searchable ws_subset id source_id publication_id title summary design expression_sample_ids
+        @searchable ws_subset id source_id publication_id title summary design genome_expression_sample_ids_map
     */
     typedef structure { 
         string id; 
         string source_id;
-        expression_sample_ids expression_sample_ids;
+        genome_expression_sample_ids_map genome_expression_sample_ids_map;
         string title; 
         string summary;
         string design; 

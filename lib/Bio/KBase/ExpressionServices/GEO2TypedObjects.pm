@@ -563,6 +563,8 @@ sub geo2TypedObjects
 	}
 	close(GSM_RESULTS_FILE); 
 
+	my %sample_genome_hash = create_sample_genome_hash($gsm_results_file);
+
         #PROCESS SERIES (IF new SERIES, or existing SERIES but need to add new samples to the list (NEED TO STORE sample_id_list)).
         #NOTE IF SERIES EXISTS ALREADY NEED TO SLURP UP ENTIRE GSE_RESULTS_FILE AND CHANGE THAT GSE ENTRY 
         #(TO INCLUDE THE NEW SAMPLE_IDS)(CAN GET SAMPLE_IDS_THEN)
@@ -572,10 +574,10 @@ sub geo2TypedObjects
 	#if it does not get new id.
     
 	my $series_id;
-	my %sample_ids_in_series;
+	my %sample_ids_in_series;#key kb_sample_id => genome_id
 	foreach my $temp_kb_sample_id (@gsm_id_array)
 	{
-	    $sample_ids_in_series{$temp_kb_sample_id}=1;
+	    $sample_ids_in_series{$temp_kb_sample_id}=$sample_genome_hash{$temp_kb_sample_id};
 	}
 
 	if (exists($processed_gse_hash{$current_gse_id}{"id"}))
@@ -587,7 +589,7 @@ sub geo2TypedObjects
 	    #print "\nIN IF : Existing series\n";
 	    foreach my $temp_kb_sample_id (keys(%sample_ids_already_in_series))
 	    {
-		$sample_ids_in_series{$temp_kb_sample_id}=1;
+		$sample_ids_in_series{$temp_kb_sample_id}=$sample_genome_hash{$temp_kb_sample_id};
 	    }	    
 	    #need to change geo results file and overwrite the previous entry (new list of sample_ids)
 	    if ($passing_gsm_count == 0)
@@ -667,10 +669,17 @@ sub geo2TypedObjects
 	    close (GSE_RESULTS_FILE);
 	}
 	my @gse_sample_ids = sort(keys(%sample_ids_in_series));
+
+	my %genome_sample_ids_hash; #key genome id =>[sample_ids]
+	foreach my $temp_sample_id (sort(keys(%sample_ids_in_series)))
+	{
+	    push(@{$genome_sample_ids_hash{$sample_ids_in_series{$temp_sample_id}}},$temp_sample_id);
+	}
+
 	#BUILD UP SERIES OBJECT and WRITE OUT SERIES OBJECT
 	my $series_object_ref = {"id"=>$series_id,
 				 "source_id"=>$gse_object_ref->{'gseID'},
-				 "expression_sample_ids"=>\@gse_sample_ids,
+				 "genome_expression_sample_ids_map"=>\%genome_sample_ids_hash,
 				 "title"=>$gse_object_ref->{'gseTitle'},
 				 "summary"=>$gse_object_ref->{'gseSummary'},
 				 "design"=>$gse_object_ref->{'gseDesign'},
@@ -768,6 +777,35 @@ sub get_processed_gsm_hash
                 $return_hash{$gsm_id}{$genome_id}{$dql} = trim($kbase_id);
             }
         }
+        close(GSM_RESULTS); 
+    } 
+    return %return_hash; 
+}
+
+sub create_sample_genome_hash
+{
+    my $gsm_results_file = shift; 
+    #returns a hash key sample_id => genome
+    my %return_hash; 
+    if (-e $gsm_results_file) 
+    { 
+        #THIS FILE HAS 5 columns (tab delimited)(only 4 are brought back for this hash)                         
+        #the first column is the GSM_ID
+        #the second column is the Genome (kbase genome id)  
+        #the third column is the DataQualityLevel (currently 3 possible int values -   
+        #        "1" for kbase pipeline processed data, "2" for seq blat mapped geo data,  "3" for synonym mapped geo data 
+        #the fourth column is the KBase Sample ID (if it exists) 
+        #the fifth column is the warning and error messages (separated by "___", 3 underscores)
+        open (GSM_RESULTS,$gsm_results_file) or return "0 - Unable to open $gsm_results_file , it was supposed to exist";
+        my @gsm_results_lines = (<GSM_RESULTS>);
+        foreach my $gsm_result_line (@gsm_results_lines)
+        { 
+            my ($gsm_id,$genome_id, $dql, $kbase_id,$messages) = split('\t',trim($gsm_result_line)); 
+            if ((trim($kbase_id) ne '') && (trim($genome_id) ne ''))
+            { 
+                $return_hash{trim($kbase_id)}=trim($genome_id);
+            } 
+        } 
         close(GSM_RESULTS); 
     } 
     return %return_hash; 

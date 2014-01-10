@@ -91,12 +91,17 @@ foreach my $series_file (@series_files)
 	my ($json_result,@temp_array)= (<JSON_FILE>);
 	close(JSON_FILE);
 	my $perl_object = from_json($json_result);
-	my @sample_ids = @{$perl_object->{"expression_sample_ids"}};
-	for (my $i = 0; $i < scalar(@sample_ids); $i++)
+	my %genome_expression_sample_ids_map = %{$perl_object->{"genome_expression_sample_ids_map"}};
+	foreach my $genome_id (keys(%genome_expression_sample_ids_map))
 	{
-		$sample_ids[$i] = $workspace_name."/".$sample_ids[$i];
+		my @sample_ids = @{$genome_expression_sample_ids_map{$genome_id}};
+		for (my $i = 0; $i < scalar(@sample_ids); $i++)
+        	{ 
+                  $sample_ids[$i] = $workspace_name."/".$sample_ids[$i];
+        	} 
+		$genome_expression_sample_ids_map{$genome_id}=\@sample_ids;
 	}
-	$perl_object->{"expression_sample_ids"}=\@sample_ids;
+	$perl_object->{"genome_expression_sample_ids_map"}=\%genome_expression_sample_ids_map;
         my $save_object_params = {"workspace"=>$workspace_name, 
                                   "objects"=>[{"type"=>$typed_object, 
                                                "name"=>$perl_object->{'id'}, 
