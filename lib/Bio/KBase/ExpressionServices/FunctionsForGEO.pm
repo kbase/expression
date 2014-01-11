@@ -499,7 +499,7 @@ sub parse_gse_platform_portion
 		            die "blat failed" unless -e $blat_results_file; 
 		            push(@blat_files_to_clean_up_after, $blat_results_file);
 		            #Parse Blat File and create mapping from Platform ID to Feature ID
-		            my %probe_to_feature_hash =  parse_blat_results($blat_results_file);  
+		            my %probe_to_feature_hash =  parse_blat_results($blat_results_file,$genome_id,$dbh);  
 		            $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id} = \%probe_to_feature_hash; 
 
 		            #if number of probe sequences mapped to feature ids is greater than (.3 * total number of probe sequences) it passes.
@@ -845,11 +845,41 @@ sub create_genome_synonyms_lookup
 sub parse_blat_results
 {
     my $blat_results_file = shift;
+    my $genome_id = shift;
+    my $dbh = shift;
     open (BLAT,$blat_results_file) or die "Unable to open the blat file : $blat_results_file.\n\n";
     my @blat_lines = (<BLAT>);
     close(BLAT);
     chomp(@blat_lines);
+
+    #make hash cds key -> locus value : so can see if CDS is part of a locus with alternative isoforms.
+    my %cds_to_locus_hash;
+
+    #make another hash for locus of all its isoforms : locus key -> value [cds feature ids]
+    my %locus_to_cds_members_hash;
+
+    #make another hash for CDS feature length key cds feature id -> length of CDS
+    my %cds_length_hash;
+
+    my $has_locus_families = 0;
+
+    my $get_cds_hiearchy_info_q = qq^select m2l.to_link as LOCUS, f.id as CDS, f.sequence_length
+                                     from Feature f inner join Encompasses c2m on f.id = c2m.from_link
+                                     inner join Encompasses m2l on c2m.to_link = m2l.from_link
+                                     where substring_index(f.id, '.', 2) = ?
+                                     and f.feature_type = 'CDS'^;
+    my $get_cds_hiearchy_info_qh = $dbh->prepare($get_cds_hiearchy_info_q) or die "Unable to prepare get_cds_hiearchy_info_q : ".$get_cds_hiearchy_info_q." : ".$dbh->errstr();
+    $get_cds_hiearchy_info_qh->execute($genome_id) or die "Unable to execute get_cds_hiearchy_info_q : ".$get_cds_hiearchy_info_q." : ".$get_cds_hiearchy_info_qh->errstr();
     
+    while (my ($temp_locus,$temp_cds, $temp_length) = $get_cds_hiearchy_info_qh->fetchrow_array()) 
+    {
+	$cds_to_locus_hash{$temp_cds}=$temp_locus;
+	push(@{$locus_to_cds_members_hash{$temp_locus}},$temp_cds);
+	$cds_length_hash{$temp_cds}=$temp_length;
+	$has_locus_families = 1;
+    }
+
+    #logic if a blat has a perfect hit to multiple CDSs if they are all members of the same locus isoform family, grab the longest CDS from the hits.
     my $past_header = 0;
     while ($past_header == 0)
     {
@@ -901,10 +931,11 @@ sub parse_blat_results
 	else
 	{
 	    #compare the multiple hits.  Take the perfect hit if only one perfect hit exists.
-	    #otherwise you have multiple perfect hits or multiple 1 mismatch hits.  Results are ambiguous.  
+            #logic if a blat has a perfect hit to multiple CDSs if they are all members of the same locus isoform family, grab the longest CDS from the hits.
+	    #otherwise you have multiple perfect hits or multiple 1 mismatch hits to unrelated locus CDSs.  Results are ambiguous.  
 	    #Nothing gets put into the hash.
-	    my $num_perfect_hits = 0;
-	    my $perfect_t_name;
+#	    my $num_perfect_hits = 0;
+	    my @perfect_t_names;
 	    foreach my $blat_line (@blat_lines)
 	    {
 		my @blat_elements = split(/\t/,$blat_line);
@@ -916,13 +947,47 @@ sub parse_blat_results
 		#criteria at max 1 mismatch along entire length of the probe.  block count must equal 1.
 		if (((($q_size - $match) + $mis_match) == 0) && ($block_count == 1))
 		{ 
-		    $num_perfect_hits++;
-		    $perfect_t_name = $t_name;
+#		    $num_perfect_hits++;
+		    push(@perfect_t_names,$t_name);
 		}
 	    }
-	    if ($num_perfect_hits == 1)
+	    if (scalar(@perfect_t_names) == 1)
 	    {
-		$probe_feature_id_hash{$candidate_q_name} = $perfect_t_name;
+		$probe_feature_id_hash{$candidate_q_name} = $perfect_t_names[0];
+	    }
+	    elsif($has_locus_families == 1)
+	    {
+		#you have multiple perfect hits, see if they are all members of the same locus
+		my %unique_locus_hash;
+		foreach my $temp_cds (@perfect_t_names)
+		{
+		    $unique_locus_hash{$cds_to_locus_hash{$temp_cds}};
+		}
+		if (scalar(keys(%unique_locus_hash)) == 1)
+		{
+		    my $max_length = 0;
+		    my $max_cds = '';
+		    foreach my $temp_cds (@perfect_t_names)
+		    {
+			if ($cds_length_hash{$temp_cds} > $max_length)
+			{
+			    $max_length = $cds_length_hash{$temp_cds};
+			    $max_cds = $temp_cds;
+			}
+		    }
+		    if ($max_cds ne '')
+		    {
+			$probe_feature_id_hash{$candidate_q_name} = $max_cds;
+		    }
+		}
+		else
+		{
+		    #do nothing as the perfect hits do not map to a single locus and its many isoforms.  Ambiguous and have to throw out.
+		}
+	    }
+	    else
+	    {
+		#can't use ambiguous and not isoform/member of a locus.
 	    }
 	}
     }
@@ -1053,6 +1118,7 @@ sub parse_gse_sample_portion
     my $platform_tax_genome_probe_feature_hash_ref = shift;
     my $lines_array_ref = shift;
     my @lines = @{$lines_array_ref};
+    my $self = shift;
 
     my %gsm_hash;
     my $gsm_id = undef;
@@ -1359,6 +1425,26 @@ sub parse_gse_sample_portion
             }
         }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
+ 
+        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+                               { RaiseError => 1, ShowErrorStatement => 1 }
+            ); 
+	my @genomes_with_data = keys(%{$gsm_data_hash_ref});
+	my $were_representatives_used_q = qq^select count(*)
+	                                     from Feature f inner join Encompasses c2m on f.id = c2m.from_link
+                                             inner join Encompasses m2l on c2m.to_link = m2l.from_link
+                                             where substring_index(f.id, '.', 2) in (^.
+					     join(",", ("?") x @genomes_with_data) . 
+                                          qq^) and f.feature_type = 'CDS'^;
+	my $were_representatives_used_qh = $dbh->prepare($were_representatives_used_q) or die "Unable to prepare were_representatives_used : ".$were_representatives_used_q . ":".$dbh->errstr();
+	$were_representatives_used_qh->execute(@genomes_with_data)or die "Unable to execute were_representatives_used : ".$were_representatives_used_q . ":".$were_representatives_used_qh->errstr();
+	my $cds_in_families_count = 0;
+	($cds_in_families_count) = $were_representatives_used_qh->fetchrow_array();
+	if ($cds_in_families_count > 0)
+	{
+	    $gsm_value_type = "Representative CDS feature ids were used to resolve ambiguous isoforms. ".$gsm_value_type;
+	}
+
 	$gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type;	
         push(@{$gsm_hash{$gsm_id}->{"errors"}},@{$temp_gsm_value_errors_ref});
         #print "GSM HASH : ".Dumper(\%gsm_hash);
@@ -1911,7 +1997,7 @@ sub get_GEO_GSE_data
 		my @gse_sample_lines = @gse_lines[$sample_start_lines[$sample_counter]..$sample_end_lines[$sample_counter]]; 
                 #print "\n\n\n\n\n\n\n\n\n\n\n\nGSE SAMPLE LINES : \n".Dumper(\@gse_sample_lines);
                 my %copy_platform_hash = %platform_hash;
-		my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines); 
+		my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines,$self); 
 		my ($gsm_id) = keys(%{$sample_hash_ref});
 
 		my @sample_errors;
