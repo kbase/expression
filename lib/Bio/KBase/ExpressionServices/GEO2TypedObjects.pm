@@ -469,7 +469,7 @@ sub geo2TypedObjects
 			my $sample_prefix = "kb|sample_test";  
 			my $gsm_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 );
 #			my $sample_prefix = "kb|sample";
-#			my $sample_id_key = $gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
+#			my $sample_id_key = "GEO::".$gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
 #                       my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
 #                       my $gsm_id = $temp_id_hash_ref->{$sample_id_key};
 			#add gsm_id to gse_list
