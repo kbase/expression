@@ -1,0 +1,130 @@
+use strict; 
+use Data::Dumper; 
+use Bio::KBase::workspace::Client; 
+use JSON;
+
+my $ws_url = shift;
+#my $ws_url = "http://140.221.84.209:7058";
+my $workspace_name = shift;
+#my $workspace_name = "networks_typed_objects_examples";
+my $typed_objects_dir = shift;
+#my $typed_objects_dir = "/mnt/typed_objects/";
+
+my $ws_client = Bio::KBase::workspace::Client->new($ws_url);
+#my $ws_client = Bio::KBase::workspace::Client->new("http://140.221.84.209:7058");
+my $typed_objects_dir_string = $typed_objects_dir . "*";
+#my @files = <$typed_objects_dir_string>;
+
+opendir DIR, $typed_objects_dir or die "cannot open dir $typed_objects_dir: $!";
+my @files= readdir DIR;
+closedir DIR;
+print "tos: ".$typed_objects_dir_string . "\n";
+
+my @platform_files;
+my @sample_files;
+my @series_files;
+my @replicate_group_files;
+
+#organize file_types
+foreach my $file_path (@files)
+{
+	my $file_name = $file_path;
+	$file_name =~ s/^\/mnt\/$typed_objects_dir\///;
+	if ($file_name =~ m/^platform/)
+	{
+		push(@platform_files,$file_name);
+	}
+	elsif ($file_name =~ m/^sample/)
+	{
+		push(@sample_files,$file_name);
+	}
+	elsif ($file_name =~ m/^series/)
+	{
+		push(@series_files,$file_name);
+	}
+	elsif ($file_name =~ m/^repGroup/)
+	{
+		push(@replicate_group_files,$file_name);
+	}
+}
+
+#process file types in the proper order.
+foreach my $platform_file (@platform_files)
+{
+	my $typed_object = "ExpressionServices.ExpressionPlatform";
+	my $file_path = $typed_objects_dir."/".$platform_file;
+	open (JSON_FILE,$file_path) or die "0 - Unable to open $file_path , it was supposed to exist";			 
+	my ($json_result,@temp_array)= (<JSON_FILE>);
+	close(JSON_FILE);
+	my $perl_object = from_json($json_result);
+#will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
+        my $save_object_params = {"workspace"=>$workspace_name, 
+                                  "objects"=>[{"type"=>$typed_object, 
+                                               "name"=>$perl_object->{'id'}, 
+                                               "data"=>$perl_object}]};
+	$ws_client->save_objects($save_object_params); 
+} 
+foreach my $sample_file (@sample_files)
+{
+	my $typed_object = "ExpressionServices.ExpressionSample";
+	my $file_path = $typed_objects_dir."/".$sample_file;
+	open (JSON_FILE,$file_path) or die "0 - Unable to open $file_path , it was supposed to exist";			 
+	my ($json_result,@temp_array)= (<JSON_FILE>);
+	close(JSON_FILE);
+	my $perl_object = from_json($json_result);
+	if($perl_object->{"platform_id"})
+	{
+		$perl_object->{"platform_id"} = $workspace_name . "/".$perl_object->{"platform_id"};
+	}
+#will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
+        my $save_object_params = {"workspace"=>$workspace_name, 
+                                  "objects"=>[{"type"=>$typed_object, 
+                                               "name"=>$perl_object->{'id'}, 
+                                               "data"=>$perl_object}]};
+	$ws_client->save_objects($save_object_params); 
+} 
+foreach my $series_file (@series_files)
+{
+	my $typed_object = "ExpressionServices.ExpressionSeries";
+	my $file_path = $typed_objects_dir."/".$series_file;
+	open (JSON_FILE,$file_path) or die "0 - Unable to open $file_path , it was supposed to exist";			 
+	my ($json_result,@temp_array)= (<JSON_FILE>);
+	close(JSON_FILE);
+	my $perl_object = from_json($json_result);
+	my %genome_expression_sample_ids_map = %{$perl_object->{"genome_expression_sample_ids_map"}};
+	foreach my $genome_id (keys(%genome_expression_sample_ids_map))
+	{
+		my @sample_ids = @{$genome_expression_sample_ids_map{$genome_id}};
+		for (my $i = 0; $i < scalar(@sample_ids); $i++)
+        	{ 
+                  $sample_ids[$i] = $workspace_name."/".$sample_ids[$i];
+        	} 
+		$genome_expression_sample_ids_map{$genome_id}=\@sample_ids;
+	}
+	$perl_object->{"genome_expression_sample_ids_map"}=\%genome_expression_sample_ids_map;
+        my $save_object_params = {"workspace"=>$workspace_name, 
+                                  "objects"=>[{"type"=>$typed_object, 
+                                               "name"=>$perl_object->{'id'}, 
+                                               "data"=>$perl_object}]};
+	$ws_client->save_objects($save_object_params); 
+} 
+foreach my $replicate_group_file (@replicate_group_files)
+{
+	my $typed_object = "ExpressionServices.ExpressionReplicateGroup";
+	my $file_path = $typed_objects_dir."/".$replicate_group_file;
+	open (JSON_FILE,$file_path) or die "0 - Unable to open $file_path , it was supposed to exist";			 
+	my ($json_result,@temp_array)= (<JSON_FILE>);
+	close(JSON_FILE);
+	my $perl_object = from_json($json_result);
+	my @sample_ids = @{$perl_object->{"expression_sample_ids"}};
+	for (my $i = 0; $i < scalar(@sample_ids); $i++)
+	{
+		$sample_ids[$i] = $workspace_name."/".$sample_ids[$i];
+	}
+	$perl_object->{"expression_sample_ids"}=\@sample_ids;
+        my $save_object_params = {"workspace"=>$workspace_name, 
+                                  "objects"=>[{"type"=>$typed_object, 
+                                               "name"=>$perl_object->{'id'}, 
+                                               "data"=>$perl_object}]};
+	$ws_client->save_objects($save_object_params); 
+} 
