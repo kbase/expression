@@ -1,0 +1,72 @@
+use strict;
+use Data::Dumper;
+use Bio::KBase; 
+use Bio::KBase::CDMI::CDMIClient; 
+use Bio::KBase::IdMap::Client; 
+
+my $id_map = Bio::KBase::IdMap::Client->new("http://140.221.85.96:7111");
+
+
+
+my $kb = Bio::KBase->new(); 
+my $cdmi_client = $kb->central_store; 
+
+my $locus_genome_fids_hash_ref = $cdmi_client->genomes_to_fids(['kb|g.3899'],['locus']); 
+my @locus_feature_ids = @{$locus_genome_fids_hash_ref->{'kb|g.3899'}}; 
+my $mRNA_genome_fids_hash_ref = $cdmi_client->genomes_to_fids(['kb|g.3899'],['mRNA']); 
+my @mRNA_feature_ids = @{$mRNA_genome_fids_hash_ref->{'kb|g.3899'}}; 
+
+#print "Results\n".Dumper(\@mRNA_feature_ids);
+
+my $locus_to_cds_hash_ref = $id_map->longest_cds_from_locus(\@locus_feature_ids);
+my $mRNA_to_cds_hash_ref = $id_map->longest_cds_from_mrna(\@mRNA_feature_ids); 
+
+my %locus_to_cds_hash;
+foreach my $locus_id (keys(%{$locus_to_cds_hash_ref}))
+{
+	my ($cds_id) = keys(%{$locus_to_cds_hash_ref->{$locus_id}});
+	$locus_to_cds_hash{$locus_id}=$cds_id;
+}
+
+my %mRNA_to_cds_hash;
+foreach my $mRNA_id (keys(%{$mRNA_to_cds_hash_ref}))
+{
+	my ($cds_id) = keys(%{$mRNA_to_cds_hash_ref->{$mRNA_id}});
+	$mRNA_to_cds_hash{$mRNA_id}=$cds_id;
+}
+
+my @aliases_CDS = $id_map->lookup_feature_synonyms('kb|g.3899','CDS');
+
+my @aliases_locus = $id_map->lookup_feature_synonyms('kb|g.3899','locus');
+my @aliases_mRNA = $id_map->lookup_feature_synonyms('kb|g.3899','mRNA');
+
+my %alias_mappings; #{Hash key alias -> {key cds_feature_id ->[array of source]}}
+# technically it is possible to have an alias mapping to more than one feature id and more than one source
+
+my $i = 0;
+foreach my $alias_hash_ref (@aliases_CDS)
+{
+	my $alias = $alias_hash_ref->{'source_id'};
+	my $source = $alias_hash_ref->{'source_db'};
+	my $feature_id = $alias_hash_ref->{'kbase_id'};
+if ($i++ < 5 )
+{
+print "\nAlias $alias \n Source $source \n Feature $feature_id \n\n";
+
+
+}
+}
+
+
+
+#print "Results\n".Dumper(\%locus_to_cds_hash);
+#print "Results\n".Dumper($locus_to_cds_hash_ref);
+#print "Results\n".Dumper($mRNA_to_cds_hash_ref);
+
+#print "Results\n".Dumper(\%mRNA_to_cds_hash);
+
+#print "Results\n".Dumper(\@results);
+
+
+
+

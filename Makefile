@@ -1,13 +1,13 @@
 TOP_DIR = ../..
 DEPLOY_RUNTIME ?= /kb/runtime
 TARGET ?= /kb/deployment
-SERVICE_SPEC = expressionServices.spec 
-SERVICE_NAME = ExpressionServices
+SERVICE_SPEC = KBaseExpression.spec 
+SERVICE_NAME = KBaseExpression
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 ROOT_DEV_MODULE_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 KB_DEPLOYMENT_CONFIG ?= $(ROOT_DEV_MODULE_DIR)/deploy.cfg
-SERVICE_CONFIG_NAME = ExpressionServices
-SERVICE_PORT = 7075
+SERVICE_CONFIG_NAME = KBaseExpression
+SERVICE_PORT = 7076
 
 include $(TOP_DIR)/tools/Makefile.common
 
@@ -25,7 +25,7 @@ CLIENT_TESTS = $(wildcard t/client-tests/*.t)
 SCRIPTS_TESTS = $(wildcard t/script-tests/*.t)
 SERVER_TESTS = $(wildcard t/server-tests/*.t)
 
-SERVICE = ExpressionServices
+SERVICE = KBaseExpression
 $(SERVICE_DIR) ?= /kb/deployment/services/$(SERVICE)
 PID_FILE = $(SERVICE_DIR)/service.pid
 ACCESS_LOG_FILE = $(SERVICE_DIR)/log/access.log
@@ -237,9 +237,9 @@ build-libs:
 		--psgi $(SERVICE_NAME).psgi \
 		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
 		--service Bio::KBase::$(SERVICE_NAME)::Service \
-		--client Bio::KBase::$(SERVICE_NAME)::ExpressionServicesClient \
-		--py biokbase/$(SERVICE_NAME)/ExpressionServicesClient \
-		--js javascript/$(SERVICE_NAME)/ExpressionServicesClient \
+		--client Bio::KBase::$(SERVICE_NAME)::KBaseExpressionClient \
+		--py biokbase/$(SERVICE_NAME)/KBaseExpressionClient \
+		--js javascript/$(SERVICE_NAME)/KBaseExpressionClient \
 		$(SERVICE_SPEC) lib
 
 # creates start/stop/reboot scripts and copies them to the deployment target

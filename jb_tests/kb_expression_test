@@ -1,0 +1,259 @@
+use strict;
+use Data::Dumper;
+use Bio::KBase::KBaseExpression::KBaseExpressionClient;
+#FOLLOWING TWO LINES IF WANT TO TEST DIRECTLY IN OTHER WAYS
+#use Bio::KBase::KBaseExpression::KBaseExpressionImpl;
+#use Bio::KBase::KBaseExpression::FunctionsForGEO; 
+
+
+#FOR STARMAN
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7076");
+#FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
+#(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
+#Log into your instance
+#sudo su
+#source /kb/deployment/user-env.sh
+#plackup --listen :9999 /kb/dev_container/modules/expression/lib/KBaseExpression.psgi 
+#my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:9999"); 
+
+
+#For testing the IMP directly
+#my $client = Bio::KBase::KBaseExpression::KBaseExpressionImpl->new("http://localhost:9999"); 
+
+print "\nTime at start : ".localtime."\n";
+
+my $result;
+print "get_expression_samples_data()\n";
+#$result = $client->get_expression_samples_data([]);
+#$result = $client->get_expression_samples_data(['kb|sample.95']);
+#$result = $client->get_expression_samples_data(['kb|sample.38','kb|sample.39']);
+#$result = $client->get_expression_samples_data(['kb|sample.50','kb|sample.51']);
+#print Dumper($result) . "\n----------------------------\n";
+
+print "get_expression_data_by_sample_and_features()\n";
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'],
+#					['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'], []); 
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.8'], []); 
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.52','kb|sample.53'], []); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_data_by_series_ids\
+print "get_expression_samples_data_by_series_ids()\n";
+#$result = $client->get_expression_samples_data_by_series_ids(['kb|series.1','kb|series.0']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_sample_ids_by_series_ids\ 
+print "get_expression_sample_ids_by_series_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_series_ids(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_samples_data_by_experimental_unit_ids
+print "get_expression_samples_data_by_experimental_unit_ids()\n";
+#$result = $client->get_expression_samples_data_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_sample_ids_by_experimental_unit_ids 
+print "get_expression_sample_ids_by_experimental_unit_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_experimental_unit_ids(['kb|expu.3167770','kb|expu.3167762']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_data_by_experiment_meta_ids 
+print "get_expression_samples_data_by_experiment_meta_ids()\n"; 
+#$result = $client->get_expression_samples_data_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_experiment_meta_ids 
+print "get_expression_sample_ids_by_experiment_meta_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_experiment_meta_ids(['kb|expm.16','kb|expm.15']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_samples_data_by_strain_ids
+print "get_expression_samples_data_by_strain_ids()\n";
+#$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.7634','kb|str.999'],'microarray');
+#$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.999'],'microarray');
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_sample_ids_by_strain_ids 
+print "get_expression_sample_ids_by_strain_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_strain_ids(['kb|str.7634','kb|str.999'],'microarray'); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_samples_data_by_genome_ids
+print "get_expression_samples_data_by_genome_ids()\n";
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y');
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','N');
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'RNA-Seq','Y');
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.0'],'microarray','Y');
+#print Dumper($result) . "\n----------------------------\n";
+ 
+#get_expression_samples_data_by_genome_ids 
+print "get_expression_sample_ids_by_genome_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y'); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_data_by_ontology_ids 
+print "get_expression_samples_data_by_ontology_ids()\n"; 
+#$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y'); 
+#$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y'); 
+#$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y'); 
+#$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_ontology_ids
+print "get_expression_sample_ids_by_ontology_ids()\n";
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y');
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y');
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y');
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
+#print Dumper($result) . "\n----------------------------\n";
+
+
+#get_expression_data_by_feature_ids
+print "get_expression_data_by_feature_ids()\n";
+#$result = $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y');
+#print Dumper($result) . "\n----------------------------\n";
+
+#compare_samples 
+print "compare_samples()\n"; 
+#$result = $client->compare_samples({	'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3},
+#					'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+#				   {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+#                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}});
+#$result = $client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2}, 
+#                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
+#                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1}, 
+#                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); 
+#$result = $client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2}, 
+#                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}}, 
+#                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2}, 
+#                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); 
+#$result = $client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2}}, 
+#                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2}, 
+#                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#compare_samples_vs_default_controls 
+print "compare_samples_vs_default_controls()\n"; 
+#$result = $client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#compare_samples_vs_the_average
+print "compare_samples_vs_the_average()\n";
+#$result = $client->compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'],
+#	['kb|sample.3','kb|sample.8','kb|sample.1']);
+#$result = $client->compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'],['kb|sample.1']);
+#$result = $client->compare_samples_vs_the_average(['kb|sample.3','kb|sample.8','kb|sample.1'],[]);
+#print Dumper($result) . "\n----------------------------\n";
+
+#getOnOffCalls
+#print "get_on_off_calls()\n";
+#$result = $client->get_on_off_calls($client->compare_samples({   'numerator1'=>{'feature1'=>1,'feature2'=>2,'feature3'=>3},
+#                                       'numerator2'=>{'feature1'=>-1,'feature2'=>0,'feature3'=>0.5}},
+#                                  {    'denominator1'=>{'feature1'=>1.5,'feature2'=>2,'feature3'=>-1},
+#                                        'denominator2'=>{'feature1'=>-.5,'feature2'=>0}}),-1,1); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_top_changers
+print "get_top_changers()\n"; 
+#$result = $client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'BOTH',10);
+#$result = $client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'UP',6);
+#$result = $client->get_top_changers($client->compare_samples_vs_default_controls(['kb|sample.3','kb|sample.8','kb|sample.1']),'DOWN',10);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_titles
+print "get_expression_samples_titles()\n"; 
+#$result = $client->get_expression_samples_titles([]);
+#$result = $client->get_expression_samples_titles(['kb|sample.95']);
+#$result = $client->get_expression_samples_titles(['kb|sample.2','kb|sample.3']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_descriptions 
+print "get_expression_samples_descriptions()\n"; 
+#$result = $client->get_expression_samples_descriptions(['kb|sample.2','kb|sample.3']);
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_samples_molecules
+print "get_expression_samples_molecules()\n";
+#$result = $client->get_expression_samples_molecules(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_types
+print "get_expression_samples_types()\n";
+#$result = $client->get_expression_samples_types(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_external_source_ids
+print "get_expression_samples_external_source_ids()\n";
+#$result = $client->get_expression_samples_external_source_ids(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_samples_original_log2_medians
+print "get_expression_samples_original_log2_medians()\n";
+#$result = $client->get_expression_samples_original_log2_medians(['kb|sample.2','kb|sample.3']); 
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_series_titles\ 
+print "get_expression_series_titles()\n"; 
+#$result = $client->get_expression_series_titles(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_series_summaries\
+print "get_expression_series_summaries()\n"; 
+#$result = $client->get_expression_series_summaries(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_series_designs\
+print "get_expression_series_designs()\n";
+#$result = $client->get_expression_series_designs(['kb|series.1','kb|series.0']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_series_external_source_ids\
+print "get_expression_series_external_source_ids()\n"; 
+#$result = $client->get_expression_series_external_source_ids(['kb|series.1','kb|series.0']); 
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_sample_external_source_ids
+print "get_expression_sample_ids_by_sample_external_source_ids()\n"; 
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM969611','GSM969635','GSM969619','GSM969620']); 
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids([]);
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM9696A11','GSM969635','GSM969619','GSM969620']);  
+#$result = $client->get_expression_sample_ids_by_sample_external_source_ids(['GSM9696A11']);  
+#print Dumper($result) . "\n----------------------------\n"; 
+
+#get_expression_sample_ids_by_platform_external_source_ids
+print "get_expression_sample_ids_by_platform_external_source_ids()\n";
+#$result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821']);
+#FOLLOWING ONE throws an error (planned)
+#$result = $client->get_expression_sample_ids_by_platform_external_source_ids([]); 
+#$result = $client->get_expression_sample_ids_by_platform_external_source_ids(['GPL15821AA']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_expression_series_ids_by_series_external_source_ids
+print "get_expression_series_ids_by_series_external_source_ids()\n";
+#$result = $client->get_expression_series_ids_by_series_external_source_ids(['GSE39462']); 
+#$result = $client->get_expression_series_ids_by_series_external_source_ids([]);
+#$result = $client->get_expression_series_ids_by_series_external_source_ids(['GSE39462AA']);
+#print Dumper($result) . "\n----------------------------\n";
+
+#get_GEO_GSE\ 
+print "get_GEO_GSE()\n"; 
+$result = $client->get_GEO_GSE('GSE21782');
+#$result = $client->get_GEO_GSE('GSE21782');
+#$result = $client->get_GEO_GSE('GSE39462');
+#$result = $client->get_GEO_GSE('GSE31535');
+#print Dumper($result) . "\n----------------------------\n"; 
+
+
+#my $functionsForGEO = Bio::KBase::KBaseExpression::FunctionsForGEO->new(); 
+#print "FUNCTIONS FOR GEO NEW : ". Dumper($functionsForGEO); 
+#my $gseObject = $functionsForGEO->get_GEO_GSE_data('GSE31535',1); 
+#print "GSE OBJECT ". Dumper($gseObject);
+
+
+print "FINAL PRINT\n".Dumper($result) . "\n----------------------------\n";
+
+
+print "\nTime at end : ".localtime."\n";
+
+
