@@ -27,6 +27,7 @@ use LWP::Simple;
 use Bio::DB::Taxonomy;
 use Bio::KBase;
 use Bio::KBase::CDMI::CDMIClient; 
+use Bio::KBase::IdMap::Client; 
 use JSON::RPC::Client; 
 use JSON;
 
@@ -249,6 +250,7 @@ sub parse_gse_platform_portion
     my $self = shift; 
     my %platform_tax_probe_feature_hash; #  Need to return a map for probe mapping for the GPL to use if this is not metadata only
                                 #  key {gplID->{taxID->{genome_id->{platform id value->feature_id it maps to}}}} 
+#print "\nIN PARSE GSE PLATFORM\n";
 
     my @temp_arr = split(/\s*=\s*/,$lines[0]);
     my $gplID = trim($temp_arr[1]);
@@ -331,8 +333,10 @@ sub parse_gse_platform_portion
 	} 
     }
     $platform_hash{$gplID}->{"gplTechnology"}=$gplTechnology;
+
     if ($metaDataOnly == 0)
     {
+#print "\nIN PARSE GSE PLATFORM NOT METADATA ONLY\n";
 	my %tax_ids_hash;  #a hash of tax ids for all the GSMs in a GSE for this GPL
 	foreach my $temp_gsm_id (keys(%gsm_platform_info_hash))
 	{
@@ -347,6 +351,7 @@ sub parse_gse_platform_portion
 	    ); 
 	my %genome_ids_hash;
 
+#print "\nIN PARSE GSE PLATFORM BEFORE QUERY\n";
 	foreach my $temp_tax_id (keys(%tax_ids_hash))
 	{
 	    my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
@@ -368,14 +373,20 @@ sub parse_gse_platform_portion
             if (scalar(keys(%genome_ids_hash)) == 0)
             {
    	        push(@{$platform_hash{$gplID}->{"errors"}},"We do not have genomes that match the following scientific name(s) : ". join(", ",@ncbi_scientific_names));
+#print "\nHAD ZERO GENOMES\n";
             }            
 
+#print "\nIN PARSE GSE PLATFORM PAst QUERY\n";
+#print "\nGenomes:\n".Dumper(\%genome_ids_hash);
             #CHECK TO SEE IF PROBE MAPPING FILE EXISTS HERE:
 #            my $gpl_file = "/mnt/platform_genome_mapping_files/".$gplID; 
             my $gpl_file = $platform_genome_mappings_directory."/".$gplID; 
             if (-e $gpl_file)
             {
                 #Open GPL file get mapping method results (lets you know what genomes you need to grab data for, and do not have to attempt to map of genomes in the list)
+
+
+#print "\nFILE EXISTS ALREADY\n";
 		open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
 		my @gpl_file_lines = (<GPL>); 
 		close(GPL); 
@@ -394,6 +405,7 @@ sub parse_gse_platform_portion
                 {
                     if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS")
                     {
+#print "GENOME FILE : $genome_id\n";
                          my $genome_number = $genome_id;
                          $genome_number =~ s/kb\|//;
 #                         my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
@@ -436,8 +448,8 @@ sub parse_gse_platform_portion
 	        my @blat_files_to_clean_up_after;
 	        my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}
 
-		#print "\nIN TRIED TO DO NEW MAPPINGS\n";
-
+#print "\nIN TRIED TO DO NEW MAPPINGS\n";
+$probe_sequence_warning = "Temporary message to force platform id mapping by synonym";
 	        if (!defined($probe_sequence_warning))
 	        {
 		    #print "\nIN BLAT TRY\n";
@@ -541,7 +553,9 @@ sub parse_gse_platform_portion
 			}
                     } 
                     ($genome_synonyms_lookup_ref) = create_genome_synonyms_lookup(\%genomes_to_be_processed);
+#print "\nGENOME SYNONYMS : ". Dumper($genome_synonyms_lookup_ref);
 		    #%genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}  
+#exit();
 		    my ($temp_hash_ref,$warnings_arr_ref, $errors_arr_ref) = parse_platform_synonyms(\@platform_map_lines,$genome_synonyms_lookup_ref);
 		    %genome_probe_to_feature_id_hash = %{$temp_hash_ref};
 		    my %represented_genome_ids;  #keep track of genomes that passed.  May have errors with other genomes to report warnings on.
@@ -592,6 +606,227 @@ sub parse_gse_platform_portion
 }   #END OF parse_gse_platform_portion
 
 sub parse_platform_synonyms
+{
+    my $lines_array_ref = shift; 
+    my @lines = @{$lines_array_ref}; 
+    
+    my $genomes_synonyms_lookup_ref = shift;
+    #print "\nDUMP OF parse_platform_synonyms : \n".Dumper($genomes_synonyms_lookup_ref);
+
+    my %genomes_synonyms_lookup = %{$genomes_synonyms_lookup_ref};
+    #{hash key genome id ->{Hash key alias -> {key cds_feature_id ->{source} =1}}}                                         
+    # technically it is possible to have an alias mapping to more than one feature id and more than one source       
+    
+    my $rows_with_synonyms_threshold = .6;
+    
+    my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}     
+    my @header_columns = split(/\t/,shift(@lines)); 
+    my $id_col_exists = undef; 
+    my $header_counter = 0; 
+    my @warnings;
+    my @errors;
+    
+    my %column_single_synonym_count_hash; 
+    my %column_multiple_synonym_count_hash; 
+
+    foreach my $header_column (@header_columns) 
+    { 
+        $id_col_exists = column_header_checker(trim($header_column),'^id$',$id_col_exists,$header_counter); 
+        $column_single_synonym_count_hash{$header_counter} = 0; 
+        $column_multiple_synonym_count_hash{$header_counter} = 0; 
+        $header_counter++; 
+    } 
+    if ($id_col_exists eq 'duplicate') 
+    { 
+        push(@warnings,"There is more than one 'ID' column"); 
+    } 
+    elsif (!defined($id_col_exists)) 
+    { 
+        push(@warnings,"An 'ID' column was not found in this platform"); 
+    } 
+    else 
+    { 
+	foreach my $genome_id (keys(%genomes_synonyms_lookup))
+	{
+	    if (defined($genomes_synonyms_lookup{$genome_id}))
+	    {
+		my %synonyms_lookup = %{$genomes_synonyms_lookup{$genome_id}};
+		#{Hash key alias -> {key cds_feature_id ->{source} =1}}                                         
+		# technically it is possible to have an alias mapping to more than one feature id and more than one source 
+		my %column_single_synonym_count_hash;  #column index -> count of hits in synonym lookup with one feature only
+		my %column_multiple_synonym_count_hash;#column index -> count of hits in synonym that only have multiple features mapped to it
+		#determine which column has the most synonyms.
+		foreach my $line (@lines) 
+		{ 
+		    my $element_counter = 0;
+		    my @line_elements = split(/\t/,$line); 
+		    foreach my $line_element (@line_elements)
+		    {
+			if (defined($synonyms_lookup{trim($line_element)}))
+			{
+			    my $num_feature_elements = scalar(keys(%{$synonyms_lookup{trim($line_element)}}));
+			    if ($num_feature_elements == 1)
+			    {
+				$column_single_synonym_count_hash{$element_counter}++;
+			    }
+			    elsif ($num_feature_elements > 1)
+			    {
+				$column_multiple_synonym_count_hash{$element_counter}++;
+			    }
+			}
+			$element_counter++;
+		    }
+		}
+		#determine column that had the most singles and ensure singles more prevalent then multiples
+		my $max_amount = 0;
+		my $max_col_index = undef;
+		foreach my $col_index (keys(%column_single_synonym_count_hash))
+		{
+		    if ($column_single_synonym_count_hash{$col_index} > $max_amount)
+		    {
+			$max_col_index = $col_index;
+			$max_amount = $column_single_synonym_count_hash{$col_index};
+		    }
+		}
+		if (($max_amount / scalar(@lines)) < $rows_with_synonyms_threshold)
+		{
+		    push(@errors,"For Genome $genome_id only " .$max_amount." out of " . scalar(@lines) . 
+			 " platform rows mapped to one feature by synonym lookup.");
+		}
+		else
+		{
+		    if (($column_multiple_synonym_count_hash{$max_col_index}/$max_amount) > .10)
+		    {
+			push(@warnings,"For Genome $genome_id more than 10 percent of ids map to multiple feature ids.  ".
+			     "Trying best to intellegently resolve them."); 
+		    }
+		    else
+		    {
+			#NOW have column with most synonyms
+			#go through that column and count the external DB hits.  
+			#(the one with most will be used to resolve multiple features to a synonym
+			my %external_db_hash_count;  #Hash to keep track of what external db is the most prevalent 
+			     #(used to resolve multiple feature ids mapping to one synonym)
+			foreach my $line (@lines)
+			{
+			    my @line_elements = split(/\t/,$line); 
+			    if (defined($synonyms_lookup{trim($line_elements[$max_col_index])}))
+			    {
+				my %feature_id_hash = %{$synonyms_lookup{trim($line_elements[$max_col_index])}};
+				my %source_hash;  #key is source of alias, need to do this to properly count aliases that were mapped to the wrong level.
+				foreach my $feature_id (keys(%feature_id_hash))
+				{
+				    my @external_dbs = keys(%{$synonyms_lookup{trim($line_elements[$max_col_index])}->{$feature_id}});
+				    foreach my $external_db (@external_dbs)
+				    {
+					$source_hash{$external_db}=1;
+				    }
+				}
+				foreach my $external_db (%source_hash)
+				{
+				    if (defined($external_db_hash_count{$external_db}))
+				    {
+					$external_db_hash_count{$external_db}++;
+				    }
+				    else
+				    {
+					$external_db_hash_count{$external_db} = 1;
+				    }				    			   
+				}
+			    }
+			}
+			my $max_external_db;
+			my $max_external_db_count = 0;
+			foreach my $external_db (keys(%external_db_hash_count))
+			{
+			    if ($external_db_hash_count{$external_db} > $max_external_db_count)
+			    {
+				$max_external_db = $external_db;
+				$max_external_db_count = $external_db_hash_count{$external_db};
+			    }
+			}
+			my $count_of_synonym_collisions_mapped_by_external_db = 0;
+			foreach my $line (@lines)
+			{
+			    #map id_col to features
+			    my @line_elements = split(/\t/,$line); 
+			    if (defined($synonyms_lookup{trim($line_elements[$max_col_index])}))
+                            { 
+				my %feature_id_hash = %{$synonyms_lookup{trim($line_elements[$max_col_index])}}; 
+				if (scalar(keys(%feature_id_hash)) == 1)
+				{
+				    my ($feature_id) = keys(%feature_id_hash);
+				    $genome_probe_to_feature_id_hash{$genome_id}->{trim($line_elements[$id_col_exists])} = trim($feature_id);  
+				    #key genome_id -> {probe_id => feature_id}     			    
+				}
+				elsif (scalar(keys(%feature_id_hash)) > 1)
+				{
+				    my $max_source_count = 0;
+				    foreach my $feature_id (keys(%feature_id_hash)) 
+				    {
+					my @external_dbs = keys(%{$synonyms_lookup{trim($line_elements[$max_col_index])}->{$feature_id}}); 
+					foreach my $external_db (@external_dbs) 
+					{
+					    if ($external_db == $max_external_db)
+					    {
+						$max_source_count++;
+					    }
+					}
+				    }
+#NOTE THIS MAY CHANGE IN THE FUTURE
+#RIGHT NOW ALIASES ARE NOT MAPPED TO THE RIGHT LEVEL Same alias applied to all isoforms example
+#                          'DRP1A' => { 
+#				    'kb|g.3899.CDS.40090' => {
+#                                                                   'uniprot_gene' => 1
+#				    }, 
+#								       'kb|g.3899.CDS.40047' => { 
+#                                                                   'uniprot_gene' => 1
+#								   }, 
+#								       'kb|g.3899.CDS.40051' => {
+#                                                                   'uniprot_gene' => 1
+#								   }
+#				}, 
+#All part of same locus but the alias is applied to both the mRNA and CDS
+#
+#Would need to run query to see if all part of the same alias, and if so take the longest representative one.
+#
+#
+#
+
+				    if ($max_source_count == 1)
+				    {
+					foreach my $feature_id (keys(%feature_id_hash)) 
+					{
+					    my @external_dbs = keys(%{$synonyms_lookup{trim($line_elements[$max_col_index])}->{$feature_id}}); 
+					    foreach my $external_db (@external_dbs) 
+					    {
+						if ($external_db == $max_external_db)
+						{
+						    $genome_probe_to_feature_id_hash{$genome_id}->{trim($line_elements[$id_col_exists])} = 
+						    trim($feature_id);  
+						    $count_of_synonym_collisions_mapped_by_external_db++;
+						}
+					    }
+					}
+				    }
+###################################
+				}
+			    }
+			}
+			if ($count_of_synonym_collisions_mapped_by_external_db > 0)
+			{
+			    push(@warnings,"For Genome $genome_id there were ".
+				 $count_of_synonym_collisions_mapped_by_external_db ." feature collisions for a synonym resolved by external id.");
+			}
+		    }
+		}
+	    }
+	}
+    }
+    return (\%genome_probe_to_feature_id_hash,\@warnings,\@errors);
+} #end parse_platform_synonyms
+
+sub parse_platform_synonyms2
 {
     my $lines_array_ref = shift; 
     my @lines = @{$lines_array_ref}; 
@@ -767,9 +1002,96 @@ sub parse_platform_synonyms
     return (\%genome_probe_to_feature_id_hash,\@warnings,\@errors);
 } #end parse_platform_synonyms
 
+#Get Synonyms for the Genome  
+sub create_genome_synonyms_lookup
+{ 
+    my $genome_hash_ref = shift; 
+    my @genome_ids = keys(%{$genome_hash_ref}); 
+
+    my $id_map = Bio::KBase::IdMap::Client->new("http://140.221.85.96:7111"); 
+ 
+    my $kb = Bio::KBase->new(); 
+    my $cdmi_client = $kb->central_store; 
+
+    my %genome_lookups_return_hash; #{hash key genome id ->{Hash key alias -> {key cds_feature_id ->{source} =1}}}
+        # technically it is possible to have an alias mapping to more than one feature id and more than one source 
+
+    foreach my $genome_id (@genome_ids)
+    { 
+	my $locus_genome_fids_hash_ref = $cdmi_client->genomes_to_fids([$genome_id],['locus']); 
+	my @locus_feature_ids = @{$locus_genome_fids_hash_ref->{$genome_id}}; 
+	my $mRNA_genome_fids_hash_ref = $cdmi_client->genomes_to_fids([$genome_id],['mRNA']); 
+	my @mRNA_feature_ids = @{$mRNA_genome_fids_hash_ref->{$genome_id}}; 
+ 
+	my $locus_to_cds_hash_ref = $id_map->longest_cds_from_locus(\@locus_feature_ids); 
+	my $mRNA_to_cds_hash_ref = $id_map->longest_cds_from_mrna(\@mRNA_feature_ids); 
+ 
+	my %locus_to_cds_hash; 
+	foreach my $locus_id (keys(%{$locus_to_cds_hash_ref})) 
+	{ 
+	    my ($cds_id) = keys(%{$locus_to_cds_hash_ref->{$locus_id}}); 
+	    $locus_to_cds_hash{$locus_id}=$cds_id; 
+	}  
+	my %mRNA_to_cds_hash; 
+	foreach my $mRNA_id (keys(%{$mRNA_to_cds_hash_ref})) 
+	{ 
+	    my ($cds_id) = keys(%{$mRNA_to_cds_hash_ref->{$mRNA_id}}); 
+	    $mRNA_to_cds_hash{$mRNA_id}=$cds_id; 
+	} 
+ 
+	my @aliases_CDS = @{$id_map->lookup_feature_synonyms($genome_id,'CDS')}; 
+	my @aliases_locus = @{$id_map->lookup_feature_synonyms($genome_id,'locus')}; 
+	my @aliases_mRNA = @{$id_map->lookup_feature_synonyms($genome_id,'mRNA')}; 
+ 
+	my $alias_mappings_ref; #{Hash key alias -> {key cds_feature_id ->{source} =1}} 
+        # technically it is possible to have an alias mapping to more than one feature id and more than one source 
+ 
+	foreach my $alias_hash_ref (@aliases_CDS) 
+	{ 
+	    my $alias = $alias_hash_ref->{'source_id'}; 
+	    my $source = $alias_hash_ref->{'source_db'}; 
+	    my $feature_id = $alias_hash_ref->{'kbase_id'}; 
+	    $alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1; 
+	} 
+my %mRNA_wo_cds;
+	foreach my $alias_hash_ref (@aliases_mRNA) 
+	{ 
+	    my $alias = $alias_hash_ref->{'source_id'}; 
+	    my $source = $alias_hash_ref->{'source_db'}; 
+	    my $feature_id = $mRNA_to_cds_hash{$alias_hash_ref->{'kbase_id'}}; 
+	    if ($feature_id ne '')
+	    {
+		$alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1; 
+	    }
+else{
+$mRNA_wo_cds{$alias_hash_ref->{'kbase_id'}}=1;
+}
+	} 
+print "mRNA : ".scalar(keys(%mRNA_wo_cds));
+my %locus_wo_cds;
+	foreach my $alias_hash_ref (@aliases_locus) 
+	{ 
+	    my $alias = $alias_hash_ref->{'source_id'}; 
+	    my $source = $alias_hash_ref->{'source_db'}; 
+	    my $feature_id = $locus_to_cds_hash{$alias_hash_ref->{'kbase_id'}}; 
+	    if ($feature_id ne '')
+	    {	    
+		$alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1;
+	    }    
+else{
+$locus_wo_cds{$alias_hash_ref->{'kbase_id'}}=1;
+}
+	}
+print "Locus : ".scalar(keys(%locus_wo_cds));
+	$genome_lookups_return_hash{$genome_id}=$alias_mappings_ref;
+    }
+    return \%genome_lookups_return_hash;
+}
+
+
 
 #Get Synonyms for the Genome
-sub create_genome_synonyms_lookup
+sub create_genome_synonyms_lookup2
 {
     my $genome_hash_ref = shift;
     my $client = new JSON::RPC::Client;

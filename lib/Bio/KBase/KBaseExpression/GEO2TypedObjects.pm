@@ -680,11 +680,26 @@ sub geo2TypedObjects
 	my $series_object_ref = {"id"=>$series_id,
 				 "source_id"=>$gse_object_ref->{'gseID'},
 				 "genome_expression_sample_ids_map"=>\%genome_sample_ids_hash,
-				 "title"=>$gse_object_ref->{'gseTitle'},
-				 "summary"=>$gse_object_ref->{'gseSummary'},
-				 "design"=>$gse_object_ref->{'gseDesign'},
-				 "publication_id"=>$gse_object_ref->{'gsePubMedID'},
 				 "external_source_date"=>$gse_object_ref->{'gseSubmissionDate'}};
+
+	if (exists($gse_object_ref->{'gseTitle'}) && ($gse_object_ref->{'gseTitle'} ne ""))
+	{
+	    $series_object_ref->{"title"} = $gse_object_ref->{'gseTitle'}; 
+	} 
+	if (exists($gse_object_ref->{'gseDesign'}) && ($gse_object_ref->{'gseDesign'} ne ""))
+	{
+	    $series_object_ref->{"design"} = $gse_object_ref->{'gseDesign'}; 
+	} 
+	if (exists($gse_object_ref->{'gsePubMedID'}) && ($gse_object_ref->{'gsePubMedID'} ne ""))
+	{
+	    $series_object_ref->{"publication_id"} = $gse_object_ref->{'gsePubMedID'}; 
+	} 
+	if (exists($gse_object_ref->{'gseSummary'}) && ($gse_object_ref->{'gseSummary'} ne ""))
+	{
+	    $series_object_ref->{"summary"} = $gse_object_ref->{'gseSummary'}; 
+	} 
+
+
 	#Write out object  
 	#CREATE JSON OBJECT FILE   
 	my $temp_series_file_name = $series_id;
