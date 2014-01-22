@@ -376,10 +376,13 @@ sub parse_gse_platform_portion
 #print "\nHAD ZERO GENOMES\n";
             }            
 
+            if (scalar(@{$platform_hash{$gplID}->{"errors"}}) > 0) 
+            { 
+                return (\%platform_hash,\%platform_tax_probe_feature_hash); 
+            } 
 #print "\nIN PARSE GSE PLATFORM PAst QUERY\n";
 #print "\nGenomes:\n".Dumper(\%genome_ids_hash);
             #CHECK TO SEE IF PROBE MAPPING FILE EXISTS HERE:
-#            my $gpl_file = "/mnt/platform_genome_mapping_files/".$gplID; 
             my $gpl_file = $platform_genome_mappings_directory."/".$gplID; 
             if (-e $gpl_file)
             {
@@ -823,6 +826,7 @@ sub parse_platform_synonyms
 	    }
 	}
     }
+    #print "\n\n\n\ngenome_probe_to_feature_id_hash:".Dumper(\%genome_probe_to_feature_id_hash);
     return (\%genome_probe_to_feature_id_hash,\@warnings,\@errors);
 } #end parse_platform_synonyms
 
@@ -1023,8 +1027,20 @@ sub create_genome_synonyms_lookup
 	my $mRNA_genome_fids_hash_ref = $cdmi_client->genomes_to_fids([$genome_id],['mRNA']); 
 	my @mRNA_feature_ids = @{$mRNA_genome_fids_hash_ref->{$genome_id}}; 
  
-	my $locus_to_cds_hash_ref = $id_map->longest_cds_from_locus(\@locus_feature_ids); 
-	my $mRNA_to_cds_hash_ref = $id_map->longest_cds_from_mrna(\@mRNA_feature_ids); 
+#	my $locus_to_cds_hash_ref = $id_map->longest_cds_from_locus(\@locus_feature_ids); 
+#	my $mRNA_to_cds_hash_ref = $id_map->longest_cds_from_mrna(\@mRNA_feature_ids); 
+
+	my $locus_to_cds_hash_ref;
+	my $mRNA_to_cds_hash_ref;
+ 
+        if (scalar(@locus_feature_ids) > 0)
+        {
+            $locus_to_cds_hash_ref = $id_map->longest_cds_from_locus(\@locus_feature_ids); 
+        }
+        if (scalar(@mRNA_feature_ids) > 0)
+        {
+            $mRNA_to_cds_hash_ref = $id_map->longest_cds_from_mrna(\@mRNA_feature_ids); 
+        }
  
 	my %locus_to_cds_hash; 
 	foreach my $locus_id (keys(%{$locus_to_cds_hash_ref})) 
@@ -1040,51 +1056,54 @@ sub create_genome_synonyms_lookup
 	} 
  
 	my @aliases_CDS = @{$id_map->lookup_feature_synonyms($genome_id,'CDS')}; 
-	my @aliases_locus = @{$id_map->lookup_feature_synonyms($genome_id,'locus')}; 
-	my @aliases_mRNA = @{$id_map->lookup_feature_synonyms($genome_id,'mRNA')}; 
+#	my @aliases_locus = @{$id_map->lookup_feature_synonyms($genome_id,'locus')}; 
+#	my @aliases_mRNA = @{$id_map->lookup_feature_synonyms($genome_id,'mRNA')}; 
+
+	my @aliases_locus; 
+        my @aliases_mRNA; 
+        if (scalar(@locus_feature_ids) > 0) 
+        {
+           @aliases_locus = @{$id_map->lookup_feature_synonyms($genome_id,'locus')}; 
+        }
+        if (scalar(@mRNA_feature_ids) > 0)
+        {
+           @aliases_mRNA = @{$id_map->lookup_feature_synonyms($genome_id,'mRNA')}; 
+        }
+
  
 	my $alias_mappings_ref; #{Hash key alias -> {key cds_feature_id ->{source} =1}} 
         # technically it is possible to have an alias mapping to more than one feature id and more than one source 
  
 	foreach my $alias_hash_ref (@aliases_CDS) 
 	{ 
-	    my $alias = $alias_hash_ref->{'source_id'}; 
+	    my $alias = $alias_hash_ref->{'alias'}; 
 	    my $source = $alias_hash_ref->{'source_db'}; 
 	    my $feature_id = $alias_hash_ref->{'kbase_id'}; 
 	    $alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1; 
 	} 
-my %mRNA_wo_cds;
 	foreach my $alias_hash_ref (@aliases_mRNA) 
 	{ 
-	    my $alias = $alias_hash_ref->{'source_id'}; 
+	    my $alias = $alias_hash_ref->{'alias'}; 
 	    my $source = $alias_hash_ref->{'source_db'}; 
 	    my $feature_id = $mRNA_to_cds_hash{$alias_hash_ref->{'kbase_id'}}; 
 	    if ($feature_id ne '')
 	    {
 		$alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1; 
 	    }
-else{
-$mRNA_wo_cds{$alias_hash_ref->{'kbase_id'}}=1;
-}
 	} 
-print "mRNA : ".scalar(keys(%mRNA_wo_cds));
-my %locus_wo_cds;
 	foreach my $alias_hash_ref (@aliases_locus) 
 	{ 
-	    my $alias = $alias_hash_ref->{'source_id'}; 
+	    my $alias = $alias_hash_ref->{'alias'}; 
 	    my $source = $alias_hash_ref->{'source_db'}; 
 	    my $feature_id = $locus_to_cds_hash{$alias_hash_ref->{'kbase_id'}}; 
 	    if ($feature_id ne '')
 	    {	    
 		$alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1;
 	    }    
-else{
-$locus_wo_cds{$alias_hash_ref->{'kbase_id'}}=1;
-}
 	}
-print "Locus : ".scalar(keys(%locus_wo_cds));
 	$genome_lookups_return_hash{$genome_id}=$alias_mappings_ref;
     }
+
     return \%genome_lookups_return_hash;
 }
 
@@ -2123,13 +2142,43 @@ sub get_GEO_GSE_data
         $metaDataOnly = 0;
     }
  
-    my $gse_url = 'ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SOFT/by_series/' . $gse_input_id . "/"; 
-    my $gzip_file_ls_line = get($gse_url); 
+#    my $gse_url = 'ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SOFT/by_series/' . $gse_input_id . "/"; 
+    my $gse_number = $gse_input_id; 
+    $gse_number =~ s/GSE//; 
+    my $gse_ftp_parent_directory_number; 
+    #print "GSE NUMBER : ".$gse_number . "\n"; 
+    if ($gse_number < 1000) 
+    { 
+	$gse_ftp_parent_directory_number = ""; 
+    } 
+    else 
+    { 
+	$gse_ftp_parent_directory_number = substr($gse_number,0,-3); 
+    } 
+    my $gse_url = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE". $gse_ftp_parent_directory_number. "nnn/".$gse_input_id."/soft/"; 
+
+    my $fetched_gse = 1;
+    my $attempt_counter = 0;
+    my $gzip_file_ls_line = get($gse_url) or $fetched_gse = 0;
+    while ($fetched_gse == 0)
+    {
+	$fetched_gse = 1;
+	$gzip_file_ls_line = get($gse_url) or $fetched_gse = 0;
+	if (($attempt_counter > 100) && ($fetched_gse == 0))
+	{
+	    $gseObject->{"gseID"} = $gse_input_id; 
+	    $gseObject->{"gseErrors"}->[0] = "Unable to fetch $gse_input_id from GEO - used URL $gse_url : Direcotry Level";
+print "\nCOULD NOT FETCH $gse_input_id FROM GEO (DIRECTORY LEVEL)\n";
+	    return($gseObject);
+	}
+	$attempt_counter++;
+    }
     my @gse_file_records = split (/\n/,$gzip_file_ls_line); 
     foreach my $gse_record (@gse_file_records) 
     { 
 	if (scalar(@gse_file_records) > 1)
 	{
+	    $gseObject->{"gseID"} = $gse_input_id; 
 	    $gseObject->{"gseErrors"}->[0] = "Error there appears to multiple GSE SOFT files associated with $gse_input_id :  ".
 		"These are the records listed ". join(",",@gse_file_records).".";
 	    return($gseObject);
@@ -2140,8 +2189,26 @@ sub get_GEO_GSE_data
 	my $gzip_file = "GSE".$line_segments[-1]; 
 	#print "GZIP FILE : $gzip_file \n"; 
 	chomp($gzip_file); 
+
+	my $fetched_gse_file = 1;
+	$attempt_counter = 0;
+
 	my $gzip_url = $gse_url.$gzip_file; 
-	my $gzip_output = get($gzip_url); 
+	my $gzip_output = get($gzip_url) or $fetched_gse_file = 0; 
+
+	while ($fetched_gse_file == 0)
+	{ 
+	    $fetched_gse_file = 1;
+	    $gzip_output = get($gzip_url) or $fetched_gse_file = 0;  
+	    if (($attempt_counter > 100) && ($fetched_gse_file == 0))
+	    { 
+		$gseObject->{"gseID"} = $gse_input_id; 
+		$gseObject->{"gseErrors"}->[0] = "Unable to fetch $gse_input_id from GEO - used URL $gzip_url : File Level";
+print "\nCOULD NOT FETCH $gse_input_id FROM GEO (FILE LEVEL)\n";
+		return($gseObject);
+	    }
+	    $attempt_counter++;
+	}
  
 	my $gse_output = new IO::Uncompress::Gunzip \$gzip_output 
 	    or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
@@ -2149,6 +2216,8 @@ sub get_GEO_GSE_data
 	my $line_count = 0;
 
 	my @gse_lines = <$gse_output>;
+
+print "GSE RECORD: ". $gse_record . " : Had lines = ".scalar(@gse_lines);
 
 	#series vars 
 	my $gse_series_line_start = undef;

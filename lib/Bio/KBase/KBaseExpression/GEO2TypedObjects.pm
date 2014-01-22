@@ -132,6 +132,10 @@ sub geo2TypedObjects
     open (JSON_FILE,$gse_object_file) or die "0 - Unable to open $gse_object_file , it was supposed to exist"; 
     my ($json_result,@temp_array)= (<JSON_FILE>); 
     close(JSON_FILE);
+    if ($json_result eq "{}")
+    {
+	return "0 - GSE OBJECT FILE : ".$gse_object_file." was an empty hash";
+    }
     my $gse_object_ref = from_json($json_result);
 
     my $gse_results_file = $geo_results_directory."/gse_results";
