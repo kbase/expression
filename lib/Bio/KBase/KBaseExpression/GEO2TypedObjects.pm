@@ -295,12 +295,14 @@ sub geo2TypedObjects
 			    my @genome_keys = sort(keys(%genome_ids_hash));
 			    $genome_id_selected = $genome_keys[0];
 			}
-                        #grab kbase_platform_id for it                        
-			my $platform_prefix = "kb|platform_test";  #if want to test it do it for sample and series as well. Then comment out next line.
-			my $kb_gpl_id = $platform_prefix .".".$id_server->allocate_id_range( $platform_prefix, 1 );
-#			my $platform_prefix = "kb|platform";
-#			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
-#			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
+                        #grab kbase_platform_id for it
+#Next two lines for testing                        
+#			my $platform_prefix = "kb|platform_test";  #if want to test it do it for sample and series as well. Then comment out next line.
+#			my $kb_gpl_id = $platform_prefix .".".$id_server->allocate_id_range( $platform_prefix, 1 );
+#Next three lines for real
+			my $platform_prefix = "kb|platform";
+			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
+			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
                         $gpl_object_hash{$gpl_id}={"id" =>$kb_gpl_id,
 						   "source_id" => $gpl_id,
 						   "genome_id" => $genome_id_selected,
@@ -367,6 +369,7 @@ sub geo2TypedObjects
 		{
 		    $gsm_description = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'};
 		}
+		$gsm_description .= "::Value Description : ".$gse_object_ref->{'gseSamples'}->{$gsm_id}->{"gsmValueType"};
 		my $gsm_title = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmTitle'};
 		my $gsm_external_source_date = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmSubmissionDate'};
 
@@ -393,10 +396,28 @@ sub geo2TypedObjects
                 my @persons;
                 foreach my $person_email (keys(%{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}}))
 		{
-		    push(@persons,{"email" => $person_email,
-				   "first_name" => $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}->{$person_email}->{'contactFirstName'},
-				   "last_name" => $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}->{$person_email}->{'contactLastName'},
-				   "institution" => $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}->{$person_email}->{'contactInstitution'}});
+		    if ($person_email ne "")
+		    {
+			my $first_name = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}->{$person_email}->{'contactFirstName'};
+			if (!(defined($first_name)) || ($first_name eq ""))
+			{
+			    $first_name = "unknown";
+			}
+			my $last_name = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}->{$person_email}->{'contactLastName'};
+			if (!(defined($last_name)) || ($last_name eq ""))
+			{
+			    $last_name = "unknown";
+			}
+			my $institution = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}->{$person_email}->{'contactInstitution'};
+			if (!(defined($institution)) || ($institution eq ""))
+			{
+			    $institution = "unknown";
+			}
+			push(@persons,{"email" => $person_email,
+				       "first_name" => $first_name,
+				       "last_name" => $last_name,
+				       "institution" => $institution});
+		    }
 		}
 
                 #NEED TO GRAB OTHER ONTOLOGY TERM INFO FROM THE DATABASE.
@@ -470,12 +491,15 @@ sub geo2TypedObjects
 			}
 			#within sample loop			
                         #grab kbase_sample_id for it
-			my $sample_prefix = "kb|sample_test";  
-			my $sample_kb_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 );
-#			my $sample_prefix = "kb|sample";
-#			my $sample_id_key = "GEO::".$gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
-#                       my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
-#                       my $sample_kb_id = $temp_id_hash_ref->{$sample_id_key};
+#Next two lines for testing                        
+#			my $sample_prefix = "kb|sample_test";  
+#			my $sample_kb_id = $sample_prefix .".".$id_server->allocate_id_range( $sample_prefix, 1 );
+#Next four lines for real                        
+			my $sample_prefix = "kb|sample";#
+			my $sample_id_key = "GEO::".$gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
+                        my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
+                        my $sample_kb_id = $temp_id_hash_ref->{$sample_id_key};
+
 			#add sample_kb_id to gse_list
 			push(@sample_id_array,$sample_kb_id);
 			#new sample - push id onto new_sample_id_array;
@@ -650,11 +674,14 @@ sub geo2TypedObjects
 	    #means brand new series and can append to series geo results file.
             #GRAB NEW SERIES KB ID
             #print "\nIN ELSE : Brand new series\n";
-	    my $series_prefix = "kb|series_test";  
-	    $series_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 );
-#	    my $series_prefix = "kb|series";
-#	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
-#	    $series_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
+#Next two lines for testing                        
+#	    my $series_prefix = "kb|series_test";  
+#	    $series_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 );
+#Next three lines for real                        
+	    my $series_prefix = "kb|series";
+	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
+	    $series_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
+
             #resolve result
 	    my $result = "Full Success";
 	    if ($passing_gsm_count == 0)

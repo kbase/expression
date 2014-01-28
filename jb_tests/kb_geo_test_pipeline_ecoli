@@ -1,0 +1,33 @@
+
+use strict; 
+use Bio::KBase::KBaseExpression::FunctionsForGEO; 
+use Bio::KBase::KBaseExpression::GEO2TypedObjects; 
+use Bio::KBase::KBaseExpression::GEO2ReplicateGroups; 
+ 
+use Data::Dumper; 
+ 
+my $functionsForGEO = Bio::KBase::KBaseExpression::FunctionsForGEO->new(); 
+
+my $gses_ref = $functionsForGEO->get_gse_records_from_gse_list('ecoli_gses.txt'); 
+my @gses = @{$gses_ref};
+#my @gses = qw(GSE21115);
+#my @gses = qw(GSE32022);
+#my @gses = qw(GSE35049);
+#my @gses = qw(GSE21194 GSE16726 GSE11230);
+#my @gses = qw(GSE47221);
+
+foreach my $gse (@gses) 
+{ 
+  #note the 3 file directories should be different and exist 
+print "\nGSE :".$gse.": -- Before call : ".localtime."\n\n";
+  $functionsForGEO->make_GSE_object_file($gse,0,"/mnt/blat_files","/mnt/platform_genome_mapping_files/","/mnt/gse_objects/","/mnt/gse_files/"); 
+ 
+print "\nAfter call : ".localtime."\n\n";
+  my $file_name = "/mnt/gse_objects/".$gse; 
+#  system("perl /kb/dev_container/modules/expression/expr_data_supplement.pl --i=$file_name --s=/mnt/sunita_test_files/test.ont --o=$file_name"); 
+  my $geo2TypedObject = Bio::KBase::KBaseExpression::GEO2TypedObjects->new(); 
+  my $test_hash_ref = $geo2TypedObject->geo2TypedObjects($file_name,"GEO","/mnt/geo_results/","/mnt/typed_objects/"); 
+  print "\nGEO2TypedObject: ".Dumper($test_hash_ref); 
+} 
+ 
+system("perl /kb/dev_container/modules/expression/jb_tests/kb_workspace_test http://140.221.84.209:7058 KBASE_Expression /mnt/typed_objects/"); 

@@ -1,0 +1,81 @@
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ; 
+use IO::File; 
+use LWP::Simple; 
+use strict;
+
+
+#TAKES TWO ARGS
+# 1) File that has list of GSEs to download
+# 2) The directory to put the files
+# If any fail a new file will be made (same name as input file with "_failed" on the end.
+# that will have the list of failed GSEs.
+my @gses; 
+my @failed_gses;
+my $gse_file_list = shift;
+my $gse_file_save_directory = shift;
+open (GSE_FILES,$gse_file_list) or die "0 - Unable to open $gse_file_list , it was supposed to exist"; 
+my @gse_list_lines= (<GSE_FILES>); 
+close(GSE_FILES); 
+foreach my $gse_list_line (@gse_list_lines) 
+{ 
+    $gse_list_line =~ s/^\s+//; 
+    $gse_list_line =~ s/\s+$//; 
+    push(@gses,$gse_list_line); 
+}
+my $total_attempts = 0;
+my $total_passed = 0;
+my $total_failed = 0;
+foreach my $gse_id (@gses)
+{
+    my $gse_number = $gse_id; 
+    $gse_number =~ s/GSE//; 
+    my $gse_ftp_parent_directory_number;    
+    if ($gse_number < 1000) 
+    { 
+        $gse_ftp_parent_directory_number = ""; 
+    } 
+    else 
+    { 
+        $gse_ftp_parent_directory_number = substr($gse_number,0,-3); 
+    } 
+    my $gzip_url = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE".$gse_ftp_parent_directory_number."nnn/".$gse_id."/soft/".$gse_id."_family.soft.gz";
+    my $attempt_counter = 1; 
+    my $file_name = $gse_file_save_directory ."/".$gse_id."_family.soft.gz";
+    my $gzip_output = getstore($gzip_url,$file_name);
+    #print "\nGSE $gse_id : gzip : ".$gzip_output."\n";
+    while ($gzip_output != 200) 
+    { 
+        $gzip_output = getstore($gzip_url,$file_name);
+        if (($attempt_counter >= 100) && ($gzip_output != 200)) 
+        { 
+	    push(@failed_gses,$gse_id);
+	    $total_failed++;
+	    last;
+        } 
+        $attempt_counter++; 
+    } 
+    $total_attempts = $total_attempts + $attempt_counter;
+    if ($gzip_output != 200)
+    {
+	next;
+    }
+#    my $gse_output = new IO::Uncompress::Gunzip $file_name or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
+#    my @gse_lines = <$gse_output>; 
+#    print $gse_id." : NUM LINES ".scalar(@gse_lines)."\n";
+#print @gse_lines;
+    $total_passed++;
+}
+print "\nTOTAL PASSED = $total_passed \n";
+print "\nTOTAL FAILED = $total_failed \n";
+print "\nTOTAL ATTEMPTS = $total_attempts \n";
+if (scalar(@failed_gses) > 0)
+{
+	my $failed_gse_file_list = $gse_file_list ."_failed";
+	open (FAILED_GSE_FILES, ">".$failed_gse_file_list) or die "0 - Unable to make $failed_gse_file_list\n";
+	foreach my $failed_gse_id (@failed_gses)
+	{
+		print FAILED_GSE_FILES $failed_gse_id ."\n";
+	}
+	close(FAILED_GSE_FILES); 
+	print "\n\nThe list of failed gses are located here : ".$failed_gse_file_list."\n\n";
+}

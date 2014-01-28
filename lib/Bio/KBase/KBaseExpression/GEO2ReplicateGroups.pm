@@ -203,13 +203,13 @@ sub geo2ReplicateGroups
 		my @sample_ids = @{$replicate_groups_needed{$genome_id}->{$dql}};
 		my $replicate_group_key = join("__",sort(@sample_ids));
 
-#mext two lines for testing IDS
-		my $replicate_group_prefix = "kb|repGroup_test";  
-		my $kb_rep_group_id = $replicate_group_prefix .".".$id_server->allocate_id_range( $replicate_group_prefix, 1 ); 
+#next two lines for testing IDS
+#		my $replicate_group_prefix = "kb|repGroup_test";  
+#		my $kb_rep_group_id = $replicate_group_prefix .".".$id_server->allocate_id_range( $replicate_group_prefix, 1 ); 
 #next three lines for real ids (comment out above two lines)
-#               my $replicate_group_prefix = "kb|repGroup";                                                                          
-#               my $temp_id_hash_ref = $id_server->register_ids($replicate_group_prefix,"KB",[$replicate_group_key]);                            
-#               my $kb_rep_group_id = $temp_id_hash_ref->{$replicate_group_key}; 
+                my $replicate_group_prefix = "kb|repGroup";                                                                          
+                my $temp_id_hash_ref = $id_server->register_ids($replicate_group_prefix,"KB",[$replicate_group_key]);                            
+                my $kb_rep_group_id = $temp_id_hash_ref->{$replicate_group_key}; 
  
 		#make replicate group data structure
 		my $rep_group_object_hash = {"id" => $kb_rep_group_id,

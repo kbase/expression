@@ -16,7 +16,8 @@ die $usage if ((!defined $db_user) || (!defined $db_pwd));
 
 my %ontology_databases = ("Plant Ontology" => "http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co",
 			  "Plant Environmental Ontology" => "http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo",
-			  "Microbial Environmental Ontology" => "http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo");
+			  "Microbial Environmental Ontology" => "http://www.berkeleybop.org/ontologies/envo/subsets/envo-basic.obo");
+#OLD ENVO site  "http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo");
 
 my $dbh = DBI->connect('DBI:mysql:expression:db1.chicago.kbase.us',$db_user, $db_pwd, { RaiseError => 1, ShowErrorStatement => 1 } ); 
 

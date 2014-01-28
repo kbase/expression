@@ -1772,17 +1772,19 @@ sub parse_gse_sample_portion
             ); 
 	my @genomes_with_data = keys(%{$gsm_data_hash_ref});
 	my $were_representatives_used_q = qq^select count(*)
-	                                     from Feature f inner join Encompasses c2m on f.id = c2m.from_link
-                                             inner join Encompasses m2l on c2m.to_link = m2l.from_link
+	                                     from kbase_sapling_v1.Feature f inner join kbase_sapling_v1.Encompasses c2m on f.id = c2m.from_link
+                                             inner join kbase_sapling_v1.Encompasses m2l on c2m.to_link = m2l.from_link
                                              where substring_index(f.id, '.', 2) in (^.
 					     join(",", ("?") x @genomes_with_data) . 
                                           qq^) and f.feature_type = 'CDS'^;
+#print "\n\nQUERY : \n".$were_representatives_used_q ."\nGenomes:".join("  ",@genomes_with_data)."\n\n";
 	my $were_representatives_used_qh = $dbh->prepare($were_representatives_used_q) or die "Unable to prepare were_representatives_used : ".$were_representatives_used_q . ":".$dbh->errstr();
 	$were_representatives_used_qh->execute(@genomes_with_data)or die "Unable to execute were_representatives_used : ".$were_representatives_used_q . ":".$were_representatives_used_qh->errstr();
 	my $cds_in_families_count = 0;
 	($cds_in_families_count) = $were_representatives_used_qh->fetchrow_array();
 	if ($cds_in_families_count > 0)
 	{
+#print "\n\nHAS REPRESENTATIVE\n\n";
 	    $gsm_value_type = "Representative CDS feature ids were used to resolve ambiguous isoforms. ".$gsm_value_type;
 	}
 
@@ -2116,8 +2118,9 @@ sub data_value_sanity_checks
 
 sub get_GEO_GSE_data
 {
+#print "\nGOT TO get_GEO_GSE_data\n";
     my $self = shift;
-    my($gse_input_id, $metaDataOnly, $blat_files_directory, $platform_genome_mappings_directory) = @_;     
+    my($gse_input_id, $metaDataOnly, $blat_files_directory, $platform_genome_mappings_directory, $gse_gz_files_directory) = @_;     
 
     my @_bad_arguments;
     (!ref($gse_input_id)) or push(@_bad_arguments, "Invalid type for argument \"gse_input_id\" (value was \"$gse_input_id\")");
@@ -2141,292 +2144,269 @@ sub get_GEO_GSE_data
     {
         $metaDataOnly = 0;
     }
- 
-#    my $gse_url = 'ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SOFT/by_series/' . $gse_input_id . "/"; 
-    my $gse_number = $gse_input_id; 
-    $gse_number =~ s/GSE//; 
-    my $gse_ftp_parent_directory_number; 
-    #print "GSE NUMBER : ".$gse_number . "\n"; 
-    if ($gse_number < 1000) 
-    { 
-	$gse_ftp_parent_directory_number = ""; 
-    } 
-    else 
-    { 
-	$gse_ftp_parent_directory_number = substr($gse_number,0,-3); 
-    } 
-    my $gse_url = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE". $gse_ftp_parent_directory_number. "nnn/".$gse_input_id."/soft/"; 
-
-    my $fetched_gse = 1;
-    my $attempt_counter = 0;
-    my $gzip_file_ls_line = get($gse_url) or $fetched_gse = 0;
-    while ($fetched_gse == 0)
+    my $gse_gz_file = $gse_gz_files_directory ."/".$gse_input_id."_family.soft.gz"; 
+    unless (-e $gse_gz_file)
     {
-	$fetched_gse = 1;
-	$gzip_file_ls_line = get($gse_url) or $fetched_gse = 0;
-	if (($attempt_counter > 100) && ($fetched_gse == 0))
-	{
-	    $gseObject->{"gseID"} = $gse_input_id; 
-	    $gseObject->{"gseErrors"}->[0] = "Unable to fetch $gse_input_id from GEO - used URL $gse_url : Direcotry Level";
-print "\nCOULD NOT FETCH $gse_input_id FROM GEO (DIRECTORY LEVEL)\n";
-	    return($gseObject);
-	}
-	$attempt_counter++;
-    }
-    my @gse_file_records = split (/\n/,$gzip_file_ls_line); 
-    foreach my $gse_record (@gse_file_records) 
-    { 
-	if (scalar(@gse_file_records) > 1)
-	{
-	    $gseObject->{"gseID"} = $gse_input_id; 
-	    $gseObject->{"gseErrors"}->[0] = "Error there appears to multiple GSE SOFT files associated with $gse_input_id :  ".
-		"These are the records listed ". join(",",@gse_file_records).".";
-	    return($gseObject);
-	}
-
-	#print "GSE RECORD : $gse_record \n"; 
-	my @line_segments = split (/GSE/,$gse_record); 
-	my $gzip_file = "GSE".$line_segments[-1]; 
-	#print "GZIP FILE : $gzip_file \n"; 
-	chomp($gzip_file); 
-
-	my $fetched_gse_file = 1;
-	$attempt_counter = 0;
-
-	my $gzip_url = $gse_url.$gzip_file; 
-	my $gzip_output = get($gzip_url) or $fetched_gse_file = 0; 
-
-	while ($fetched_gse_file == 0)
+print "\nFile did not exist\n";
+	my $gse_number = $gse_input_id; 
+	$gse_number =~ s/GSE//; 
+	my $gse_ftp_parent_directory_number;  
+	if ($gse_number < 1000) 
 	{ 
-	    $fetched_gse_file = 1;
-	    $gzip_output = get($gzip_url) or $fetched_gse_file = 0;  
-	    if (($attempt_counter > 100) && ($fetched_gse_file == 0))
+	    $gse_ftp_parent_directory_number = ""; 
+	} 
+	else 
+	{ 
+	    $gse_ftp_parent_directory_number = substr($gse_number,0,-3); 
+	} 
+	my $gzip_url = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE".$gse_ftp_parent_directory_number."nnn/".$gse_input_id."/soft/".$gse_input_id."_family.soft.gz"; 
+	my $attempt_counter = 1; 
+	my $file_name = $gse_gz_files_directory ."/".$gse_input_id."_family.soft.gz"; 
+	my $gzip_output = getstore($gzip_url,$file_name); 
+	#print "\nGSE $gse_input_id : gzip : ".$gzip_output."\n"; 
+	while ($gzip_output != 200) 
+	{ 
+	    $gzip_output = getstore($gzip_url,$file_name); 
+	    if (($attempt_counter >= 100) && ($gzip_output != 200)) 
 	    { 
 		$gseObject->{"gseID"} = $gse_input_id; 
-		$gseObject->{"gseErrors"}->[0] = "Unable to fetch $gse_input_id from GEO - used URL $gzip_url : File Level";
-print "\nCOULD NOT FETCH $gse_input_id FROM GEO (FILE LEVEL)\n";
+		$gseObject->{"gseErrors"}->[0] = "Unable to fetch $gse_input_id from GEO - used URL $gzip_url";
+print "\nCOULD NOT FETCH $gse_input_id FROM GEO \n";
 		return($gseObject);
-	    }
-	    $attempt_counter++;
-	}
- 
-	my $gse_output = new IO::Uncompress::Gunzip \$gzip_output 
-	    or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
- 
-	my $line_count = 0;
-
-	my @gse_lines = <$gse_output>;
-
-print "GSE RECORD: ". $gse_record . " : Had lines = ".scalar(@gse_lines);
-
-	#series vars 
-	my $gse_series_line_start = undef;
-	my $gse_series_line_end = undef;
-	my $gse_series_section_parsed = 0;
-	my $listed_gsm_hash_ref;
-
-	#platform vars
-	my @platform_start_lines; #start lines for each platform in the platforms section
-	my @platform_end_lines; #start lines for each platform in the platforms section
-	my %platform_hash; #key is the platform name
-
-	#vars for dealing with mapping probes to features
-	my %gsm_platform_info_hash;  #Hash that has GSMID as key (or "ALL_GSMS" as single key) -> {"organism"=>value,                
-                                #                                                             "taxID"=>value,     
-                                #                                                             "platform"=>GPLID}     
-	my %platform_tax_genome_probe_feature_hash; #key platform_id->{tax_id -> {genome_id->{probe_id -> feature_id}}}
-
-        #sample vars  
-        my @sample_start_lines; #start lines for each sample in the samples section  
-        my @sample_end_lines; #start lines for each sample in the samples section 
-	my %GSMs_hash; #key gsmID -> value Hash (essentially for GSM object)
-
-	#IF METADATA ONLY = 0, means we need to deal with the Platform sections to create id->feature id hash.
-        #The platform parsing section will need more information need to populate the %gsm_info_hash
-	if ($metaDataOnly == 0)
-	{
-	    my @md_sample_start_lines;
-	    my @md_sample_end_lines;
-	    my $md_line_count = 0;
-            my $md_looking_for_start = 1;
-            foreach my $gse_line (@gse_lines) 
-            { 
-                if ($gse_line =~ m/^\^SAMPLE = /)
-                { 
-                    if ($md_looking_for_start == 0)
-                    { 
-                        push(@md_sample_end_lines,($md_line_count-1));
-                    }
-                    push(@md_sample_start_lines,$md_line_count);
-                    $md_looking_for_start = 0;
-                }
-                if ($gse_line =~ m/^\!sample_table_end/)
-                { 
-                    push(@md_sample_end_lines,$md_line_count);
-                    $md_looking_for_start = 1; 
-                } 
-                $md_line_count++;
-            } 
-            if($md_looking_for_start == 0)
-            { 
-                push(@md_sample_end_lines,($md_line_count-1)); 
-            } 
-
-	    #LOOP Through each sample and parse.                
-	    if (scalar(@sample_start_lines) != scalar(@sample_end_lines)) 
-	    { 
-		push(@{$gseObject->{"gseErrors"}},"The samples do not have the same number of start positions (" .
-		     scalar(@sample_start_lines) . 
-		     ") as end positions (" . scalar(@sample_end_lines) . ")");
 	    } 
-	    else 
-	    { 
-		for (my $md_sample_counter = 0; $md_sample_counter < scalar(@md_sample_start_lines); $md_sample_counter++)
-		{
-		    my @md_sample_lines = @gse_lines[$md_sample_start_lines[$md_sample_counter]..$md_sample_end_lines[$md_sample_counter]]; 
-		    my %temp_sample_hash = %{parse_gse_sample_info_for_platform(\@md_sample_lines)};
-		    my ($temp_gsm_id) = keys(%temp_sample_hash);
-		    $gsm_platform_info_hash{$temp_gsm_id} = $temp_sample_hash{$temp_gsm_id}; 
-		} 
-	    }
-	}
+	    $attempt_counter++; 
+	} 
+    }
+    unless (-e $gse_gz_file)
+    {
+	$gseObject->{"gseID"} = $gse_input_id; 
+	$gseObject->{"gseErrors"}->[0] = "Unable to fetch $gse_input_id - This Error should be unreachable.";
+print "\n\nREACHED UNREACHABLE ERROR\n\n";
+	return($gseObject);
+    }
 
-	my $looking_for_start = 1; 
-	foreach my $gse_line (@gse_lines)
+#print "\nBefore unzipping\n";
+    my $gse_output = new IO::Uncompress::Gunzip $gse_gz_file or die "IO::Uncompress::Gunzip failed: $GunzipError\n"; 
+#print "\nAfter unzipping\n";
+#print "\nGSE OUTPUT : ".$gse_output ."\n";
+#    my @gse_lines = <$gse_output> or print "\nERROR COULD NOT OPEN FILE\n"; 
+my @gse_lines;
+my $count_lines = 1;
+while(my $line = <$gse_output>)
+{
+#    print $count_lines ." :: " .$line;
+    push(@gse_lines,$line);
+    $count_lines++;
+}
+    my $line_count = 0;
+print "GSE RECORD: ". $gse_input_id . " : Had lines = ".scalar(@gse_lines);
+    #series vars 
+    my $gse_series_line_start = undef;
+    my $gse_series_line_end = undef;
+    my $gse_series_section_parsed = 0;
+    my $listed_gsm_hash_ref;
+    
+    #platform vars
+    my @platform_start_lines; #start lines for each platform in the platforms section
+    my @platform_end_lines; #start lines for each platform in the platforms section
+    my %platform_hash; #key is the platform name
+    
+    #vars for dealing with mapping probes to features
+    my %gsm_platform_info_hash;  #Hash that has GSMID as key (or "ALL_GSMS" as single key) -> {"organism"=>value,                
+    #                                                             "taxID"=>value,     
+    #                                                             "platform"=>GPLID}     
+    my %platform_tax_genome_probe_feature_hash; #key platform_id->{tax_id -> {genome_id->{probe_id -> feature_id}}}
+    
+    #sample vars  
+    my @sample_start_lines; #start lines for each sample in the samples section  
+    my @sample_end_lines; #start lines for each sample in the samples section 
+    my %GSMs_hash; #key gsmID -> value Hash (essentially for GSM object)
+    
+    #IF METADATA ONLY = 0, means we need to deal with the Platform sections to create id->feature id hash.
+    #The platform parsing section will need more information need to populate the %gsm_info_hash
+    if ($metaDataOnly == 0)
+    {
+	my @md_sample_start_lines;
+	my @md_sample_end_lines;
+	my $md_line_count = 0;
+	my $md_looking_for_start = 1;
+	foreach my $gse_line (@gse_lines) 
 	{ 
-	    #SERIES SECTION OF GSE
-	    if ($gse_line =~ m/^\^SERIES = /)
-	    {
-		$gse_series_line_start = $line_count;
-	    }
-	    if ($gse_line =~ m/^\^PLATFORM = /)
-	    {
-		$gse_series_line_end = $line_count -1;
-	    }
-	    if (defined($gse_series_line_start) && defined($gse_series_line_end) && $gse_series_section_parsed == 0)
-	    {
-		#need to process SERIES PORTION OF GSE
-		$gse_series_section_parsed = 1;
-		my @gse_portion_lines = @gse_lines[$gse_series_line_start..$gse_series_line_end];
-		($gseObject,$listed_gsm_hash_ref) = parse_gse_series_portion(\@gse_portion_lines,$gseObject);
-	    }
-
-	    #PLATFORM(S) SECTION OF GSE
-            if ($gse_line =~ m/^\^PLATFORM = /)
-            { 
-                push(@platform_start_lines,$line_count);
-		my @temp_arr = split(/\s*=\s*/,$gse_line);
-		my $gplID = trim($temp_arr[1]);
-		$platform_hash{$gplID}={"processed" => 0}; 
-            } 
-	    if ($gse_line =~ m/^\!platform_table_end/)
-	    {
-		push(@platform_end_lines,$line_count);
-	    }
-            if (($gse_line =~ m/^\^SAMPLE = /)  && ($platform_end_lines[-1] == ($line_count - 1)))
-	    {
-		#print "PLATFORM END LINES -1 :". $platform_end_lines[-1] . ":\nLINE COUNT -1 :".($line_count - 1)."\n";
-		#need to process platform section of GSE
-		if (scalar(@platform_start_lines) != scalar(@platform_end_lines))
-		{
-		    push(@{$gseObject->{"gseErrors"}},"The platforms do not have the same number of start positions (" . 
-			 scalar(@platform_start_lines) . 
-			 ") as end positions (" . scalar(@platform_end_lines) . ")");
+	    if ($gse_line =~ m/^\^SAMPLE = /)
+	    { 
+		if ($md_looking_for_start == 0)
+		{ 
+		    push(@md_sample_end_lines,($md_line_count-1));
 		}
-		else
+		push(@md_sample_start_lines,$md_line_count);
+		$md_looking_for_start = 0;
+	    }
+	    if ($gse_line =~ m/^\!sample_table_end/)
+	    { 
+		push(@md_sample_end_lines,$md_line_count);
+		$md_looking_for_start = 1; 
+	    } 
+	    $md_line_count++;
+	} 
+	if($md_looking_for_start == 0)
+	{ 
+	    push(@md_sample_end_lines,($md_line_count-1)); 
+	} 
+	
+	#LOOP Through each sample and parse.                
+	if (scalar(@sample_start_lines) != scalar(@sample_end_lines)) 
+	{ 
+	    push(@{$gseObject->{"gseErrors"}},"The samples do not have the same number of start positions (" .
+		 scalar(@sample_start_lines) . 
+		 ") as end positions (" . scalar(@sample_end_lines) . ")");
+	} 
+	else 
+	{ 
+	    for (my $md_sample_counter = 0; $md_sample_counter < scalar(@md_sample_start_lines); $md_sample_counter++)
+	    {
+		my @md_sample_lines = @gse_lines[$md_sample_start_lines[$md_sample_counter]..$md_sample_end_lines[$md_sample_counter]]; 
+		my %temp_sample_hash = %{parse_gse_sample_info_for_platform(\@md_sample_lines)};
+		my ($temp_gsm_id) = keys(%temp_sample_hash);
+		$gsm_platform_info_hash{$temp_gsm_id} = $temp_sample_hash{$temp_gsm_id}; 
+	    } 
+	}
+    }
+    
+    my $looking_for_start = 1; 
+    foreach my $gse_line (@gse_lines)
+    { 
+	#SERIES SECTION OF GSE
+	if ($gse_line =~ m/^\^SERIES = /)
+	{
+	    $gse_series_line_start = $line_count;
+	}
+	if ($gse_line =~ m/^\^PLATFORM = /)
+	{
+	    $gse_series_line_end = $line_count -1;
+	}
+	if (defined($gse_series_line_start) && defined($gse_series_line_end) && $gse_series_section_parsed == 0)
+	{
+	    #need to process SERIES PORTION OF GSE
+	    $gse_series_section_parsed = 1;
+	    my @gse_portion_lines = @gse_lines[$gse_series_line_start..$gse_series_line_end];
+	    ($gseObject,$listed_gsm_hash_ref) = parse_gse_series_portion(\@gse_portion_lines,$gseObject);
+	}
+	
+	#PLATFORM(S) SECTION OF GSE
+	if ($gse_line =~ m/^\^PLATFORM = /)
+	{ 
+	    push(@platform_start_lines,$line_count);
+	    my @temp_arr = split(/\s*=\s*/,$gse_line);
+	    my $gplID = trim($temp_arr[1]);
+	    $platform_hash{$gplID}={"processed" => 0}; 
+	} 
+	if ($gse_line =~ m/^\!platform_table_end/)
+	{
+	    push(@platform_end_lines,$line_count);
+	}
+	if (($gse_line =~ m/^\^SAMPLE = /)  && ($platform_end_lines[-1] == ($line_count - 1)))
+	{
+	    #print "PLATFORM END LINES -1 :". $platform_end_lines[-1] . ":\nLINE COUNT -1 :".($line_count - 1)."\n";
+	    #need to process platform section of GSE
+	    if (scalar(@platform_start_lines) != scalar(@platform_end_lines))
+	    {
+		push(@{$gseObject->{"gseErrors"}},"The platforms do not have the same number of start positions (" . 
+		     scalar(@platform_start_lines) . 
+		     ") as end positions (" . scalar(@platform_end_lines) . ")");
+	    }
+	    else
+	    {
+		for (my $platform_counter = 0; $platform_counter < scalar(@platform_start_lines); $platform_counter++) 
 		{
-		    for (my $platform_counter = 0; $platform_counter < scalar(@platform_start_lines); $platform_counter++) 
-		    {
-			my @gse_platform_lines = @gse_lines[$platform_start_lines[$platform_counter]..$platform_end_lines[$platform_counter]];
-
-			my ($platform_hash_ref,$temp_plt_tax_genome_probe_feat_hash_ref) = parse_gse_platform_portion(\%platform_hash,
+		    my @gse_platform_lines = @gse_lines[$platform_start_lines[$platform_counter]..$platform_end_lines[$platform_counter]];
+		    my ($platform_hash_ref,$temp_plt_tax_genome_probe_feat_hash_ref) = parse_gse_platform_portion(\%platform_hash,
 														  $metaDataOnly,
 														  \@gse_platform_lines,
 														  \%gsm_platform_info_hash, 
 														  $blat_files_directory,
 														  $platform_genome_mappings_directory,
 														  $self);
-			%platform_hash = %{$platform_hash_ref};
-		        my ($temp_gpl_id) = keys(%{$temp_plt_tax_genome_probe_feat_hash_ref});
-			$platform_tax_genome_probe_feature_hash{$temp_gpl_id}=$temp_plt_tax_genome_probe_feat_hash_ref->{$temp_gpl_id};
-		    }
+		    %platform_hash = %{$platform_hash_ref};
+		    my ($temp_gpl_id) = keys(%{$temp_plt_tax_genome_probe_feat_hash_ref});
+		    $platform_tax_genome_probe_feature_hash{$temp_gpl_id}=$temp_plt_tax_genome_probe_feat_hash_ref->{$temp_gpl_id};
 		}
-	    }
-            if ($gse_line =~ m/^\^SAMPLE = /)
-            { 
-                if ($looking_for_start == 0)
-                { 
-                    push(@sample_end_lines,($line_count-1));
-                }
-                push(@sample_start_lines,$line_count);
-                $looking_for_start = 0;
-            } 
-            if ($gse_line =~ m/^\!sample_table_end/)
-            { 
-                push(@sample_end_lines,$line_count);
-                $looking_for_start = 1; 
-            } 
-            $line_count++; 
-        }
-        if($looking_for_start == 0) 
-        { 
-            push(@sample_end_lines,($line_count-1));
-        }
-
-	#LOOP Through each sample and parse.
-	if (scalar(@sample_start_lines) != scalar(@sample_end_lines)) 
-	{ 
-	    push(@{$gseObject->{"gseErrors"}},"The samples do not have the same number of start positions (" . 
-		 scalar(@sample_start_lines) . 
-		 ") as end positions (" . scalar(@sample_end_lines) . ")"); 
-	} 
-	else 
-	{
-	    my $has_passing_gsm = 0;
-	    for (my $sample_counter = 0; $sample_counter < scalar(@sample_start_lines); $sample_counter++) 
-	    { 
-		my @gse_sample_lines = @gse_lines[$sample_start_lines[$sample_counter]..$sample_end_lines[$sample_counter]]; 
-                #print "\n\n\n\n\n\n\n\n\n\n\n\nGSE SAMPLE LINES : \n".Dumper(\@gse_sample_lines);
-                my %copy_platform_hash = %platform_hash;
-		my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines,$self); 
-		my ($gsm_id) = keys(%{$sample_hash_ref});
-
-		my @sample_errors;
-
-		if(exists($gsm_platform_info_hash{$gsm_id}{"error"}))
-		{
-		    push(@{$sample_hash_ref->{$gsm_id}->{"errors"}},$gsm_platform_info_hash{$gsm_id}{"error"});
-		}
-                if(defined($sample_hash_ref->{$gsm_id}->{"errors"}))
-		{
-                    @sample_errors = @{$sample_hash_ref->{$gsm_id}->{"errors"}};
-                }
-		if (scalar(@sample_errors) == 0)
-		{
-		    $has_passing_gsm = 1;
-		}
-		$gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash_ref->{$gsm_id};
-		delete $listed_gsm_hash_ref->{$gsm_id};
-	    } 
-	    foreach my $not_parsed_gsm (keys(%{$listed_gsm_hash_ref}))
-	    {
-		push(@{$gseObject->{"gseErrors"}},"The sample $not_parsed_gsm was in the series header but the sample was not found in the body"); 
-	    }
-	    if ($has_passing_gsm == 0)
-	    {
-		push(@{$gseObject->{"gseErrors"}},"This GSE did not contain any GSMs that passed."); 
 	    }
 	}
-	#print "FINAL LINE COUNT $line_count \n"; 
-	#print "GSM LISTED HASH : \n".Dumper($listed_gsm_hash_ref);
+	if ($gse_line =~ m/^\^SAMPLE = /)
+	{ 
+	    if ($looking_for_start == 0)
+	    { 
+		push(@sample_end_lines,($line_count-1));
+	    }
+	    push(@sample_start_lines,$line_count);
+	    $looking_for_start = 0;
+	} 
+	if ($gse_line =~ m/^\!sample_table_end/)
+	{ 
+	    push(@sample_end_lines,$line_count);
+	    $looking_for_start = 1; 
+	} 
+	$line_count++; 
+    }
+    if($looking_for_start == 0) 
+    { 
+	push(@sample_end_lines,($line_count-1));
+    }
+    
+    #LOOP Through each sample and parse.
+    if (scalar(@sample_start_lines) != scalar(@sample_end_lines)) 
+    { 
+	push(@{$gseObject->{"gseErrors"}},"The samples do not have the same number of start positions (" . 
+	     scalar(@sample_start_lines) . 
+	     ") as end positions (" . scalar(@sample_end_lines) . ")"); 
     } 
-    #print "\nGSE OBJECT : ".Dumper($gseObject)."\n";
+    else 
+    {
+	my $has_passing_gsm = 0;
+	for (my $sample_counter = 0; $sample_counter < scalar(@sample_start_lines); $sample_counter++) 
+	{ 
+	    my @gse_sample_lines = @gse_lines[$sample_start_lines[$sample_counter]..$sample_end_lines[$sample_counter]]; 
+	    #print "\n\n\n\n\n\n\n\n\n\n\n\nGSE SAMPLE LINES : \n".Dumper(\@gse_sample_lines);
+	    my %copy_platform_hash = %platform_hash;
+	    my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines,$self); 
+	    my ($gsm_id) = keys(%{$sample_hash_ref});
+	    
+	    my @sample_errors;
+	    
+	    if(exists($gsm_platform_info_hash{$gsm_id}{"error"}))
+	    {
+		push(@{$sample_hash_ref->{$gsm_id}->{"errors"}},$gsm_platform_info_hash{$gsm_id}{"error"});
+	    }
+	    if(defined($sample_hash_ref->{$gsm_id}->{"errors"}))
+	    {
+		@sample_errors = @{$sample_hash_ref->{$gsm_id}->{"errors"}};
+	    }
+	    if (scalar(@sample_errors) == 0)
+	    {
+		$has_passing_gsm = 1;
+	    }
+	    $gseObject->{"gseSamples"}->{$gsm_id} = $sample_hash_ref->{$gsm_id};
+	    delete $listed_gsm_hash_ref->{$gsm_id};
+	} 
+	foreach my $not_parsed_gsm (keys(%{$listed_gsm_hash_ref}))
+	{
+	    push(@{$gseObject->{"gseErrors"}},"The sample $not_parsed_gsm was in the series header but the sample was not found in the body"); 
+	}
+	if ($has_passing_gsm == 0)
+	{
+	    push(@{$gseObject->{"gseErrors"}},"This GSE did not contain any GSMs that passed."); 
+	}
+    }
+    #print "FINAL LINE COUNT $line_count \n"; 
+    #print "GSM LISTED HASH : \n".Dumper($listed_gsm_hash_ref); 
+#print "\nGSE OBJECT : ".Dumper($gseObject)."\n";
     my @_bad_returns;
     (ref($gseObject) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"gseObject\" (value was \"$gseObject\")");
-    if (@_bad_returns) {
+    if (@_bad_returns) 
+    {
 	my $msg = "Invalid returns passed to get_GEO_GSE:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_GEO_GSE');
+							   method_name => 'get_GEO_GSE');
     }
     return($gseObject);
 #    return({});
@@ -2436,8 +2416,8 @@ print "GSE RECORD: ". $gse_record . " : Had lines = ".scalar(@gse_lines);
 sub make_GSE_object_file
 { 
     my $self = shift;
-    my($gse_input_id, $metaDataOnly, $blat_files_directory, $platform_genome_mappings_directory,$gse_object_directory) = @_;
-    my $gse_object = get_GEO_GSE_data($self,$gse_input_id,$metaDataOnly,$blat_files_directory,$platform_genome_mappings_directory); 
+    my($gse_input_id, $metaDataOnly, $blat_files_directory, $platform_genome_mappings_directory,$gse_object_directory,$gse_gz_directory) = @_;
+    my $gse_object = get_GEO_GSE_data($self,$gse_input_id,$metaDataOnly,$blat_files_directory,$platform_genome_mappings_directory,$gse_gz_directory); 
     my $file_name = $gse_object_directory."/".$gse_input_id;
     open(FILE, ">".$file_name) or die "Unable to make to $file_name \n"; 
     print FILE to_json($gse_object); 

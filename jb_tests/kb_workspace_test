@@ -26,7 +26,7 @@ my @series_files;
 my @replicate_group_files;
 
 #organize file_types
-foreach my $file_path (@files)
+foreach my $file_path (sort(@files))
 {
 	my $file_name = $file_path;
 	$file_name =~ s/^\/mnt\/$typed_objects_dir\///;
