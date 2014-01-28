@@ -337,7 +337,7 @@ sub get_expression_samples_data
                                     inner join StrainWithSample sws on sam.id = sws.to_link 
                                     inner join Strain str on sws.from_link = str.id 
                                     inner join GenomeParentOf gpo on str.id = gpo.to_link 
-                                    inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id 
+                                    inner join Genome gen on gpo.from_link = gen.id 
                                     left outer join PlatformWithSamples pws on sam.id = pws.to_link 
                                     left outer join Platform plt on pws.from_link = plt.id 
                                     left outer join HasExpressionSample hes on sam.id = hes.to_link 
@@ -473,7 +473,7 @@ sub get_expression_samples_data
                               inner join SampleMeasurements sme on sam.id = sme.from_link
                               inner join Measurement mea on sme.to_link = mea.id
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link
-                              inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id
+                              inner join Feature fea on fmb.from_link = fea.id
                               where sam.id in (^. 
                            join(",", ("?") x @{$sample_ids}) . ") ";  
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
@@ -586,7 +586,7 @@ sub get_expression_data_by_samples_and_features
                                      inner join SampleMeasurements sms on sam.id = sms.from_link      
                                      inner join Measurement mea on sms.to_link = mea.id       
                                      inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link      
-                                     inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id       
+                                     inner join Feature fea on fmb.from_link = fea.id       
                                      where sam.id in (^.
 				     join(",", ("?") x @{$sample_ids}). ") ";
     if (scalar(@{$feature_ids}) > 0)
@@ -2266,7 +2266,7 @@ sub get_expression_samples_data_by_genome_ids
            inner join StrainWithSample sws on sam.id = sws.to_link
            inner join Strain str on sws.from_link = str.id
            inner join GenomeParentOf gpo on str.id = gpo.to_link
-           inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id
+           inner join Genome gen on gpo.from_link = gen.id
            where gen.id in (^.
 	   join(",", ("?") x @{$genome_ids}). ") ". 
 	   $wild_type_part . 
@@ -2422,7 +2422,7 @@ sub get_expression_sample_ids_by_genome_ids
            inner join StrainWithSample sws on sam.id = sws.to_link 
            inner join Strain str on sws.from_link = str.id 
            inner join GenomeParentOf gpo on str.id = gpo.to_link 
-           inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id     
+           inner join Genome gen on gpo.from_link = gen.id     
            where gen.id in (^. 
 	   join(",", ("?") x @{$genome_ids}). ") ". 
            $wild_type_part . 
@@ -2704,7 +2704,7 @@ sub get_expression_samples_data_by_ontology_ids
                inner join StrainWithSample sws on sam.id = sws.to_link 
                inner join Strain str on sws.from_link = str.id 
                inner join GenomeParentOf gpo on str.id = gpo.to_link 
-               inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id 
+               inner join Genome gen on gpo.from_link = gen.id 
                inner join SampleHasAnnotations sha on sha.from_link = sam.id
                inner join OntologyForSample ofs on ofs.to_link = sha.to_link
                inner join Ontology ont on ofs.from_link = ont.id
@@ -2926,7 +2926,7 @@ sub get_expression_sample_ids_by_ontology_ids
                inner join StrainWithSample sws on sam.id = sws.to_link  
                inner join Strain str on sws.from_link = str.id               
                inner join GenomeParentOf gpo on str.id = gpo.to_link    
-               inner join kbase_sapling_v1.Genome gen on gpo.from_link = gen.id   
+               inner join Genome gen on gpo.from_link = gen.id   
                inner join SampleHasAnnotations sha on sha.from_link = sam.id  
                inner join OntologyForSample ofs on ofs.to_link = sha.to_link  
                inner join Ontology ont on ofs.from_link = ont.id  
@@ -3103,7 +3103,7 @@ sub get_expression_data_by_feature_ids
                                      inner join SampleMeasurements sms on sam.id = sms.from_link     
                                      inner join Measurement mea on sms.to_link = mea.id 
                                      inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link 
-                                     inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id 
+                                     inner join Feature fea on fmb.from_link = fea.id 
                                      inner join StrainWithSample sws on sam.id = sws.to_link 
                                      inner join Strain str on sws.from_link = str.id  
                                      where fea.id in (^.
@@ -3426,7 +3426,7 @@ sub compare_samples_vs_default_controls
                               inner join SampleMeasurements sme on sam.id = sme.from_link 
                               inner join Measurement mea on sme.to_link = mea.id  
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link 
-                              inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id  
+                              inner join Feature fea on fmb.from_link = fea.id  
                               where sam.id in (^. 
 			      join(",", ("?") x scalar(keys(%distinct_sample_ids_hash))) . ") "; 
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ".
@@ -3562,7 +3562,7 @@ sub compare_samples_vs_the_average
                               inner join SampleMeasurements sme on sam.id = sme.from_link       
                               inner join Measurement mea on sme.to_link = mea.id                         
                               inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link              
-                              inner join kbase_sapling_v1.Feature fea on fmb.from_link = fea.id                    
+                              inner join Feature fea on fmb.from_link = fea.id                    
                               where sam.id in (^. 
                               join(",", ("?") x scalar(keys(%distinct_sample_ids_hash))) . ") "; 
     my $get_log2levels_qh = $dbh->prepare($get_log2levels_q) or die "Unable to prepare get_log2levels_q : ". 

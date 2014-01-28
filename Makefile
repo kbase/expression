@@ -7,7 +7,7 @@ SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 ROOT_DEV_MODULE_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 KB_DEPLOYMENT_CONFIG ?= $(ROOT_DEV_MODULE_DIR)/deploy.cfg
 SERVICE_CONFIG_NAME = KBaseExpression
-SERVICE_PORT = 7076
+SERVICE_PORT = 7075
 
 include $(TOP_DIR)/tools/Makefile.common
 
