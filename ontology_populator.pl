@@ -2,13 +2,28 @@ use Data::Dumper;
 use DBI;
 use LWP::UserAgent;
 use HTTP::Request::Common;
+use Getopt::Long;
 use strict;
+
+my $db_name = undef;
+my $db_user = undef;
+my $db_pwd = undef;
+
+my $usage = "This command requires a db_user and db_pwd for inserting the ontologies.  Both need to be in single quotes.  Example : perl ontology_populator_for_db1.pl -db_user='YourUserName' -db_pwd='YourDBPwd' \n";
+(GetOptions('db_name=s' => \$db_name,
+            'db_user=s' => \$db_user,
+	    'db_pwd=s' => \$db_pwd)
+     && @ARGV == 0) || die $usage;
+die $usage if ((!defined $db_user) || (!defined $db_pwd) || (!defined $db_name));
 
 my %ontology_databases = ("Plant Ontology" => "http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co",
 			  "Plant Environmental Ontology" => "http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo",
-			  "Microbial Environmental Ontology" => "http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo");
-#my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost','expressionSelect', '', { RaiseError => 1, ShowErrorStatement => 1 } ); 
-my $dbh = DBI->connect('DBI:mysql:CS_expression:localhost','root', '', { RaiseError => 1, ShowErrorStatement => 1 } ); 
+			  "Microbial Environmental Ontology" => "http://www.berkeleybop.org/ontologies/envo/subsets/envo-basic.obo");
+#OLD ENVO site  "http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo");
+
+my $full_db_name = 'DBI:mysql:'.$db_name;
+my $dbh = DBI->connect($full_db_name,$db_user, $db_pwd, { RaiseError => 1, ShowErrorStatement => 1 } ); 
+#my $dbh = DBI->connect('DBI:mysql:expression:db1.chicago.kbase.us',$db_user, $db_pwd, { RaiseError => 1, ShowErrorStatement => 1 } ); 
 
 my $does_ontology_exist_q = qq^select id from Ontology where id = ? ^;
 my $does_ontology_exist_qh = $dbh->prepare($does_ontology_exist_q) or die "Unable to prepare does_ontology_exist_q : $does_ontology_exist_q : " . $dbh->errstr();
