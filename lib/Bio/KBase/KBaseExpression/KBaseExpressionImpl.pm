@@ -61,7 +61,7 @@ sub new
 	my %params; 
 #print "DEPLOYMENT_CONFIG ". $ENV{KB_DEPLOYMENT_CONFIG} . "\n";
         if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) { 
-#print "IN CONFIG IF\n"; 
+#warn "IN CONFIG IF\n"; 
 #print "CONFIG FILE $e \n\n";
             my $EXPRESSION_SERVICE_NAME = $ENV{KB_SERVICE_NAME}; 
             my $c = Config::Simple->new(); 
@@ -70,18 +70,18 @@ sub new
 	    my %temp_hash = $c->vars();
 #foreach my $c_key (keys(%temp_hash))
 #{
-#print "CKEY: $c_key : Val $temp_hash{$c_key} \n";
+#warn "CKEY: $c_key : Val $temp_hash{$c_key} \n";
 #}
-            my @param_list = qw(dbName dbUser dbhost); 
+            my @param_list = qw(dbName dbUser dbhost dbPwd); 
 #print "PAram list : ".join(":",@param_list)."\n";
             for my $p (@param_list) 
             { 
-#print "$EXPRESSION_SERVICE_NAME.$p \n\n";
+#warn "$EXPRESSION_SERVICE_NAME.$p \n\n";
                 my $v = $c->param("$EXPRESSION_SERVICE_NAME.$p"); 
-#print "IN LOOP P: $p v $v \n";
+#warn "IN LOOP P: $p v $v \n";
                 if ($v) 
                 { 
-#print "IN V IF\n"; 
+#warn "IN V IF\n"; 
                     $params{$p} = $v; 
                     $self->{$p} = $v; 
                 } 
@@ -89,10 +89,15 @@ sub new
         } 
         else 
         { 
-            $self->{dbName} = 'expression'; 
-            $self->{dbUser} = 'expressionselect'; 
-            $self->{dbhost} = 'db1.chicago.kbase.us'; 
-#print "IN CONFIG ELSE\n"; 
+#            $self->{dbName} = 'expression'; 
+#            $self->{dbUser} = 'expressionselect'; 
+#            $self->{dbhost} = 'db1.chicago.kbase.us'; 
+            $self->{dbName} = 'kbase_sapling_v3_dev'; 
+            $self->{dbUser} = 'wreckitralph'; 
+            $self->{dbhost} = 'db4.chicago.kbase.us'; 
+            $self->{dbPwd} = '@glitch&'; 
+
+#warn "IN CONFIG ELSE\n"; 
         } 
         #Create a connection to the EXPRESSION (and print a logging debug mssg)              
 	if( 0 < scalar keys(%params) ) { 
@@ -103,16 +108,18 @@ sub new
     } 
     else 
     { 
-#        $self->{dbName} = 'CS_expression'; 
-#        $self->{dbUser} = 'expressionSelect'; 
-#        $self->{dbhost} = 'localhost'; 
-         $self->{dbName} = 'expression'; 
-         $self->{dbUser} = 'expressionselect';
-         $self->{dbhost} = 'db1.chicago.kbase.us'; 
+#         $self->{dbName} = 'expression'; 
+#         $self->{dbUser} = 'expressionselect';
+#         $self->{dbhost} = 'db1.chicago.kbase.us'; 
+	$self->{dbName} = 'kbase_sapling_v3_dev'; 
+	$self->{dbUser} = 'wreckitralph'; 
+	$self->{dbhost} = 'db4.chicago.kbase.us';
+	$self->{dbPwd} = '@glitch&';  
 #print "IN ELSE\n"; 
     } 
 #print "\nDBNAME : ".  $self->{dbName}; 
 #print "\nDBUSER : ".  $self->{dbUser}; 
+#print "\nDBPWD : ".  $self->{dbPwd}; 
 #print "\nDBHOST : ".  $self->{dbhost} . "\n"; 
     #END_CONSTRUCTOR
 
@@ -320,9 +327,20 @@ sub get_expression_samples_data
 #                           { RaiseError => 1, ShowErrorStatement => 1 } 
 #        ); 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+#    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+#			   { RaiseError => 1, ShowErrorStatement => 1 } 
+#    );
+
+#print "\n\nDB PWD :  $self->{dbPwd} \n\n"; 
+#$expression_data_samples_map->{'dbPwd'} = $self->{dbPwd};
+#$expression_data_samples_map->{'dbName'} = $self->{dbName};
+#$expression_data_samples_map->{'dbhost'} = $self->{dbhost};
+#$expression_data_samples_map->{'dbUser'} = $self->{dbUser};
+#return($expression_data_samples_map);
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
 			   { RaiseError => 1, ShowErrorStatement => 1 } 
     ); 
+ 
     my $get_sample_meta_data_q = qq^select sam.id, sam.source_id, sam.title as sample_title, sam.description as sample_description,  
                                     sam.molecule, sam.type, sam.dataSource, sam.externalSourceId, 
                                     FROM_UNIXTIME(sam.kbaseSubmissionDate), FROM_UNIXTIME(sam.externalSourceDate),  
@@ -577,9 +595,9 @@ sub get_expression_data_by_samples_and_features
 							       method_name => 'get_expression_data_by_samples_and_features'); 
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
-                           { RaiseError => 1, ShowErrorStatement => 1 } 
-	); 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
+			   { RaiseError => 1, ShowErrorStatement => 1 } 
+    ); 
 
     my $get_feature_log2level_q = qq^select sam.id, fea.id, mea.value   
                                      from Sample sam           
@@ -801,7 +819,7 @@ sub get_expression_samples_data_by_series_ids
                                                              method_name => 'get_expression_samples_data_by_series_ids');
     } 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
 
@@ -921,7 +939,7 @@ sub get_expression_sample_ids_by_series_ids
 							     method_name => 'get_expression_sample_ids_by_series_ids'); 
     } 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
  
@@ -1144,7 +1162,7 @@ sub get_expression_samples_data_by_experimental_unit_ids
                                                              method_name => 'get_expression_samples_data_by_experimental_unit_ids'); 
     } 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	); 
     my $get_sample_ids_by_experimental_unit_ids_q = 
@@ -1267,7 +1285,7 @@ sub get_expression_sample_ids_by_experimental_unit_ids
                                                              method_name => 'get_expression_sample_ids_by_experimental_unit_ids'); 
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
     my $get_sample_ids_by_experimental_unit_ids_q = 
@@ -1487,7 +1505,7 @@ sub get_expression_samples_data_by_experiment_meta_ids
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_samples_data_by_experiment_meta_ids'); 
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
  
@@ -1607,7 +1625,7 @@ sub get_expression_sample_ids_by_experiment_meta_ids
                                                              method_name => 'get_expression_sample_ids_by_experiment_meta_ids'); 
     } 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
      my $get_experimental_unit_ids_by_experiment_meta_ids_q = 
@@ -1853,7 +1871,7 @@ sub get_expression_samples_data_by_strain_ids
     { 
         #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty.                                                                                                                                                           
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
 
@@ -1996,7 +2014,7 @@ sub get_expression_sample_ids_by_strain_ids
     { 
         #ASSUME "ALL" DO NOT HAVE A SAMPLE TYPE FILTER keep it empty. 
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
  
@@ -2228,7 +2246,7 @@ sub get_expression_samples_data_by_genome_ids
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_samples_data_by_genome_ids'); 
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
 
@@ -2386,7 +2404,7 @@ sub get_expression_sample_ids_by_genome_ids
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
                                                              method_name => 'get_expression_sample_ids_by_genome_ids'); 
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
  
@@ -2695,7 +2713,7 @@ sub get_expression_samples_data_by_ontology_ids
     }
     my $distinct_ontology_count = scalar(keys(%distinct_ontologies));
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
 	); 
     my $get_sample_ids_by_ontology_ids_q = 
@@ -2916,7 +2934,7 @@ sub get_expression_sample_ids_by_ontology_ids
         $distinct_ontologies{$ont_id} = 1; 
     } 
     my $distinct_ontology_count = scalar(keys(%distinct_ontologies)); 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_sample_ids_by_ontology_ids_q_p1 = qq^select distinct sam.id as samid ^;
@@ -3068,7 +3086,7 @@ sub get_expression_data_by_feature_ids
                                                              method_name => 'get_expression_data_by_feature_ids'); 
     } 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
 	);
 
@@ -3396,7 +3414,7 @@ sub compare_samples_vs_default_controls
                                                              method_name => 'compare_samples_vs_default_controls'); 
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
 
@@ -3540,7 +3558,7 @@ sub compare_samples_vs_the_average
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
 							 method_name => 'compare_samples_vs_average');
     } 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
     my %distinct_sample_ids_hash; 
@@ -3959,7 +3977,7 @@ sub get_expression_samples_titles
                                                              method_name => 'get_expression_samples_titles'); 
     } 
 
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
 	); 
     my $get_samples_titles_q = qq^select id, title from Sample where id in (^.
@@ -4051,7 +4069,7 @@ sub get_expression_samples_descriptions
                                                              method_name => 'get_expression_samples_descriptions');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_descriptions_q = qq^select id, description from Sample where id in (^.
@@ -4143,7 +4161,7 @@ sub get_expression_samples_molecules
                                                              method_name => 'get_expression_samples_molecules');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_molecules_q = qq^select id, molecule from Sample where id in (^.
@@ -4235,7 +4253,7 @@ sub get_expression_samples_types
                                                              method_name => 'get_expression_samples_types');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_types_q = qq^select id, type from Sample where id in (^.
@@ -4327,7 +4345,7 @@ sub get_expression_samples_external_source_ids
                                                              method_name => 'get_expression_samples_external_source_ids');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_ex_id_q = qq^select id, externalSourceId from Sample where id in (^.
@@ -4419,7 +4437,7 @@ sub get_expression_samples_original_log2_medians
                                                              method_name => 'get_expression_samples_original_log2_medians');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_olog2_q = qq^select id, originalLog2Median from Sample where id in (^.
@@ -4512,7 +4530,7 @@ sub get_expression_series_titles
                                                              method_name => 'get_expression_series_titles');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, title from Series where id in (^.
@@ -4604,7 +4622,7 @@ sub get_expression_series_summaries
 							       method_name => 'get_expression_series_summaries');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, summary from Series where id in (^.
@@ -4696,7 +4714,7 @@ sub get_expression_series_designs
 							       method_name => 'get_expression_series_designs');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, design from Series where id in (^.
@@ -4788,7 +4806,7 @@ sub get_expression_series_external_source_ids
 							       method_name => 'get_expression_series_external_source_ids');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_series_info_q = qq^select id, externalSourceId from Series where id in (^.
@@ -4883,7 +4901,7 @@ sub get_expression_sample_ids_by_sample_external_source_ids
 							     method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
     }
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 }
         ); 
     my $get_samples_q = qq^select id from Sample where externalSourceId in (^.
@@ -4978,7 +4996,7 @@ sub get_expression_sample_ids_by_platform_external_source_ids
                                                              method_name => 'get_expression_sample_ids_by_platform_external_source_ids'); 
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
     my $get_samples_q = qq^select s.id from Sample s inner join PlatformWithSamples ps on s.id = ps.to_link ^.
@@ -5074,7 +5092,7 @@ sub get_expression_series_ids_by_series_external_source_ids
                                                              method_name => 'get_expression_series_ids_by_series_external_source_ids');
     } 
  
-    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '', 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
                            { RaiseError => 1, ShowErrorStatement => 1 } 
         ); 
     my $get_series_q = qq^select s.id from Series s where s.externalSourceId in (^.

@@ -55,7 +55,7 @@ sub new
             my $c = Config::Simple->new(); 
             $c->read($e); 
 	    my %temp_hash = $c->vars();
-            my @param_list = qw(dbName dbUser dbhost); 
+	    my @param_list = qw(dbName dbUser dbhost dbPwd);  
             for my $p (@param_list) 
             { 
                 my $v = $c->param("$EXPRESSION_SERVICE_NAME.$p"); 

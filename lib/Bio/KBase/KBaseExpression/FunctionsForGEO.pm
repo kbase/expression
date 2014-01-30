@@ -82,7 +82,7 @@ sub new
             my $c = Config::Simple->new(); 
             $c->read($e); 
 	    my %temp_hash = $c->vars();
-            my @param_list = qw(dbName dbUser dbhost); 
+	    my @param_list = qw(dbName dbUser dbhost dbPwd); 
             for my $p (@param_list) 
             { 
                 my $v = $c->param("$EXPRESSION_SERVICE_NAME.$p"); 
@@ -346,7 +346,7 @@ sub parse_gse_platform_portion
 	    }
 	}
 
-	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
 			       { RaiseError => 1, ShowErrorStatement => 1 }
 	    ); 
 	my %genome_ids_hash;
@@ -1767,7 +1767,7 @@ sub parse_gse_sample_portion
         }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
  
-        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, '',
+        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
                                { RaiseError => 1, ShowErrorStatement => 1 }
             ); 
 	my @genomes_with_data = keys(%{$gsm_data_hash_ref});
