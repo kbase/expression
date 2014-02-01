@@ -71,9 +71,13 @@ sub new
         } 
         else 
         { 
-            $self->{dbName} = 'expression'; 
-            $self->{dbUser} = 'expressionselect'; 
-            $self->{dbhost} = 'db1.chicago.kbase.us'; 
+            $self->{dbName} = 'kbase_sapling_v3_dev'; 
+            $self->{dbUser} = 'wreckitralph';
+            $self->{dbhost} = 'db4.chicago.kbase.us'; 
+            $self->{dbPwd} = '@glitch&'; 
+#            $self->{dbName} = 'expression'; 
+#            $self->{dbUser} = 'expressionselect'; 
+#            $self->{dbhost} = 'db1.chicago.kbase.us'; 
         } 
         #Create a connection to the EXPRESSION (and print a logging debug mssg)              
 	if( 0 < scalar keys(%params) ) { 
@@ -83,9 +87,13 @@ sub new
     } 
     else 
     { 
-         $self->{dbName} = 'expression'; 
-         $self->{dbUser} = 'expressionselect';
-         $self->{dbhost} = 'db1.chicago.kbase.us'; 
+            $self->{dbName} = 'kbase_sapling_v3_dev'; 
+            $self->{dbUser} = 'wreckitralph';
+            $self->{dbhost} = 'db4.chicago.kbase.us'; 
+            $self->{dbPwd} = '@glitch&'; 
+#         $self->{dbName} = 'expression'; 
+#         $self->{dbUser} = 'expressionselect';
+#         $self->{dbhost} = 'db1.chicago.kbase.us'; 
     } 
     #END_CONSTRUCTOR
 
@@ -264,7 +272,7 @@ sub geo2TypedObjects
 			my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
 			my $ncbi_taxon = $ncbi_db->get_taxon(-taxonid=>$gpl_hash{'gplTaxID'});
 			my @ncbi_scientific_names = @{$ncbi_taxon->{'_names_hash'}->{'scientific'}};
-                        my $get_genome_ids_q = "select id from kbase_sapling_v1.Genome where scientific_name in (".
+                        my $get_genome_ids_q = "select id from Genome where scientific_name in (".
                             join(",", ("?") x @ncbi_scientific_names) . ") "; 
                         my $get_genome_ids_qh = $dbh->prepare($get_genome_ids_q) or return "0 - Unable to prepare get_genome_ids_q : $get_genome_ids_q ".
                             $dbh->errstr(); 
@@ -422,20 +430,26 @@ sub geo2TypedObjects
 
                 #NEED TO GRAB OTHER ONTOLOGY TERM INFO FROM THE DATABASE.
 		my @expression_ontology_terms;
-	        my @ontology_term_ids = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmOntologies'};
-		my $get_ontology_info_q = "select id, name, definition from expression.Ontology where id in (".
-		    join(",", ("?") x @ontology_term_ids) . ") ";
-		my $get_ontology_info_qh = $dbh->prepare($get_ontology_info_q) or return "0 - Unable to prepare get_ontology_info_q : $get_ontology_info_q ". 
-		    $dbh->errstr(); 
-                $get_ontology_info_qh->execute(@ontology_term_ids) or return "0 - Unable to execute get_ontology_info_q : $get_ontology_info_q ".
-		    $get_ontology_info_qh->errstr();
-                while(my ($temp_term_id, $temp_term_name, $temp_term_definition) = $get_ontology_info_qh->fetchrow_array())
-                {
-		    push(@expression_ontology_terms,{'expression_ontology_term_id'=>$temp_term_id,
-						     'expression_ontology_term_name'=>$temp_term_name,
-						     'expression_ontology_term_definition'=>$temp_term_definition});  
-                }				   
-                #genome specific data : id, genome_id, expression_levels, original_median, data_quality_level, strain (all of strain)
+	        my @ontology_term_ids = @{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmOntologies'}};
+#print "\n\nONTOLOGY TERM IDS : ". join(":",@ontology_term_ids) ;
+		if (scalar(@ontology_term_ids > 0))
+		{
+		    my $get_ontology_info_q = "select id, name, definition from Ontology where id in (".
+			join(",", ("?") x @ontology_term_ids) . ") ";
+		    my $get_ontology_info_qh = $dbh->prepare($get_ontology_info_q) or return "0 - Unable to prepare get_ontology_info_q : $get_ontology_info_q ". 
+			$dbh->errstr(); 
+		    $get_ontology_info_qh->execute(@ontology_term_ids) or die "UNABLE TO EXECUTE ONTS ".
+#return "0 - 
+			"Unable to execute get_ontology_info_q : $get_ontology_info_q ".
+                        $get_ontology_info_qh->errstr();
+		    while(my ($temp_term_id, $temp_term_name, $temp_term_definition) = $get_ontology_info_qh->fetchrow_array())
+		    {
+			push(@expression_ontology_terms,{'expression_ontology_term_id'=>$temp_term_id,
+							 'expression_ontology_term_name'=>$temp_term_name,
+							 'expression_ontology_term_definition'=>$temp_term_definition});  
+		    }				   
+		}
+		#genome specific data : id, genome_id, expression_levels, original_median, data_quality_level, strain (all of strain)
 		#loop through each passing GENOME        
                 my @genome_ids = keys(%{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}});
 		foreach my $temp_genome_id (@genome_ids)
@@ -539,6 +553,7 @@ sub geo2TypedObjects
 
 			if (scalar(@expression_ontology_terms) > 0)
 			{
+#print "\nHAVE ONTOLOGY TERMS:\n";
 			    $sample_object_ref->{"expression_ontology_terms"}=\@expression_ontology_terms;
 			}			
 			if ($gsm_protocol)
