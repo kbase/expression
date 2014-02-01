@@ -1,0 +1,43 @@
+use strict; 
+use Bio::KBase::KBaseExpression::FunctionsForGEO; 
+use Bio::KBase::KBaseExpression::GEO2TypedObjects; 
+use Bio::KBase::KBaseExpression::GEO2ReplicateGroups; 
+ 
+use Data::Dumper; 
+ 
+my $functionsForGEO = Bio::KBase::KBaseExpression::FunctionsForGEO->new(); 
+ 
+my @gses; 
+my $gse_file_list = "/mnt/all_gses_list"; 
+open (GSE_FILES,$gse_file_list) or die "0 - Unable to open $gse_file_list , it was supposed to exist"; 
+my @gse_list_lines=<GSE_FILES>; 
+close(GSE_FILE); 
+foreach my $gse_list_line (@gse_list_lines) 
+{ 
+    $gse_list_line =~ s/^\s+//; 
+    $gse_list_line =~ s/\s+$//; 
+    push(@gses,$gse_list_line); 
+} 
+
+#@gses = qw(GSE10522); 
+
+foreach my $gse (@gses) 
+{ 
+  #note the 3 file directories should be different and exist 
+print "\nBefore call ".$gse." : ".localtime."\n\n"; 
+  my $file_name = "/mnt/ALL_EXPRESSION/gse_objects/".$gse;
+  system("perl /kb/dev_container/modules/expression/expr_data_supplement.pl --i=$file_name --s=/mnt/gsm_to_ont2 --o=$file_name");
+  my $geo2TypedObject = Bio::KBase::KBaseExpression::GEO2TypedObjects->new(); 
+  my $test_hash_ref = $geo2TypedObject->geo2TypedObjects($file_name,"GEO","/mnt/ALL_EXPRESSION/geo_results/","/mnt/ALL_EXPRESSION/typed_objects/");
+  print "\nGEO2TypedObject: ".Dumper($test_hash_ref); 
+} 
+#my $geo2ReplicateGroups = Bio::KBase::KBaseExpression::GEO2ReplicateGroups->new();
+#my $rep_file = "/mnt/geo_results/gsm_rep_ath_ptr";
+#my $gsm_results_file = "/mnt/geo_results/gsm_results";
+#my $typed_objects_dir = "/mnt/typed_objects/";
+#my $rep_warnings_file = "/mnt/geo_results/rep_warnings";
+#my $rep_test_hash_ref = $geo2ReplicateGroups->geo2ReplicateGroups($rep_file,$gsm_results_file,$typed_objects_dir,$rep_warnings_file); 
+#print "\nREP Portion : ".Dumper($rep_test_hash_ref); 
+ 
+#system("perl /kb/dev_container/modules/expression/jb_tests/kb_workspace_test http://140.221.84.209:7058 KBASE_Expression /mnt/typed_objects/"); 
+system("perl /kb/dev_container/modules/expression/jb_tests/kb_workspace_test https://kbase.us/services/ws KBasePublicExpression /mnt/ALL_EXPRESSION/typed_objects/");
