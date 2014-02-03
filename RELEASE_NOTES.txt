@@ -33,3 +33,15 @@ ANTICIPATED FUTURE DEVELOPMENTS:
 
 
 
+Version 1.0 (GIT commit on 2/3/2014)
+---------------------------------------------
+NEW FEATURES:
+Now the Data resides in the CDS.
+The data also resides in the WS.
+Completely changed the data pipeline.
+New way of getting aliases for GEO uploads.
+
+ANTICIPATED FUTURE DEVELOPMENTS:
+Add handling of multiple tax id GSEs to the GEO uploader.
+Add Sys:AlarmCall as the GEO files sometimes cannot be slurped up.
+
