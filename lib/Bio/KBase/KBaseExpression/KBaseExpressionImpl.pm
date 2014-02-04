@@ -93,9 +93,9 @@ sub new
 #            $self->{dbUser} = 'expressionselect'; 
 #            $self->{dbhost} = 'db1.chicago.kbase.us'; 
             $self->{dbName} = 'kbase_sapling_v3_dev'; 
-            $self->{dbUser} = 'wreckitralph'; 
+            $self->{dbUser} = 'kbase_sapselect'; 
             $self->{dbhost} = 'db4.chicago.kbase.us'; 
-            $self->{dbPwd} = '@glitch&'; 
+            $self->{dbPwd} = 'oiwn22&dmwWEe'; 
 
 #warn "IN CONFIG ELSE\n"; 
         } 
@@ -112,9 +112,9 @@ sub new
 #         $self->{dbUser} = 'expressionselect';
 #         $self->{dbhost} = 'db1.chicago.kbase.us'; 
 	$self->{dbName} = 'kbase_sapling_v3_dev'; 
-	$self->{dbUser} = 'wreckitralph'; 
+	$self->{dbUser} = 'kbase_sapselect'; 
 	$self->{dbhost} = 'db4.chicago.kbase.us';
-	$self->{dbPwd} = '@glitch&';  
+	$self->{dbPwd} = 'oiwn22&dmwWEe';  
 #print "IN ELSE\n"; 
     } 
 #print "\nDBNAME : ".  $self->{dbName}; 

@@ -68,9 +68,13 @@ sub new
         } 
         else 
         { 
-            $self->{dbName} = 'expression'; 
-            $self->{dbUser} = 'expressionselect'; 
-            $self->{dbhost} = 'db1.chicago.kbase.us'; 
+            $self->{dbName} = 'kbase_sapling_v3_dev';
+            $self->{dbUser} = 'kbase_sapselect'; 
+            $self->{dbhost} = 'db4.chicago.kbase.us';
+            $self->{dbPwd} = 'oiwn22&dmwWEe'; 
+#            $self->{dbName} = 'expression'; 
+#            $self->{dbUser} = 'expressionselect'; 
+#            $self->{dbhost} = 'db1.chicago.kbase.us'; 
         } 
         #Create a connection to the EXPRESSION (and print a logging debug mssg)              
 	if( 0 < scalar keys(%params) ) { 
@@ -80,9 +84,13 @@ sub new
     } 
     else 
     { 
-         $self->{dbName} = 'expression'; 
-         $self->{dbUser} = 'expressionselect';
-         $self->{dbhost} = 'db1.chicago.kbase.us'; 
+	$self->{dbName} = 'kbase_sapling_v3_dev';
+	$self->{dbUser} = 'kbase_sapselect'; 
+	$self->{dbhost} = 'db4.chicago.kbase.us';
+	$self->{dbPwd} = 'oiwn22&dmwWEe'; 
+#         $self->{dbName} = 'expression'; 
+#         $self->{dbUser} = 'expressionselect';
+#         $self->{dbhost} = 'db1.chicago.kbase.us'; 
     } 
     #END_CONSTRUCTOR
 

@@ -71,10 +71,10 @@ sub new
         } 
         else 
         { 
-            $self->{dbName} = 'kbase_sapling_v3_dev'; 
-            $self->{dbUser} = 'wreckitralph';
-            $self->{dbhost} = 'db4.chicago.kbase.us'; 
-            $self->{dbPwd} = '@glitch&'; 
+            $self->{dbName} = 'kbase_sapling_v3_dev';
+            $self->{dbUser} = 'kbase_sapselect'; 
+            $self->{dbhost} = 'db4.chicago.kbase.us';
+            $self->{dbPwd} = 'oiwn22&dmwWEe'; 
 #            $self->{dbName} = 'expression'; 
 #            $self->{dbUser} = 'expressionselect'; 
 #            $self->{dbhost} = 'db1.chicago.kbase.us'; 
@@ -87,10 +87,10 @@ sub new
     } 
     else 
     { 
-            $self->{dbName} = 'kbase_sapling_v3_dev'; 
-            $self->{dbUser} = 'wreckitralph';
-            $self->{dbhost} = 'db4.chicago.kbase.us'; 
-            $self->{dbPwd} = '@glitch&'; 
+	$self->{dbName} = 'kbase_sapling_v3_dev';
+	$self->{dbUser} = 'kbase_sapselect'; 
+	$self->{dbhost} = 'db4.chicago.kbase.us';
+	$self->{dbPwd} = 'oiwn22&dmwWEe'; 
 #         $self->{dbName} = 'expression'; 
 #         $self->{dbUser} = 'expressionselect';
 #         $self->{dbhost} = 'db1.chicago.kbase.us'; 

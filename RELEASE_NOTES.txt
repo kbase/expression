@@ -33,7 +33,7 @@ ANTICIPATED FUTURE DEVELOPMENTS:
 
 
 
-Version 1.0 (GIT commit on 2/3/2014)
+Version 1.0 (GIT commit on 2/4/2014)
 ---------------------------------------------
 NEW FEATURES:
 Now the Data resides in the CDS.
