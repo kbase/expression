@@ -288,9 +288,9 @@ eval {
 }; 
 ok($@ =~ /requires a list of valid/,"get_expression_samples_data_by_ontology_ids(['Not A real ID','kb|not Real'],'or','kb|g.3907','microarray','N') throws exception properly because fake ontology_ids.");
 $result = undef;
-eval { 
-    $result = $client->get_expression_samples_data_by_ontology_ids(['EO:0007174','PO:0000014','PO:0009025'],'or','kb|g.3899','microarray','Y');
-};
+#eval { 
+#    $result = $client->get_expression_samples_data_by_ontology_ids(['EO:0007174','PO:0000014','PO:0009025'],'or','kb|g.3899','microarray','Y');
+#};
 #
 # THIS REQUIRES MORE TESTING BEING ADDED ONCE WE HAVE DATA THAT ACTUALLY HAS ONTOLOGY IDS/ SAMPLE ANNOTATIONS
 #
