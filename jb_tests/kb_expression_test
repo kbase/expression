@@ -7,7 +7,7 @@ use Bio::KBase::KBaseExpression::KBaseExpressionClient;
 
 
 #FOR STARMAN
-my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7076");
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7075");
 #FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
 #(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
 #Log into your instance
@@ -20,12 +20,18 @@ my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://loc
 #For testing the IMP directly
 #my $client = Bio::KBase::KBaseExpression::KBaseExpressionImpl->new("http://localhost:9999"); 
 
+
+#print "\nCLIENT:".Dumper($client).":\n";
+
 print "\nTime at start : ".localtime."\n";
 
 my $result;
 print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data([]);
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
+#$result = $client->get_expression_samples_data(['kb|sample.3713']);
+#$result = $client->get_expression_samples_data(['kb|sample.3745']);
+$result = $client->get_expression_samples_data(['kb|sample.3775']);
 #$result = $client->get_expression_samples_data(['kb|sample.38','kb|sample.39']);
 #$result = $client->get_expression_samples_data(['kb|sample.50','kb|sample.51']);
 #print Dumper($result) . "\n----------------------------\n";
@@ -41,6 +47,7 @@ print "get_expression_data_by_sample_and_features()\n";
 #get_expression_samples_data_by_series_ids\
 print "get_expression_samples_data_by_series_ids()\n";
 #$result = $client->get_expression_samples_data_by_series_ids(['kb|series.1','kb|series.0']);
+#$result = $client->get_expression_samples_data_by_series_ids(['kb|series.278']);
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_sample_ids_by_series_ids\ 
@@ -71,7 +78,7 @@ print "get_expression_sample_ids_by_experiment_meta_ids()\n";
 #get_expression_samples_data_by_strain_ids
 print "get_expression_samples_data_by_strain_ids()\n";
 #$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.7634','kb|str.999'],'microarray');
-#$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.999'],'microarray');
+#$result = $client->get_expression_samples_data_by_strain_ids(['kb|str.2'],'microarray');
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_sample_ids_by_strain_ids 
@@ -83,13 +90,15 @@ print "get_expression_sample_ids_by_strain_ids()\n";
 print "get_expression_samples_data_by_genome_ids()\n";
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y');
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','N');
-#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.20848','kb|g.0'],'RNA-Seq','Y');
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.3907','kb|g.0'],'microarray','N');
+#$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.3907'],'RNA-Seq','Y');
 #$result = $client->get_expression_samples_data_by_genome_ids(['kb|g.0'],'microarray','Y');
 #print Dumper($result) . "\n----------------------------\n";
  
 #get_expression_samples_data_by_genome_ids 
 print "get_expression_sample_ids_by_genome_ids()\n"; 
 #$result = $client->get_expression_sample_ids_by_genome_ids(['kb|g.20848','kb|g.0'],'microarray','Y'); 
+#$result = $client->get_expression_sample_ids_by_genome_ids(['kb|g.3907'],'microarray','Y'); 
 #print Dumper($result) . "\n----------------------------\n"; 
 
 #get_expression_sample_data_by_ontology_ids 
@@ -111,7 +120,7 @@ print "get_expression_sample_ids_by_ontology_ids()\n";
 
 #get_expression_data_by_feature_ids
 print "get_expression_data_by_feature_ids()\n";
-#$result = $client->get_expression_data_by_feature_ids(['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687'],'microarray','Y');
+#$result = $client->get_expression_data_by_feature_ids(['kb|g.3899.CDS.35409','kb|g.3899.CDS.35425'],'microarray','N');
 #print Dumper($result) . "\n----------------------------\n";
 
 #compare_samples 
@@ -237,8 +246,8 @@ print "get_expression_series_ids_by_series_external_source_ids()\n";
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_GEO_GSE\ 
-print "get_GEO_GSE()\n"; 
-$result = $client->get_GEO_GSE('GSE21782');
+#print "get_GEO_GSE()\n"; 
+#$result = $client->get_GEO_GSE('GSE21782');
 #$result = $client->get_GEO_GSE('GSE21782');
 #$result = $client->get_GEO_GSE('GSE39462');
 #$result = $client->get_GEO_GSE('GSE31535');
