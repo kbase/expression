@@ -26,7 +26,7 @@ SCRIPTS_TESTS = $(wildcard t/script-tests/*.t)
 SERVER_TESTS = $(wildcard t/server-tests/*.t)
 
 SERVICE = KBaseExpression
-$(SERVICE_DIR) ?= /kb/deployment/services/$(SERVICE)
+$(SERVICE_DIR) ?= $(TARGET)/services/$(SERVICE)
 PID_FILE = $(SERVICE_DIR)/service.pid
 ACCESS_LOG_FILE = $(SERVICE_DIR)/log/access.log
 ERR_LOG_FILE = $(SERVICE_DIR)/log/error.log

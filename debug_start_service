@@ -1,7 +1,6 @@
 #!/bin/sh
-export PERL5LIB=$PERL5LIB:/kb/deployment/lib
-export KB_DEPLOYMENT_CONFIG=/homes/oakland/jkbaumohl/expression_instance/test.cfg
-export KB_SERVICE_NAME=expressionServices
+export KB_DEPLOYMENT_CONFIG=$KB_TOP/deployment.cfg
+export KB_SERVICE_NAME=KBaseExpression
 export STARMAN_DEBUG=1
-/kb/runtime/bin/starman --listen :9999 --workers 1 \
-    /kb/deployment/lib/
+$KB_RUNTIME/bin/starman --listen :7075 --workers 1 \
+    $KB_TOP/lib/KBaseExpression.psgi

@@ -1,12 +1,13 @@
 #!/bin/sh
-echo starting ExpressionServices service.
-export PERL5LIB=$PERL5LIB:/kb/deployment/lib
-export KB_DEPLOYMENT_CONFIG=/homes/oakland/jkbaumohl/expression_instance/test.cfg
-export KB_SERVICE_NAME=expressionServices
+
+echo starting KBaseExpression service.
+export KB_DEPLOYMENT_CONFIG=$KB_TOP/deployment.cfg
+export KB_SERVICE_NAME=KBaseExpression
+export KB_SERVICE_DIR=$KB_TOP/services/$KB_SERVICE_NAME
 #uncomment to debug: export STARMAN_DEBUG=1
-/kb/runtime/bin/starman --listen :9999 --pid /kb/deployment/services/ExpressionServices/service.pid --daemonize \
-  --access-log /kb/deployment/services/ExpressionServices/log/access.log \
-  --error-log /kb/deployment/services/ExpressionServices/log/error.log \
-  /kb/deployment/lib/
-echo ExpressionServices service is listening on port 9999.
+$KB_RUNTIME/bin/starman --listen :7075 --pid $KB_SERVICE_DIR/service.pid --daemonize \
+  --access-log $KB_SERVICE_DIR/log/access.log \
+  --error-log $KB_SERVICE_DIR/log/error.log \
+  $KB_TOP/lib/KBaseExpression.psgi
+echo KBaseExpression service is listening on port 7075.
 
