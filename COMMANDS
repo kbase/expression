@@ -1,2 +1,2 @@
-#group-name	expression	Expression scripts
+#group-name	expression	Expression
 #command-set	scripts/(.*).pl	expression
