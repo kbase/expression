@@ -5,34 +5,45 @@ use Getopt::Long;
 use Data::Dumper;
 use Carp;
 use Config::Simple;
-use Bio::KBase::ExpressionServices::ExpressionServicesClient; 
+use Bio::KBase::KBaseExpression::KBaseExpressionClient; 
 
 my $DESCRIPTION =
 qq^
-NAME
-    get_expression_samples_data_by_genome_ids
+get_expression_samples_data_by_genome_ids [--genomeID ID] [--sampleType] [--wildTypeOnly]
 
 DESCRIPTION
-     given a list of Genome IDs, a SampleType ( controlled vocabulary : microarray, RNA-Seq, qPCR, or proteomics) 
-     and a int indicating WildTypeOnly (1 = true, 0 = false) , it returns a GenomeExpressionDataSamplesMapping , 
-     GenomeId -> StrainId -> ExpressionDataSample. StrainId -> 
-        ExpressionSampleDataStructure {genome_id -> {strain_id -> {sample_id -> expressionSampleDataStructure}}}
+INPUT:     This command takes a list of Genome IDs, a SampleType and the WildTypeOnly flag.
 
-    Arguments : 
-        -genomeID : kbase genome ids.  If have multiple genome ids do the following :  " -genomeID='kb|g.20848'  -genomeID='kb|g.1' "
-        -sampleType : the type of sample type to limit results to.  Acceptable values (case ignored): 'microarray', 'RNA-Seq', 'qPCR' or 'proteomics'. 
-            Any other passed value will be evaluated to no filter on sample type, thus including all sample types.
-        -wildTypeOnly : wildTypeOnly is a flag.  If equal to '1','Y' or 'TRUE' then only strains that are wild type will be included in the results. 
 
-        -h, --help Displays this message and ignores all other arguments   
-        -help, --help Displays this message and ignores all other arguments 
-        -man, --help Displays this message and ignores all other arguments  
-    
-    Returns : a genomeExpressionDataSamplesMapping
+OUTPUT:    This output of this command is a GenomeExpressionDataSamplesMapping, 
+                GenomeId -> StrainId -> ExpressionDataSample. StrainId -> 
+           ExpressionSampleDataStructure {genome_id -> {strain_id -> {sample_id -> expressionSampleDataStructure}}}
+PARAMETERS:
 
-    genomeExpressionDataSamplesMapping = obj->get_expression_samples_data_by_genome_ids(genomeIDs, sampleType, wildTypeOnly)    
+--genomeID               The KBase genome ID.  
+                         Multiple sample IDs can be submitted, as: 
+                            " -genomeID='kb|g.3907'  -genomeID='kb|g.3899' "
 
-    Details : 
+--sampleType             The type of sample type to limit results to.  
+                         Acceptable values (case ignored): microarray, RNA-Seq, qPCR or proteomics. 
+                         Any other passed value will be evaluated to no filter on sample type, thus including all.
+ 
+--wildTypeOnly          The WildTypeOnly is a flag indicating true or false.  
+                        If equal to '1','Y' or 'TRUE' then only strains that are wild type will be included in the 
+                        results. 
+                        If equal to '0', 'N', or 'FALSE' then results will include all strains. 
+                         
+
+--help                  Display help message to standard out and exit with error code zero;                                                    
+                        ignore all other command-line arguments.
+
+
+EXAMPLES
+perl expr-get-expression-samples-data-by-genome-ids.pl -genomeID='kb|g.3907' -genomeID='kb|g.0' -sampleType='microarray' -wildTypeOnly='Y'
+
+AUTHOR: Jason Baumohl (jkbaumohl\@lbl.gov)
+
+Details of the returned data structure : 
         genomeIDs is a GenomeIDs
         sampleType is a SampleType
         wildTypeOnly is a WildTypeOnly
@@ -102,12 +113,6 @@ DESCRIPTION
         DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
         FeatureID is a string
         Measurement is a float
-
-EXAMPLES
-    perl expr-get-expression-samples-data-by-genome-ids.pl -genomeID='kb|g.20848' -genomeID='kb|g.0' -sampleType='microarray' -wildTypeOnly='Y'
-
-AUTHORS
-    Jason Baumohl (jkbaumohl\@lbl.gov)
 ^;
 
 
@@ -150,14 +155,15 @@ else {
     $cfg = new Config::Simple(syntax=>'ini') or
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => Config::Simple->error(),
 							       method_name => 'new'); 
-    $cfg->param('ExpressionServices.dbName', 'expression');
-    $cfg->param('ExpressionServices.dbUser', 'expressionSelect');
-    $cfg->param('ExpressionServices.userData', 'expressionSelect/');
-    $cfg->param('ExpressionServices.dbhost', 'db1.chicago.kbase.us');
-    $cfg->param('ExpressionServices.dbms', 'mysql');
+    $cfg->param('KBaseExpression.dbName', 'kbase_sapling_v3'); 
+    $cfg->param('KBaseExpression.dbUser', 'kbase_sapselect'); 
+#    $cfg->param('KBaseExpression.userData', 'kbase_sapselect/');                                                           
+    $cfg->param('KBaseExpression.dbhost', 'db3.chicago.kbase.us'); 
+    $cfg->param('KBaseExpression.dbPwd', 'oiwn22&dmwWEe'); 
+    $cfg->param('KBaseExpression.dbms', 'mysql'); 
 }
 my $service_url = "http://localhost:7075";
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($service_url); 
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new($service_url); 
 
 print Dumper($client->get_expression_samples_data_by_genome_ids(\@genomeID,$sampleType,$wildTypeOnly));
 

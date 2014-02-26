@@ -5,30 +5,37 @@ use Getopt::Long;
 use Data::Dumper;
 use Carp;
 use Config::Simple;
-use Bio::KBase::ExpressionServices::ExpressionServicesClient; 
+use Bio::KBase::KBaseExpression::KBaseExpressionClient; 
 
 my $DESCRIPTION =
 qq^
 NAME
-    get_expression_samples_data
+get_expression_samples_data_by_series_ids -- This command returns a SeriesExpressionDataSamplesMapping (a hash {seriesIDs -> ExpressionDataSamplesMap})
+
+VERSION
+1.0
+
+SYNOPSIS
+get_expression_samples_data_by_series_ids [--seriesID ID]
 
 DESCRIPTION
-    core function used by many others. Given a list of KBase SampleIds returns mapping of SampleId to expressionSampleDataStructure 
-    (essentially the core Expression Sample Object) : {sample_id -> expressionSampleDataStructure}
+INPUT:     The input for this command is one or more series IDs. 
+OUTPUT:    The output file for this command is a SeriesExpressionDataSamplesMapping.
 
-    Arguments : 
-        -seriesID kbase sample ids.  If have multiple series ids do the following : " -seriesID='kb|series.2' -sampleID='kb|series.1' "
+PARAMETERS:
 
-        -h, --help Displays this message and ignores all other arguments   
-        -help, --help Displays this message and ignores all other arguments 
-        -man, --help Displays this message and ignores all other arguments  
+--seriesID KBase series ids.  If have multiple series ids do the following : " -seriesID='kb|series.278' -sampleID='kb|series.279' "
+
+--help     Display help message to standard out and exit with error code zero;                                                    
+           ignore all other command-line arguments.  
     
-    Returns : an ExpressionDataSamplesMap 
+EXAMPLES:
+perl expr-get-expression-samples-data-by-series-ids.pl -seriesID='kb|series.278' -seriesID='kb|series.279'
 
-    expressionDataSamplesMap = 
-    seriesExpressionDataSamplesMapping = obj->get_expression_samples_data_by_series_ids(seriesIDs);
+AUTHOR: Jason Baumohl (jkbaumohl\@lbl.gov
 
-    Details : 
+
+Details of returned Data Structure: 
         seriesExpressionDataSamplesMapping is a SeriesExpressionDataSamplesMapping                                                         
         SeriesIDs is a reference to a list where each element is a SeriesID                                                                 
         SeriesID is a string                                                                                                                
@@ -92,12 +99,6 @@ SampleIDsAveragedFrom is a reference to a list where each element is a SampleID
 DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement                  
 FeatureID is a string                                                                                                               
 Measurement is a float
-
-EXAMPLES
-    perl expr-get-expression-samples-data-by-series-ids.pl -seriesID='kb|series.2' -seriesID='kb|series.3' 
-
-AUTHORS
-    Jason Baumohl (jkbaumohl\@lbl.gov)
 ^;
 
 
@@ -136,14 +137,15 @@ else {
     $cfg = new Config::Simple(syntax=>'ini') or
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => Config::Simple->error(),
 							       method_name => 'new'); 
-    $cfg->param('ExpressionServices.dbName', 'expression');
-    $cfg->param('ExpressionServices.dbUser', 'expressionSelect');
-    $cfg->param('ExpressionServices.userData', 'expressionSelect/');
-    $cfg->param('ExpressionServices.dbhost', 'db1.chicago.kbase.us');
-    $cfg->param('ExpressionServices.dbms', 'mysql');
+    $cfg->param('KBaseExpression.dbName', 'kbase_sapling_v3'); 
+    $cfg->param('KBaseExpression.dbUser', 'kbase_sapselect'); 
+#    $cfg->param('KBaseExpression.userData', 'kbase_sapselect/');    
+    $cfg->param('KBaseExpression.dbhost', 'db3.chicago.kbase.us'); 
+    $cfg->param('KBaseExpression.dbPwd', 'oiwn22&dmwWEe'); 
+    $cfg->param('KBaseExpression.dbms', 'mysql'); 
 }
 my $service_url = "http://localhost:7075";
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($service_url); 
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new($service_url); 
 
 print Dumper($client->get_expression_samples_data_by_series_ids(\@seriesID));
 

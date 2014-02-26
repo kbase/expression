@@ -5,44 +5,43 @@ use Getopt::Long;
 use Data::Dumper;
 use Carp;
 use Config::Simple;
-use Bio::KBase::ExpressionServices::ExpressionServicesClient; 
+use Bio::KBase::KBaseExpression::KBaseExpressionClient; 
 
 my $DESCRIPTION =
 qq^
 NAME
-    get_expression_data_by_samples_and_features.pl
+get_expression_data_by_samples_and_features.pl -- This command returns an ExpressionDataSamplesMap.  
+
+VERSION
+1.0
+
+SYNOPSIS
+get_expression_data_by_samples_and_features [--sampleID ID] [--featureID ID]
 
 DESCRIPTION
-    given a list of sample ids and feature ids it returns a LabelDataMapping {sampleID}->{featureId => value}}. 
+INPUT:     The input for this command is one or more sample IDs and/or feature IDs. 
+OUTPUT:    The output file for this command is an ExpressionDataSamplesMap.
 
-    Arguments : 
-        -sampleID kbase sample ids.  If have multiple sample ids do the following : " -sampleID='kb|sample.2' -sampleID='kb|sample.3' "
-        -featureID kbase sample ids.  If have multiple feature ids do the following : "  -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687' "
-           (If no featureIDs entered, then all features with measurment values will be returned.)
+PARAMETERS:
 
-        -h, --help Displays this message and ignores all other arguments   
-        -help, --help Displays this message and ignores all other arguments 
-        -man, --help Displays this message and ignores all other arguments  
-    
-    Returns : an ExpressionDataSamplesMap 
+--sampleID          The KBase sample IDs. Datatype = string. 
+                    Multiple sample IDs can be submitted, as 
+                    " -sampleID='kb|sample.2' -sampleID='kb|sample.3' "
 
-    labelDataMapping = obj->get_expression_data_by_samples_and_features(sampleIDs, featureIDs)
+--featureID         The KBase feature IDs. Datatype = string.                
+                    Multiple feature IDs can be submitted, as
+                    "  -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687' "
+                    If no feature IDs are entered, then all features with measurement values will be      
+                    returned.
 
-    Details : 
-        sampleIDs is a SampleIDs
-        featureIDs is a FeatureIDs
-        labelDataMapping is a LabelDataMapping
-        SampleIDs is a reference to a list where each element is a SampleID
-        SampleID is a string
-        FeatureIDs is a reference to a list where each element is a FeatureID
-        FeatureID is a string
-        LabelDataMapping is a reference to a hash where the key is a SampleID and the value is a DataExpressionLevelsForSample
-        DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
-        Measurement is a float
+--help             Display help message to standard out and exit with error code zero;                                                    
+                   ignore all other command-line arguments.      
+
 
 EXAMPLES
-    perl expr-get-expression-data-by-samples-and-features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3' -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687'
-	   OR perl expr-get-expression-data-by-samples-and-features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3'  (if you want all features with measurments) 
+perl expr-get-expression-data-by-samples-and-features.pl -sampleID='kb|sample.5759' -sampleID='kb|sample.5079' -featureID='kb|g.3899.CDS.39001' -featureID='kb|g.3899.CDS.39003'
+ 
+perl expr-get-expression-data-by-samples-and-features.pl -sampleID='kb|sample.5759' -sampleID='kb|sample.5079'  (if you want all features with measurments) 
 
 AUTHORS
     Jason Baumohl (jkbaumohl\@lbl.gov)
@@ -70,9 +69,7 @@ if (defined($h) || defined($help) || defined($man)) {
 if (scalar(@sampleID) < 1 )
 {
     print "NOTE This requires SampleIDs to passed in.\n    
-           Ex: perl get_expression_data_by_samples_and_features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3'  
-           -featureID='kb|g.20848.CDS.1800' -featureID='kb|g.20848.CDS.1687' \n".
-	  "OR perl get_expression_data_by_samples_and_features.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3'  (if you want all features with measurments). \n".
+           Ex: perl expr-get-expression-data-by-samples-and-features.pl -sampleID=''kb|sample.5759' -sampleID=''kb|sample.5079' -featureID=kb|g.3899.CDS.39001' -featureID='kb|g.3899.CDS.39003' \n".
 	  $DESCRIPTION;
     exit 1;
 }
@@ -89,14 +86,15 @@ else {
     $cfg = new Config::Simple(syntax=>'ini') or
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => Config::Simple->error(),
 							       method_name => 'new'); 
-    $cfg->param('ExpressionServices.dbName', 'expression');
-    $cfg->param('ExpressionServices.dbUser', 'expressionSelect');
-    $cfg->param('ExpressionServices.userData', 'expressionSelect/');
-    $cfg->param('ExpressionServices.dbhost', 'db1.chicago.kbase.us');
-    $cfg->param('ExpressionServices.dbms', 'mysql');
+    $cfg->param('KBaseExpression.dbName', 'kbase_sapling_v3');
+    $cfg->param('KBaseExpression.dbUser', 'kbase_sapselect');
+#    $cfg->param('KBaseExpression.userData', 'kbase_sapselect/');
+    $cfg->param('KBaseExpression.dbhost', 'db3.chicago.kbase.us');
+    $cfg->param('KBaseExpression.dbPwd', 'oiwn22&dmwWEe');
+    $cfg->param('KBaseExpression.dbms', 'mysql');
 }
 my $service_url = "http://localhost:7075";
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($service_url); 
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new($service_url); 
 
 print Dumper($client->get_expression_data_by_samples_and_features(\@sampleID,\@featureID));
 

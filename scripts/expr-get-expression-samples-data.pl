@@ -5,29 +5,43 @@ use Getopt::Long;
 use Data::Dumper;
 use Carp;
 use Config::Simple;
-use Bio::KBase::ExpressionServices::ExpressionServicesClient; 
+use Bio::KBase::KBaseExpression::KBaseExpressionClient; 
+
 
 my $DESCRIPTION =
 qq^
 NAME
-    get_expression_samples_data
+expr-get-expression-samples-data -- This command returns mapping of SampleID to expressionSampleDataStructure 
+                                    given a list of KBase sample IDs.  ExpressionSampleDataStructure 
+                                    is essentially the core Expression Sample Object) : {sample_id -> 
+                                    expressionSampleDataStructure}.
+
+VERSION 
+1.0
+
+SYNOPSIS
+expr-get-expression-samples-data [--help] [--sampleID ID] 
 
 DESCRIPTION
-    core function used by many others. Given a list of KBase SampleIds returns mapping of SampleId to expressionSampleDataStructure 
-    (essentially the core Expression Sample Object) : {sample_id -> expressionSampleDataStructure}
+INPUT:     The input for this command is a list of KBase sample IDs. 
 
-    Arguments : 
-        -sampleID kbase sample ids.  If have multiple sample ids do the following : " -sampleID='kb|sample.2' -sampleID='kb|sample.3' "
+OUTPUT:    This command returns an ExpressionDataSamplesMap. 
 
-        -h, --help Displays this message and ignores all other arguments   
-        -help, --help Displays this message and ignores all other arguments 
-        -man, --help Displays this message and ignores all other arguments  
-    
-    Returns : an ExpressionDataSamplesMap 
+            expressionDataSamplesMap = obj->get_expression_samples_data(sampleIDs)
 
-    expressionDataSamplesMap = obj->get_expression_samples_data(sampleIDs)
+PARAMETERS:
+--help                 Display help message to standard out and exit with error code zero;                                                    
+                       ignore all other command-line arguments.
+--sampleID             The KBase sample IDs. Datatype = string.
+                       Multiple sample IDs can be submitted, as:
+                       " -sampleID='kb|sample.3746' -sampleID='kb|sample.3747' "   
 
-    Details : 
+EXAMPLES
+perl expr-get-expression-samples-data.pl -sampleID='kb|sample.3746' -sampleID='kb|sample.3747' 
+  
+AUTHOR: Jason Baumohl (jkbaumohl\@lbl.gov) 
+
+Details For returned Datastructure: 
     SampleIDs is a reference to a list where each element is a SampleID
     SampleID is a string
     ExpressionDataSamplesMap is a reference to a hash where the key is a SampleID and the value is an ExpressionDataSample
@@ -90,12 +104,6 @@ DESCRIPTION
     DataExpressionLevelsForSample is a reference to a hash where the key is a FeatureID and the value is a Measurement
     FeatureID is a string
     Measurement is a float
-
-EXAMPLES
-    perl expr-get-expression-samples-data.pl -sampleID='kb|sample.2' -sampleID='kb|sample.3' 
-
-AUTHORS
-    Jason Baumohl (jkbaumohl\@lbl.gov)
 ^;
 
 
@@ -134,14 +142,15 @@ else {
     $cfg = new Config::Simple(syntax=>'ini') or
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => Config::Simple->error(),
 							       method_name => 'new'); 
-    $cfg->param('ExpressionServices.dbName', 'expression');
-    $cfg->param('ExpressionServices.dbUser', 'expressionSelect');
-    $cfg->param('ExpressionServices.userData', 'expressionSelect/');
-    $cfg->param('ExpressionServices.dbhost', 'db1.chicago.kbase.us');
-    $cfg->param('ExpressionServices.dbms', 'mysql');
+    $cfg->param('KBaseExpression.dbName', 'kbase_sapling_v3'); 
+    $cfg->param('KBaseExpression.dbUser', 'kbase_sapselect'); 
+#    $cfg->param('KBaseExpression.userData', 'kbase_sapselect/');                                                                                                                         
+    $cfg->param('KBaseExpression.dbhost', 'db3.chicago.kbase.us'); 
+    $cfg->param('KBaseExpression.dbPwd', 'oiwn22&dmwWEe'); 
+    $cfg->param('KBaseExpression.dbms', 'mysql'); 
 }
 my $service_url = "http://localhost:7075";
-my $client = Bio::KBase::ExpressionServices::ExpressionServicesClient->new($service_url); 
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new($service_url); 
 
 print Dumper($client->get_expression_samples_data(\@sampleID));
 
