@@ -2198,14 +2198,27 @@ print "\n\nREACHED UNREACHABLE ERROR\n\n";
 #print "\nAfter unzipping\n";
 #print "\nGSE OUTPUT : ".$gse_output ."\n";
 #    my @gse_lines = <$gse_output> or print "\nERROR COULD NOT OPEN FILE\n"; 
-my @gse_lines;
-my $count_lines = 1;
-while(my $line = <$gse_output>)
-{
+    my @gse_lines;
+    my $count_lines = 1;
+    eval
+    {
+	local $SIG{ALRM} = sub {die "alarm\n"}; 
+	alarm 300; 
+	while(my $line = <$gse_output>)
+	{
 #    print $count_lines ." :: " .$line;
-    push(@gse_lines,$line);
-    $count_lines++;
-}
+	    push(@gse_lines,$line);
+	    $count_lines++;
+	}
+	alarm 0;
+    };
+
+    if ($@)
+    {
+	#Means the reading of the file has timed out.  Need to put error in.
+	push(@{$gseObject->{"gseErrors"}},"Unable to read $gse_input_id file : $gse_gz_file .  Timed out after 5 minutes");  
+	return($gseObject);
+    }
     my $line_count = 0;
 print "GSE RECORD: ". $gse_input_id . " : Had lines = ".scalar(@gse_lines);
     #series vars 
