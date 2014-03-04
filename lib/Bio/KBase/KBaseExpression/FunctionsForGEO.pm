@@ -95,9 +95,9 @@ sub new
         } 
         else 
         {
-            $self->{dbName} = 'kbase_sapling_v3_dev';
+            $self->{dbName} = 'kbase_sapling_v3';
             $self->{dbUser} = 'kbase_sapselect'; 
-            $self->{dbhost} = 'db4.chicago.kbase.us';
+            $self->{dbhost} = 'db3.chicago.kbase.us';
             $self->{dbPwd} = 'oiwn22&dmwWEe'; 
 #            $self->{dbName} = 'expression'; 
 #            $self->{dbUser} = 'expressionselect'; 
@@ -111,9 +111,9 @@ sub new
     } 
     else 
     { 
-	$self->{dbName} = 'kbase_sapling_v3_dev';
+	$self->{dbName} = 'kbase_sapling_v3';
 	$self->{dbUser} = 'kbase_sapselect'; 
-	$self->{dbhost} = 'db4.chicago.kbase.us';
+	$self->{dbhost} = 'db3.chicago.kbase.us';
 	$self->{dbPwd} = 'oiwn22&dmwWEe'; 
 #         $self->{dbName} = 'expression'; 
 #         $self->{dbUser} = 'expressionselect';
@@ -367,7 +367,7 @@ sub parse_gse_platform_portion
 	    #Check for the GSMs Tax ID vs NCBI and get Scientific name.  Then look up genome by that scientific name.
 	    my $ncbi_taxon = $ncbi_db->get_taxon(-taxonid=>$temp_tax_id);
 	    my @ncbi_scientific_names = @{$ncbi_taxon->{'_names_hash'}->{'scientific'}};
-	    my $get_genome_ids_q = "select id from kbase_sapling_v1.Genome where scientific_name in (".
+	    my $get_genome_ids_q = "select id from Genome where scientific_name in (".
 		join(",", ("?") x @ncbi_scientific_names) . ") ";
 	    my $get_genome_ids_qh = $dbh->prepare($get_genome_ids_q) or die "Unable to prepare get_genome_ids_q : $get_genome_ids_q ".
 		$dbh->errstr();
@@ -1772,6 +1772,10 @@ sub parse_gse_sample_portion
             {
                 $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=3;
             }
+            elsif ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "User Custom Mappings for Probe Sequences")
+            {
+                $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=1;
+            }
         }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
  
@@ -1780,8 +1784,8 @@ sub parse_gse_sample_portion
             ); 
 	my @genomes_with_data = keys(%{$gsm_data_hash_ref});
 	my $were_representatives_used_q = qq^select count(*)
-	                                     from kbase_sapling_v1.Feature f inner join kbase_sapling_v1.Encompasses c2m on f.id = c2m.from_link
-                                             inner join kbase_sapling_v1.Encompasses m2l on c2m.to_link = m2l.from_link
+	                                     from Feature f inner join Encompasses c2m on f.id = c2m.from_link
+                                             inner join Encompasses m2l on c2m.to_link = m2l.from_link
                                              where substring_index(f.id, '.', 2) in (^.
 					     join(",", ("?") x @genomes_with_data) . 
                                           qq^) and f.feature_type = 'CDS'^;
