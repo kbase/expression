@@ -345,6 +345,7 @@ sub parse_gse_platform_portion
     if ($metaDataOnly == 0)
     {
 #print "\nIN PARSE GSE PLATFORM NOT METADATA ONLY\n";
+#print "\n:gsm_platform_info_hash : \n". Dumper(\%gsm_platform_info_hash);
 	my %tax_ids_hash;  #a hash of tax ids for all the GSMs in a GSE for this GPL
 	foreach my $temp_gsm_id (keys(%gsm_platform_info_hash))
 	{
@@ -353,15 +354,15 @@ sub parse_gse_platform_portion
 		$tax_ids_hash{$gsm_platform_info_hash{$temp_gsm_id}->{"taxID"}} = 1;
 	    }
 	}
-
 	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
 			       { RaiseError => 1, ShowErrorStatement => 1 }
 	    ); 
 	my %genome_ids_hash;
-
+	my $has_passing_tax_id = 0;
 #print "\nIN PARSE GSE PLATFORM BEFORE QUERY\n";
 	foreach my $temp_tax_id (keys(%tax_ids_hash))
 	{
+#print "\nPLATFORM TAX ID : $temp_tax_id\n";
 	    my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
 	    #IF GSM uses current GPL
 	    #Check for the GSMs Tax ID vs NCBI and get Scientific name.  Then look up genome by that scientific name.
@@ -380,13 +381,12 @@ sub parse_gse_platform_portion
 	    }
             if (scalar(keys(%genome_ids_hash)) == 0)
             {
-   	        push(@{$platform_hash{$gplID}->{"errors"}},"We do not have genomes that match the following scientific name(s) : ". join(", ",@ncbi_scientific_names));
+   	        push(@{$platform_hash{$gplID}->{"warnings"}},"Tax ID ".$temp_tax_id . " does not have corresponding genome in the database.");
 #print "\nHAD ZERO GENOMES\n";
             }            
-
             if (scalar(@{$platform_hash{$gplID}->{"errors"}}) > 0) 
             { 
-                return (\%platform_hash,\%platform_tax_probe_feature_hash); 
+		next;
             } 
 #print "\nIN PARSE GSE PLATFORM PAst QUERY\n";
 #print "\nGenomes:\n".Dumper(\%genome_ids_hash);
@@ -395,8 +395,6 @@ sub parse_gse_platform_portion
             if (-e $gpl_file)
             {
                 #Open GPL file get mapping method results (lets you know what genomes you need to grab data for, and do not have to attempt to map of genomes in the list)
-
-
 #print "\nFILE EXISTS ALREADY\n";
 		open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
 		my @gpl_file_lines = (<GPL>); 
@@ -417,9 +415,9 @@ sub parse_gse_platform_portion
                     if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS")
                     {
 #print "GENOME FILE : $genome_id\n";
-                         my $genome_number = $genome_id;
-                         $genome_number =~ s/kb\|//;
-#                         my $gpl_genome_file = "/mnt/platform_genome_mapping_files/".$gplID."_".$genome_number; 
+			 $has_passing_tax_id = 1;
+			 my $genome_number = $genome_id;
+			 $genome_number =~ s/kb\|//;
                          my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                          #check file exists if it does, die as it should be;
                          if (-e $gpl_genome_file)
@@ -460,7 +458,19 @@ sub parse_gse_platform_portion
 	        my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}
 
 #print "\nIN TRIED TO DO NEW MAPPINGS\n";
-$probe_sequence_warning = "Temporary message to force platform id mapping by synonym";
+		#IF THE
+		my $get_genomes_max_size_q = "select max(dna_size) from Genome where id in (". 
+                join(",", ("?") x scalar(keys(%genome_ids_hash))) . ") "; 
+		my $get_genomes_max_size_qh = $dbh->prepare($get_genomes_max_size_q) or die 
+		    "Unable to prepare get_genomes_max_size_q : $get_genomes_max_size_q ". $dbh->errstr(); 
+		$get_genomes_max_size_qh->execute(keys(%genome_ids_hash)) or die "Unable to execute get_genomes_max_size_q : $get_genomes_max_size_q " . 
+		    $get_genomes_max_size_qh->errstr(); 
+		my ($max_genome_size) = $get_genomes_max_size_qh->fetchrow_array();
+		if ($max_genome_size > 10000000)
+		{
+		    $probe_sequence_warning = "Genomes size is large > 10000000.  Blat is too time consuming.  Attempting to map by synonym.";
+		}
+#$probe_sequence_warning = "Temporary message to force platform id mapping by synonym";
 	        if (!defined($probe_sequence_warning))
 	        {
 		    #print "\nIN BLAT TRY\n";
@@ -534,10 +544,10 @@ $probe_sequence_warning = "Temporary message to force platform id mapping by syn
                                 $genome_number =~ s/kb\|//;
                                 my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                                 make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);
+				$has_passing_tax_id = 1;
 		            }
                             else
                             {
-#				push(@{$platform_hash{$gplID}->{"errors"}},"UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS");
                                 $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
                             }
 		            #MAY want to add self so can connect to DB to resolve alternative splicings
@@ -588,7 +598,8 @@ $probe_sequence_warning = "Temporary message to force platform id mapping by syn
                                 my $genome_number = $test_genome_id;
                                 $genome_number =~ s/kb\|//;
                                 my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
-                                make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);   
+                                make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);  
+				$has_passing_tax_id = 1; 
 		            }
                             else
                             {
@@ -600,6 +611,10 @@ $probe_sequence_warning = "Temporary message to force platform id mapping by syn
 	        }#end if probe sequences/ else do synonym lookup
             }#end need to do new mappings
 	}#end looping through tax_ids
+	if ($has_passing_tax_id == 0)
+	{
+	    push(@{$platform_hash{$gplID}->{"errors"}},"GPLID $gplID was not able to mapped to KBase feature ids");		  
+	}
         my $gpl_out_file = $platform_genome_mappings_directory."/".$gplID; 
         open(GPL_OUT_FILE, ">".$gpl_out_file) or die "Unable to make $gpl_out_file \n";
         foreach my $mapping_genome_id (keys(%{$platform_hash{$gplID}->{"genomesMappingMethod"}}))
@@ -1212,9 +1227,9 @@ sub parse_blat_results
 
     my $has_locus_families = 0;
 
-    my $get_cds_hiearchy_info_q = qq^select m2l.to_link as LOCUS, f.id as CDS, f.sequence_length
-                                     from Feature f inner join Encompasses c2m on f.id = c2m.from_link
-                                     inner join Encompasses m2l on c2m.to_link = m2l.from_link
+    my $get_cds_hiearchy_info_q = qq^select m2l.from_link as LOCUS, f.id as CDS, f.sequence_length
+                                     from Feature f inner join Encompasses c2m on f.id = c2m.to_link
+                                     inner join Encompasses m2l on c2m.from_link = m2l.to_link
                                      where substring_index(f.id, '.', 2) = ?
                                      and f.feature_type = 'CDS'^;
     my $get_cds_hiearchy_info_qh = $dbh->prepare($get_cds_hiearchy_info_q) or die "Unable to prepare get_cds_hiearchy_info_q : ".$get_cds_hiearchy_info_q." : ".$dbh->errstr();
@@ -1422,7 +1437,9 @@ sub parse_gse_sample_info_for_platform
 {
     my $lines_array_ref = shift;
     my @lines = @{$lines_array_ref}; 
-
+#    my $genome_id = shift; #NOTE THIS IS AN OPTIONAL PARAMETER.  IT IS ONLY POPULATED IF THE USER IS TRYING TO FORCE A CERTAIN GENOME TO BE USED.
+#   CAN FORCE IT IN parse_gse_sample_info_for_platform set genome there and if that is set then disregard doing the mappings for other things.
+#   NOT SURE OF OTHER CONSEQUENCES DOWN THE LINE. passing for now.
     my $gsm_id = undef;
     my %gsm_platform_info_hash; #Hash that has GSMID as key (or "ALL_GSMS" as single key) -> {"organism"=>value,          
                                 #                                                             "taxID"=>value,      
@@ -1633,6 +1650,7 @@ sub parse_gse_sample_portion
             { 
                 push(@{$gsm_hash{$gsm_id}->{"errors"}}, 
                      "This is sample has Genomic DNA in channel 1.");
+                $gsm_molecule = $gsm_molecule_hash{"!Sample_molecule_ch1"};
             } 
             elsif(defined($accepted_molecule_hash{lc($gsm_molecule_hash{"!Sample_molecule_ch1"})}))
             { 
@@ -1708,19 +1726,6 @@ sub parse_gse_sample_portion
     }
     else
     {
-	my @we_types = ("warnings","errors");
-	foreach my $we_type (@we_types)
-	{
-	    foreach my $we_msg (@{$platform_hash_ref->{$gpl_id}->{$we_type}})
-	    {
-		push(@{$gsm_hash{$gsm_id}->{$we_type}},$we_msg);
-		if ($we_type eq "errors")
-		{
-		    $platform_passed = 0;
-		}
-	    }
-	}
-
 	my %gpl_hash = ("gplID" => $gpl_id,
 		     "gplTitle" => $platform_hash{$gpl_id}->{"gplTitle"},
 		     "gplTaxID" => $platform_hash{$gpl_id}->{"gplTaxID"},
@@ -1738,6 +1743,28 @@ sub parse_gse_sample_portion
                 $platform_passed = 1;
             }
         }
+
+	my @we_types = ("warnings","errors");
+	foreach my $we_type (@we_types)
+	{
+	    foreach my $we_msg (@{$platform_hash_ref->{$gpl_id}->{$we_type}})
+	    {
+		if (($we_type eq "warnings") && ($we_msg eq "Tax ID ".$gsm_tax_id . " does not have corresponding genome in the database."))
+		{
+		    push(@{$gsm_hash{$gsm_id}->{"errors"}},"This GSM had a Tax ID ".$gsm_tax_id. ". ".$we_msg);
+		    $platform_passed = 0;
+		}
+                else
+                {
+		    if ($we_type eq "errors")
+		    {
+			$platform_passed = 0;
+		    }
+		    push(@{$gsm_hash{$gsm_id}->{$we_type}},$we_msg);
+                }
+	    }
+	}
+
         if (($platform_passed == 0) && ($metaDataOnly eq '0'))
         {
 	    push(@{$gsm_hash{$gsm_id}->{"errors"}},"None of the Genomes were able to be mapped to this platform.");
@@ -1758,8 +1785,10 @@ sub parse_gse_sample_portion
         #PARSE VALUE SECTION OF THE GSM                                             
         #CALL FUNCTION FOR VALUES SECTION.  PASSES GSM, GSM_ID_FEATURE_HASH_REF, VALUE TYPE, LINE ($sample_table_start, @lines size)
 	my @sample_data_lines = @lines[$sample_table_start..(scalar(@lines)-2)];
-
+#print "\nGPLID:".$gpl_id.":::TAX:".$gsm_tax_id.":\n";
+#print "\nplatform_tax_genome_probe_feature_hash_ref : \n". Dumper($platform_tax_genome_probe_feature_hash_ref);
 	my $genome_probe_feature_hash_ref = $platform_tax_genome_probe_feature_hash_ref->{$gpl_id}->{$gsm_tax_id};
+#print "\ngenome_probe_feature_hash_ref : \n". Dumper($genome_probe_feature_hash_ref);
         my ($gsm_data_hash_ref,$gsm_value_type,$temp_gsm_value_errors_ref) = 
 	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,\@sample_data_lines);
         foreach my $temp_genome_id (keys(%{$gsm_data_hash_ref}))
@@ -2393,7 +2422,9 @@ print "GSE RECORD: ". $gse_input_id . " : Had lines = ".scalar(@gse_lines);
 	    my @gse_sample_lines = @gse_lines[$sample_start_lines[$sample_counter]..$sample_end_lines[$sample_counter]]; 
 	    #print "\n\n\n\n\n\n\n\n\n\n\n\nGSE SAMPLE LINES : \n".Dumper(\@gse_sample_lines);
 	    my %copy_platform_hash = %platform_hash;
+
 	    my $sample_hash_ref = parse_gse_sample_portion($metaDataOnly,\%copy_platform_hash,\%platform_tax_genome_probe_feature_hash,\@gse_sample_lines,$self); 
+#print "\n\nplatform_tax_genome_probe_feature_hash : ". Dumper(\%platform_tax_genome_probe_feature_hash);
 	    my ($gsm_id) = keys(%{$sample_hash_ref});
 	    
 	    my @sample_errors;
