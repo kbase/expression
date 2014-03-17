@@ -539,6 +539,9 @@ module KBaseExpression {
     /* list of expression sample ids */ 
     typedef list<expression_sample_id> expression_sample_ids;
 
+    /* list of expression series ids that the sample belongs to : note this can not be a ws_reference because ws does not support bidirectional references */
+    typedef list<string> expression_series_ids;
+
     /* map between genome ids and a list of samples from that genome in this sample */
     typedef mapping<genome_id genome_id, expression_sample_ids> genome_expression_sample_ids_map; 
     
@@ -554,7 +557,7 @@ module KBaseExpression {
        we may need a link to experimentMetaID later.
 
        @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
-       @optional averaged_from_samples protocol strain persons molecule data_source
+       @optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids 
        
        @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
        @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
@@ -583,6 +586,9 @@ module KBaseExpression {
         persons persons;
         string molecule;
         string data_source; 
+        string shock_url;
+        string processing_comments;
+        expression_series_ids expression_series_ids;
     } ExpressionSample;
 
     /*

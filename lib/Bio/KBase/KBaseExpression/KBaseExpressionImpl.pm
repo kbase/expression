@@ -8106,6 +8106,37 @@ a reference to a list where each element is a KBaseExpression.expression_sample_
 
 
 
+=head2 expression_series_ids
+
+=over 4
+
+
+
+=item Description
+
+list of expression series ids that the sample belongs to : note this can not be a ws_reference because ws does not support bidirectional references
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
 =head2 genome_expression_sample_ids_map
 
 =over 4
@@ -8183,7 +8214,7 @@ protocol, persons and strain should need to eventually have common ws objects.  
 we may need a link to experimentMetaID later.
 
 @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
-@optional averaged_from_samples protocol strain persons molecule data_source
+@optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids 
 
 @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
 @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
@@ -8218,6 +8249,9 @@ strain has a value which is a KBaseExpression.Strain
 persons has a value which is a KBaseExpression.persons
 molecule has a value which is a string
 data_source has a value which is a string
+shock_url has a value which is a string
+processing_comments has a value which is a string
+expression_series_ids has a value which is a KBaseExpression.expression_series_ids
 
 </pre>
 
@@ -8246,6 +8280,9 @@ strain has a value which is a KBaseExpression.Strain
 persons has a value which is a KBaseExpression.persons
 molecule has a value which is a string
 data_source has a value which is a string
+shock_url has a value which is a string
+processing_comments has a value which is a string
+expression_series_ids has a value which is a KBaseExpression.expression_series_ids
 
 
 =end text
