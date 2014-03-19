@@ -76,6 +76,16 @@ foreach my $sample_file (@sample_files)
 	{
 		$perl_object->{"platform_id"} = $workspace_name . "/".$perl_object->{"platform_id"};
 	}
+        if($perl_object->{"expression_series_ids"}) 
+        { 
+                my @series_ids = @{$perl_object->{"expression_series_ids"}};
+                my @prepended_series_ids; 
+                foreach my $series_id (@series_ids)
+                { 
+                        push(@prepended_series_ids,$workspace_name ."/".$series_id);
+                } 
+                $perl_object->{"expression_series_ids"}) = \@prepended_series_ids;
+        }
 #will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
         my $save_object_params = {"workspace"=>$workspace_name, 
                                   "objects"=>[{"type"=>$typed_object, 
