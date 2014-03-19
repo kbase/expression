@@ -455,11 +455,19 @@ sub geo2TypedObjects
 		foreach my $temp_genome_id (@genome_ids)
 		{
 		    my $dataQualityLevel = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}->{$temp_genome_id}->{'dataQualityLevel'};
+		    my $gsm_processing_comments = "";
 		    my $temp_kbase_id = "";
 		    if(exists($processed_gsm_hash{$gsm_id}{$temp_genome_id}{$dataQualityLevel}))
 		    {
 			$temp_kbase_id = $processed_gsm_hash{$gsm_id}{$temp_genome_id}{$dataQualityLevel};
                     }
+
+		    my $gsm_processing_comments = "";
+		    if (exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}->{$temp_genome_id}->{'processing_comments'}) &&
+			($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}->{$temp_genome_id}->{'processing_comments'} ne ""))
+		    {
+			$gsm_processing_comments = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}->{$temp_genome_id}->{'processing_comments'};
+		    }
 		    if($temp_kbase_id ne "")
 		    {
 			#means the sample already exists just need to add the sample kbase_id to the list of samples for the 
@@ -571,6 +579,10 @@ sub geo2TypedObjects
 			if (scalar(@persons) > 0)
 			{
 			    $sample_object_ref->{"persons"}=\@persons;
+			}
+			if ($gsm_processing_comments)
+			{
+			    $sample_object_ref->{"processing_comments"}=$gsm_processing_comments;
 			}
 			#Write out object
 			#CREATE JSON OBJECT FILE          
@@ -745,6 +757,10 @@ sub geo2TypedObjects
 	    $series_object_ref->{"summary"} = $gse_object_ref->{'gseSummary'}; 
 	} 
 
+        foreach my $temp_sample_id (sort(keys(%sample_ids_in_series))) 
+	{ 
+	    add_series_ids_to_samples($typed_objects_directory,$temp_sample_id,$series_id);
+	} 
 
 	#Write out object  
 	#CREATE JSON OBJECT FILE   
@@ -870,6 +886,41 @@ sub create_sample_genome_hash
         close(GSM_RESULTS); 
     } 
     return %return_hash; 
+}
+
+sub add_series_ids_to_samples
+{
+    my $typed_objects_directory = shift;
+    my $sample_id = shift;
+    my $series_id = shift;
+
+    my %kb_series_ids;
+    $kb_series_ids{$series_id} = 1;
+
+    my $temp_sample_file_name = $sample_id;
+    $temp_sample_file_name =~ s/kb\|//; 
+    my $sample_file_name = $typed_objects_directory."/".$temp_sample_file_name; 
+
+    open (JSON_FILE,$sample_file_name) or die "0 - Unable to open $sample_file_name, it was supposed to exist"; 
+    my ($json_result,@temp_array)= (<JSON_FILE>); 
+    close(JSON_FILE); 
+    my $perl_object = from_json($json_result); 
+
+    if ($perl_object->{"expression_series_ids"})
+    {
+	my @old_series_ids = @{$perl_object->{"expression_series_ids"}};
+	foreach my $old_series_id (@old_series_ids)
+	{
+	    $kb_series_ids{$old_series_id} = 1;
+	}
+    }
+    my @new_series_ids = sort(keys(%kb_series_ids));
+    $perl_object->{"expression_series_ids"} = \@new_series_ids;
+    open(SAMPLE_FILE, ">".$sample_file_name) or return "0 - Unable to make to $sample_file_name \n"; 
+    print SAMPLE_FILE to_json($perl_object); 
+    close(SAMPLE_FILE); 
+    
+    return 1;
 }
 
 

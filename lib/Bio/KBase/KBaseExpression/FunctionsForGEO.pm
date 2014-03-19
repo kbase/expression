@@ -1791,44 +1791,51 @@ sub parse_gse_sample_portion
 #print "\ngenome_probe_feature_hash_ref : \n". Dumper($genome_probe_feature_hash_ref);
         my ($gsm_data_hash_ref,$gsm_value_type,$temp_gsm_value_errors_ref) = 
 	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,\@sample_data_lines);
+
+        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
+                               { RaiseError => 1, ShowErrorStatement => 1 }
+            ); 
+	my $were_representatives_used_q = qq^select count(*)
+	                                     from Feature f inner join Encompasses c2m on f.id = c2m.to_link
+                                             inner join Encompasses m2l on c2m.from_link = m2l.to_link
+                                             where substring_index(f.id, '.', 2) = ? 
+                                             and f.feature_type = 'CDS'^;
+#print "\n\nQUERY : \n".$were_representatives_used_q ."\nGenomes:".join("  ",@genomes_with_data)."\n\n";
+	my $were_representatives_used_qh = $dbh->prepare($were_representatives_used_q) or die "Unable to prepare were_representatives_used : ".$were_representatives_used_q . ":".$dbh->errstr();
+
+	my %genomes_with_data = %{$gsm_data_hash_ref};
         foreach my $temp_genome_id (keys(%{$gsm_data_hash_ref}))
         {
+	    my $processing_comments = "Imported using KBase GEO Importer. ";
+	    if (defined($genomes_with_data{$temp_genome_id}))
+	    {
+		$were_representatives_used_qh->execute($temp_genome_id)or die "Unable to execute were_representatives_used : ".$were_representatives_used_q . ":".$were_representatives_used_qh->errstr();
+		my $cds_in_families_count = 0;
+		($cds_in_families_count) = $were_representatives_used_qh->fetchrow_array();
+		if ($cds_in_families_count > 0)
+		{
+#print "\n\nHAS REPRESENTATIVE\n\n";
+		    $processing_comments .= " Representative CDS feature ids were used to resolve ambiguous isoforms.";
+		}
+	    }
             if ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "Probe Sequences Blat Resolved")
             {
                 $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=2;
+		$processing_comments .= " Probe sequences were resolved using Blat.";
             }
             elsif ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "Platform External IDs Translated")
             {
                 $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=3;
+		$processing_comments .= " The platform ids were translated using feature aliases.";	      
             }
             elsif ($gsm_hash{$gsm_id}{"gsmPlatform"}{"genomesMappingMethod"}{$temp_genome_id} eq "User Custom Mappings for Probe Sequences")
             {
                 $gsm_data_hash_ref->{$temp_genome_id}->{"dataQualityLevel"}=1;
+		$processing_comments .= " The platform ids were resolved using a custom mappings file.";	      
             }
+	    $gsm_data_hash_ref->{$temp_genome_id}->{"processing_comments"}=$processing_comments;
         }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
- 
-        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
-                               { RaiseError => 1, ShowErrorStatement => 1 }
-            ); 
-	my @genomes_with_data = keys(%{$gsm_data_hash_ref});
-	my $were_representatives_used_q = qq^select count(*)
-	                                     from Feature f inner join Encompasses c2m on f.id = c2m.from_link
-                                             inner join Encompasses m2l on c2m.to_link = m2l.from_link
-                                             where substring_index(f.id, '.', 2) in (^.
-					     join(",", ("?") x @genomes_with_data) . 
-                                          qq^) and f.feature_type = 'CDS'^;
-#print "\n\nQUERY : \n".$were_representatives_used_q ."\nGenomes:".join("  ",@genomes_with_data)."\n\n";
-	my $were_representatives_used_qh = $dbh->prepare($were_representatives_used_q) or die "Unable to prepare were_representatives_used : ".$were_representatives_used_q . ":".$dbh->errstr();
-	$were_representatives_used_qh->execute(@genomes_with_data)or die "Unable to execute were_representatives_used : ".$were_representatives_used_q . ":".$were_representatives_used_qh->errstr();
-	my $cds_in_families_count = 0;
-	($cds_in_families_count) = $were_representatives_used_qh->fetchrow_array();
-	if ($cds_in_families_count > 0)
-	{
-#print "\n\nHAS REPRESENTATIVE\n\n";
-	    $gsm_value_type = "Representative CDS feature ids were used to resolve ambiguous isoforms. ".$gsm_value_type;
-	}
-
 	$gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type;	
         push(@{$gsm_hash{$gsm_id}->{"errors"}},@{$temp_gsm_value_errors_ref});
         #print "GSM HASH : ".Dumper(\%gsm_hash);
