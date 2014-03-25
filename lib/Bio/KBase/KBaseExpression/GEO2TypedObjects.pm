@@ -299,9 +299,31 @@ sub geo2TypedObjects
                         }
 			if ($genome_id_selected eq '')
 			{
-                            #if mapped genome does not match GPL genome ids,  Will select first (sorted) GPL genome id.
-			    my @genome_keys = sort(keys(%genome_ids_hash));
-			    $genome_id_selected = $genome_keys[0];
+			    if (scalar(keys(%genome_ids_hash)) > 0)
+			    {
+				#if mapped genome does not match GPL genome ids,  Will select first (sorted) GPL genome id.
+				my @genome_keys = sort(keys(%genome_ids_hash));
+				$genome_id_selected = $genome_keys[0];
+			    }
+			    else
+			    {
+				foreach my $genome_id (sort(keys(%genomes_map_results))) 
+				{ 				    
+				    if ($genomes_map_results{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS")
+				    { 
+					$genome_id_selected = $genome_id; 
+				    } 
+				}
+			    }
+			}
+			if ($genome_id_selected eq '')
+			{
+			    #should not be possible to reach this as at least one gsm genome should 
+			    #have been able to be mapped to have a gse w/o errrors
+			    open (GSE_RESULTS_FILE, ">>".$gse_results_file) or return "0 - Unable to make/append to $gse_results_file \n"; 
+			    print GSE_RESULTS_FILE $current_gse_id . "\t\tFailure\tUnable to find a tax id mapping for platform.  Should not be able to reach this error.\t\n"; 
+			    close(GSE_RESULTS_FAIL); 
+			    return 1;
 			}
                         #grab kbase_platform_id for it
 #Next two lines for testing                        

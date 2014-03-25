@@ -251,7 +251,8 @@ sub parse_gse_platform_portion
     my $gsm_info_hash_ref = shift;
     my %gsm_platform_info_hash = %{$gsm_info_hash_ref};  #Hash that has GSMID as key (or "ALL_GSMS" as single key) -> {"organism"=>value,
                                 #                                                             "taxID"=>value,
-                                #                                                             "platform"=>GPLID}
+                                #                                                             "platform"=>GPLID
+                                #                                                             "error" => ?}
                                 #  NOTE THIS GETS VERY COMPLICATED IF NOT METADATA ONLY.  Remember multiple GPLs can exist per GSE
     my $blat_files_directory = shift;
     my $platform_genome_mappings_directory = shift;
@@ -288,6 +289,10 @@ sub parse_gse_platform_portion
         } 
         if ($line =~ m/^\!Platform_taxid =/)
         {
+#	    if ($gplTaxID)
+#	    {
+#		push(@{$platform_hash{$gplID}->{"errors"}},"The platform has more than one tax id");
+#	    }
             my @temp_arr = split(/\s*=\s*/,$line);
             $gplTaxID = trim($temp_arr[1]);
         }
@@ -298,6 +303,10 @@ sub parse_gse_platform_portion
         }
         if ($line =~ m/^\!Platform_organism =/)
         { 
+#	    if ($gplOrganism)
+#	    {
+#		push(@{$platform_hash{$gplID}->{"errors"}},"The platform has more than one organism");
+#	    }
             my @temp_arr = split(/\s*=\s*/,$line);
             $gplOrganism = trim($temp_arr[1]);
         } 
@@ -344,6 +353,11 @@ sub parse_gse_platform_portion
 
     if ($metaDataOnly == 0)
     {
+	
+	if (scalar(@{$platform_hash{$gplID}->{"errors"}}) > 0)
+	{
+	    return (\%platform_hash,\%platform_tax_probe_feature_hash);
+	}
 #print "\nIN PARSE GSE PLATFORM NOT METADATA ONLY\n";
 #print "\n:gsm_platform_info_hash : \n". Dumper(\%gsm_platform_info_hash);
 	my %tax_ids_hash;  #a hash of tax ids for all the GSMs in a GSE for this GPL
@@ -351,17 +365,25 @@ sub parse_gse_platform_portion
 	{
 	    if ($gplID eq $gsm_platform_info_hash{$temp_gsm_id}->{"platform"})
 	    {
-		$tax_ids_hash{$gsm_platform_info_hash{$temp_gsm_id}->{"taxID"}} = 1;
+#print "GPL : $gplID  -- hash :" .$gsm_platform_info_hash{$temp_gsm_id}->{"platform"} . 
+#"Equal test ".($gplID eq $gsm_platform_info_hash{$temp_gsm_id}->{"platform"})."\n";
+
+		unless (defined($gsm_platform_info_hash{$temp_gsm_id}->{"error"}))
+		{
+		    $tax_ids_hash{$gsm_platform_info_hash{$temp_gsm_id}->{"taxID"}} = 1;
+		}
 	    }
 	}
+#print "\nDUMPER OF TAX ID HASH : ".Dumper(\%tax_ids_hash)."\n";
 	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
 			       { RaiseError => 1, ShowErrorStatement => 1 }
 	    ); 
-	my %genome_ids_hash;
+
 	my $has_passing_tax_id = 0;
 #print "\nIN PARSE GSE PLATFORM BEFORE QUERY\n";
 	foreach my $temp_tax_id (keys(%tax_ids_hash))
 	{
+	    my %genome_ids_hash;
 #print "\nPLATFORM TAX ID : $temp_tax_id\n";
 	    my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
 	    #IF GSM uses current GPL
@@ -377,7 +399,7 @@ sub parse_gse_platform_portion
 	    while (my ($genome_id) = $get_genome_ids_qh->fetchrow_array())
 	    {
 		$genome_ids_hash{$genome_id} = 1;
-                #print "\nMatching GENOME $genome_id \n";
+print "\nMatching GENOME $genome_id \n";
 	    }
             if (scalar(keys(%genome_ids_hash)) == 0)
             {
@@ -389,7 +411,7 @@ sub parse_gse_platform_portion
 		next;
             } 
 #print "\nIN PARSE GSE PLATFORM PAst QUERY\n";
-#print "\nGenomes:\n".Dumper(\%genome_ids_hash);
+#print "\nGenomes - 1:\n".Dumper(\%genome_ids_hash);
             #CHECK TO SEE IF PROBE MAPPING FILE EXISTS HERE:
             my $gpl_file = $platform_genome_mappings_directory."/".$gplID; 
             if (-e $gpl_file)
@@ -452,8 +474,12 @@ sub parse_gse_platform_portion
 	        #determine if a sequence column exists 
     	        my @platform_map_lines = @lines[$platform_table_begin..(scalar(@lines)-2)];
 	    
-	        my ($probe_sequence_hash_ref, $probe_sequence_warning) = make_platform_sequence_hash(\@platform_map_lines);
+	        my $probe_sequence_hash_ref;
+		my $probe_sequence_warning - '';;
+		($probe_sequence_hash_ref, $probe_sequence_warning) = make_platform_sequence_hash(\@platform_map_lines);
 	        my %probe_sequence_hash = %{$probe_sequence_hash_ref};
+print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash))."\n";
+
 	        my @blat_files_to_clean_up_after;
 	        my %genome_probe_to_feature_id_hash;  #key genome_id -> {probe_id => feature_id}
 
@@ -466,9 +492,16 @@ sub parse_gse_platform_portion
 		$get_genomes_max_size_qh->execute(keys(%genome_ids_hash)) or die "Unable to execute get_genomes_max_size_q : $get_genomes_max_size_q " . 
 		    $get_genomes_max_size_qh->errstr(); 
 		my ($max_genome_size) = $get_genomes_max_size_qh->fetchrow_array();
-		if ($max_genome_size > 10000000)
+		if (!defined($probe_sequence_warning))
 		{
-		    $probe_sequence_warning = "Genomes size is large > 10000000.  Blat is too time consuming.  Attempting to map by synonym.";
+		    if ($max_genome_size > 10000000)
+		    {
+			$probe_sequence_warning .= "Genomes size is large > 10000000.  Blat is too time consuming.  Attempting to map by synonym.";
+		    }
+		    if (scalar(keys(%probe_sequence_hash)) > 50000)
+		    {
+			$probe_sequence_warning .= "There were more than 50,000 probe sequences.  Blat is too time consuming.  Attempting to map by synonym.";
+		    }
 		}
 #$probe_sequence_warning = "Temporary message to force platform id mapping by synonym";
 	        if (!defined($probe_sequence_warning))
@@ -500,8 +533,10 @@ sub parse_gse_platform_portion
 		    #Run blat
 		    #create mapping platform_id -> feature_id
 		    #remove files
+#print "\nGenomes:\n".Dumper(\%genome_ids_hash);
 		    foreach my $genome_id (keys(%genome_ids_hash))
 		    {
+#print "\nLoop $genome_id $genome_ids_hash{$genome_id}\n";
                         if($genome_ids_hash{$genome_id} == 1)
 		        {
                             #create Blat DB File
@@ -520,6 +555,7 @@ sub parse_gse_platform_portion
 			        $fid_count++;
 			        print BLAT_DB_FILE ">".$fid_key."\n".$fid_sequence_hash->{$fid_key}."\n"; 
 		            } 
+print "\nGENOME $genome_id : $fid_count\n";
 		            close(BLAT_DB_FILE); 
 		            # Run Blat
 		            my $blat_results_file = "/kb/dev_container/modules/expression/blat_files/".
@@ -527,7 +563,8 @@ sub parse_gse_platform_portion
 		            my $cmd = "/usr/local/bin/blat -t=dna -q=dna -tileSize=6 -repMatch=1000000 -minIdentity=95 -fine ".
 			              "-minMatch=0 -out=psl -minScore=$min_probe_length ".
 			              "$blat_genome_db_file $blat_platform_query_file $blat_results_file"; #-intron=0
-                            #print "Running blat: $cmd\n"; 
+	       
+			    #print "Running blat: $cmd\n"; 
 		            system($cmd) == 0 || die "Cannot run blat"; 
 		            die "blat failed" unless -e $blat_results_file; 
 		            push(@blat_files_to_clean_up_after, $blat_results_file);
@@ -539,10 +576,10 @@ sub parse_gse_platform_portion
 		            if (scalar(keys(%probe_to_feature_hash)) > 
 			       ($min_number_of_probes_mapped_threshold * $number_of_probe_sequences))
 		            {
-                                $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="Probe Sequences Blat Resolved";
-                                my $genome_number = $genome_id;
-                                $genome_number =~ s/kb\|//;
-                                my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
+				$platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="Probe Sequences Blat Resolved";
+				my $genome_number = $genome_id;
+				$genome_number =~ s/kb\|//;
+				my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                                 make_gpl_genome_file($gpl_genome_file,\%probe_to_feature_hash);
 				$has_passing_tax_id = 1;
 		            }
@@ -1454,6 +1491,10 @@ sub parse_gse_sample_info_for_platform
         } 
         if ($line =~ m/^\!Sample_taxid_ch1 = /) 
         { 
+            if (exists($gsm_platform_info_hash{$gsm_id}->{"taxID"})) 
+            {
+                $gsm_platform_info_hash{$gsm_id}->{"error"} = "More than one taxID for channel 1 for GSM $gsm_id";
+            }
             my @temp_arr = split(/\s*=\s*/,$line); 
             $gsm_platform_info_hash{$gsm_id}->{"taxID"} = trim($temp_arr[1]); 
         } 
@@ -1461,7 +1502,7 @@ sub parse_gse_sample_info_for_platform
         { 
 	    if (exists($gsm_platform_info_hash{$gsm_id}->{"organism"}))
 	    {
-		$gsm_platform_info_hash{$gsm_id}->{"error"} = "More than one organism for channel 1 for this GSM"; 
+		$gsm_platform_info_hash{$gsm_id}->{"error"} = "More than one organism for channel 1 for GSM $gsm_id"; 
 	    }
             my @temp_arr = split(/\s*=\s*/,$line);
             $gsm_platform_info_hash{$gsm_id}->{"organism"} = trim($temp_arr[1]); 
@@ -1511,6 +1552,7 @@ sub parse_gse_sample_portion
 
     foreach my $line (@lines)
     { 
+#print "Sample Line Counter : $sample_line_counter \n";
         if ($line =~ m/^\^SAMPLE = /)
         { 
             my @temp_arr = split(/\s*=\s*/,$line); 
@@ -1781,14 +1823,32 @@ sub parse_gse_sample_portion
 
     if (($metaDataOnly eq '0') && ($platform_passed == 1))
     { 
+        unless(defined($sample_table_start))
+	{
+	    push(@{$gsm_hash{$gsm_id}->{"errors"}},"Sample data does not exist in this sample.");
+	    return \%gsm_hash;
+	}
+        if (scalar(@{$gsm_hash{$gsm_id}->{"errors"}}) > 0)
+	{
+	    return \%gsm_hash;
+	}
         $gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type; 
         #PARSE VALUE SECTION OF THE GSM                                             
         #CALL FUNCTION FOR VALUES SECTION.  PASSES GSM, GSM_ID_FEATURE_HASH_REF, VALUE TYPE, LINE ($sample_table_start, @lines size)
 	my @sample_data_lines = @lines[$sample_table_start..(scalar(@lines)-2)];
 #print "\nGPLID:".$gpl_id.":::TAX:".$gsm_tax_id.":\n";
 #print "\nplatform_tax_genome_probe_feature_hash_ref : \n". Dumper($platform_tax_genome_probe_feature_hash_ref);
-	my $genome_probe_feature_hash_ref = $platform_tax_genome_probe_feature_hash_ref->{$gpl_id}->{$gsm_tax_id};
+	my $genome_probe_feature_hash_ref;
+	if (defined($platform_tax_genome_probe_feature_hash_ref))
+	{
+	    $genome_probe_feature_hash_ref = $platform_tax_genome_probe_feature_hash_ref->{$gpl_id}->{$gsm_tax_id};
 #print "\ngenome_probe_feature_hash_ref : \n". Dumper($genome_probe_feature_hash_ref);
+	}
+	else
+	{
+	    push(@{$gsm_hash{$gsm_id}->{"errors"}},"No Platform to Feature Map was able to be generated");
+	    return \%gsm_hash;
+	}
         my ($gsm_data_hash_ref,$gsm_value_type,$temp_gsm_value_errors_ref) = 
 	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,\@sample_data_lines);
 
@@ -2336,6 +2396,7 @@ print "GSE RECORD: ". $gse_input_id . " : Had lines = ".scalar(@gse_lines);
     my $looking_for_start = 1; 
     foreach my $gse_line (@gse_lines)
     { 
+#print "Got to line number $line_count \n";
 	#SERIES SECTION OF GSE
 	if ($gse_line =~ m/^\^SERIES = /)
 	{
@@ -2388,8 +2449,11 @@ print "GSE RECORD: ". $gse_input_id . " : Had lines = ".scalar(@gse_lines);
 														  $platform_genome_mappings_directory,
 														  $self);
 		    %platform_hash = %{$platform_hash_ref};
-		    my ($temp_gpl_id) = keys(%{$temp_plt_tax_genome_probe_feat_hash_ref});
-		    $platform_tax_genome_probe_feature_hash{$temp_gpl_id}=$temp_plt_tax_genome_probe_feat_hash_ref->{$temp_gpl_id};
+		    if (scalar( keys(%{$temp_plt_tax_genome_probe_feat_hash_ref})) > 0 )
+		    {
+			my ($temp_gpl_id) = keys(%{$temp_plt_tax_genome_probe_feat_hash_ref});
+			$platform_tax_genome_probe_feature_hash{$temp_gpl_id}=$temp_plt_tax_genome_probe_feat_hash_ref->{$temp_gpl_id};
+		    }
 		}
 	    }
 	}
@@ -2413,7 +2477,7 @@ print "GSE RECORD: ". $gse_input_id . " : Had lines = ".scalar(@gse_lines);
     { 
 	push(@sample_end_lines,($line_count-1));
     }
-    
+
     #LOOP Through each sample and parse.
     if (scalar(@sample_start_lines) != scalar(@sample_end_lines)) 
     { 
