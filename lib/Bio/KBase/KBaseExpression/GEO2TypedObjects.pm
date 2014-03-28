@@ -272,11 +272,19 @@ sub geo2TypedObjects
 			my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
 			my $ncbi_taxon = $ncbi_db->get_taxon(-taxonid=>$gpl_hash{'gplTaxID'});
 			my @ncbi_scientific_names = @{$ncbi_taxon->{'_names_hash'}->{'scientific'}};
-                        my $get_genome_ids_q = "select id from Genome where scientific_name in (".
-                            join(",", ("?") x @ncbi_scientific_names) . ") "; 
+                       # my $get_genome_ids_q = "select id from Genome where scientific_name in (".
+                       #     join(",", ("?") x @ncbi_scientific_names) . ") "; 
+			my $get_genome_ids_q = "select distinct g.id from Genome g left outer join ". 
+                                   "IsTaxonomyOf it on it.to_link = g.id left outer join ". 
+                                   "TaxonomicGrouping tg on tg.id = it.from_link ".
+                                   "where tg.scientific_name in (".
+                                   join(",", ("?") x @ncbi_scientific_names) . ") ".
+                                   "or g.scientific_name in (". 
+                                   join(",", ("?") x @ncbi_scientific_names) . ") ";
+
                         my $get_genome_ids_qh = $dbh->prepare($get_genome_ids_q) or return "0 - Unable to prepare get_genome_ids_q : $get_genome_ids_q ".
                             $dbh->errstr(); 
-                        $get_genome_ids_qh->execute(@ncbi_scientific_names) or return "0 - Unable to execute get_genome_ids_q : $get_genome_ids_q " . 
+                        $get_genome_ids_qh->execute(@ncbi_scientific_names,@ncbi_scientific_names) or return "0 - Unable to execute get_genome_ids_q : $get_genome_ids_q " . 
                         $get_genome_ids_qh->errstr(); 
                         my $genome_id_selected = '';
                         my %genome_ids_hash;
