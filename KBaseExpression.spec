@@ -556,10 +556,10 @@ module KBaseExpression {
        
        we may need a link to experimentMetaID later.
 
-       @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
+       @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample characteristics
        @optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids 
        
-       @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
+       @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source characteristics keys_of(expression_levels) 
        @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
        @searchable ws_subset strain.genome_id strain.reference_strain strain.wild_type          
        @searchable ws_subset protocol.name protocol.description 
@@ -589,6 +589,7 @@ module KBaseExpression {
         string shock_url;
         string processing_comments;
         expression_series_ids expression_series_ids;
+        string characteristics;
     } ExpressionSample;
 
     /*
