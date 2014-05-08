@@ -8213,10 +8213,10 @@ protocol, persons and strain should need to eventually have common ws objects.  
 
 we may need a link to experimentMetaID later.
 
-@optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample 
+@optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample characteristics
 @optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids 
 
-@searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source keys_of(expression_levels) 
+@searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source characteristics keys_of(expression_levels) 
 @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
 @searchable ws_subset strain.genome_id strain.reference_strain strain.wild_type          
 @searchable ws_subset protocol.name protocol.description 
@@ -8252,6 +8252,7 @@ data_source has a value which is a string
 shock_url has a value which is a string
 processing_comments has a value which is a string
 expression_series_ids has a value which is a KBaseExpression.expression_series_ids
+characteristics has a value which is a string
 
 </pre>
 
@@ -8283,6 +8284,7 @@ data_source has a value which is a string
 shock_url has a value which is a string
 processing_comments has a value which is a string
 expression_series_ids has a value which is a KBaseExpression.expression_series_ids
+characteristics has a value which is a string
 
 
 =end text
