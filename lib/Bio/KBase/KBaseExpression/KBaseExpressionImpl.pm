@@ -8356,7 +8356,6 @@ external_source_date has a value which is a string
 =item Description
 
 Simple Grouping of Samples that belong to the same replicate group.  ExpressionReplicateGroup typed object.
-
 @searchable ws_subset id expression_sample_ids
 
 
@@ -8378,6 +8377,484 @@ expression_sample_ids has a value which is a KBaseExpression.expression_sample_i
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 expression_sample_ids has a value which is a KBaseExpression.expression_sample_ids
+
+
+=end text
+
+=back
+
+
+
+=head2 genome_id
+
+=over 4
+
+
+
+=item Description
+
+reference genome id for mapping the RNA-Seq fastq file
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqSampleMetaData
+
+=over 4
+
+
+
+=item Description
+
+Object for the RNASeq Metadata
+@optional platform source tissue condition po_id eo_id
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+paired has a value which is a string
+platform has a value which is a string
+sample_id has a value which is a string
+title has a value which is a string
+source has a value which is a string
+source_id has a value which is a string
+ext_source_date has a value which is a string
+domain has a value which is a string
+ref_genome has a value which is a KBaseExpression.genome_id
+tissue has a value which is a reference to a list where each element is a string
+condition has a value which is a reference to a list where each element is a string
+po_id has a value which is a reference to a list where each element is a string
+eo_id has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+paired has a value which is a string
+platform has a value which is a string
+sample_id has a value which is a string
+title has a value which is a string
+source has a value which is a string
+source_id has a value which is a string
+ext_source_date has a value which is a string
+domain has a value which is a string
+ref_genome has a value which is a KBaseExpression.genome_id
+tissue has a value which is a reference to a list where each element is a string
+condition has a value which is a reference to a list where each element is a string
+po_id has a value which is a reference to a list where each element is a string
+eo_id has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqSamplesMetaData
+
+=over 4
+
+
+
+=item Description
+
+Complete List of RNASeq MetaData
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a KBaseExpression.RNASeqSampleMetaData
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a KBaseExpression.RNASeqSampleMetaData
+
+=end text
+
+=back
+
+
+
+=head2 shock_url
+
+=over 4
+
+
+
+=item Description
+
+A reference to RNASeq fastq  object on shock
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 shock_id
+
+=over 4
+
+
+
+=item Description
+
+A reference to RNASeq fastq  object on shock
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 shock_ref
+
+=over 4
+
+
+
+=item Description
+
+A reference to RNASeq fastq  object
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a KBaseExpression.shock_id
+shock_url has a value which is a KBaseExpression.shock_url
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a KBaseExpression.shock_id
+shock_url has a value which is a KBaseExpression.shock_url
+
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqSample
+
+=over 4
+
+
+
+=item Description
+
+RNASeq fastq  object
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+type has a value which is a string
+created has a value which is a string
+shock_ref has a value which is a KBaseExpression.shock_ref
+metadata has a value which is a KBaseExpression.RNASeqSampleMetaData
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+type has a value which is a string
+created has a value which is a string
+shock_ref has a value which is a KBaseExpression.shock_ref
+metadata has a value which is a KBaseExpression.RNASeqSampleMetaData
+
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqSamplesSet
+
+=over 4
+
+
+
+=item Description
+
+list of RNASeqSamples
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a KBaseExpression.RNASeqSample
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a KBaseExpression.RNASeqSample
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqSampleAlignment
+
+=over 4
+
+
+
+=item Description
+
+Object for the RNASeq Alignment bam file
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+paired has a value which is a string
+created has a value which is a string
+shock_ref has a value which is a KBaseExpression.shock_ref
+metadata has a value which is a KBaseExpression.RNASeqSampleMetaData
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+paired has a value which is a string
+created has a value which is a string
+shock_ref has a value which is a KBaseExpression.shock_ref
+metadata has a value which is a KBaseExpression.RNASeqSampleMetaData
+
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqSampleAlignmentSet
+
+=over 4
+
+
+
+=item Description
+
+list of RNASeqSampleAlignment
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a KBaseExpression.RNASeqSampleAlignment
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a KBaseExpression.RNASeqSampleAlignment
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqDifferentialExpressionFile
+
+=over 4
+
+
+
+=item Description
+
+RNASeqDifferentialExpression file structure
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+shock_ref has a value which is a KBaseExpression.shock_ref
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+shock_ref has a value which is a KBaseExpression.shock_ref
+
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqDifferentialExpressionSet
+
+=over 4
+
+
+
+=item Description
+
+list of RNASeqDifferentialExpression files
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a KBaseExpression.RNASeqDifferentialExpressionFile
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a KBaseExpression.RNASeqDifferentialExpressionFile
+
+=end text
+
+=back
+
+
+
+=head2 RNASeqDifferentialExpression
+
+=over 4
+
+
+
+=item Description
+
+Object for the RNASeq Differential Expression
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+title has a value which is a string
+created has a value which is a string
+diff_expression has a value which is a KBaseExpression.RNASeqDifferentialExpressionSet
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+name has a value which is a string
+title has a value which is a string
+created has a value which is a string
+diff_expression has a value which is a KBaseExpression.RNASeqDifferentialExpressionSet
 
 
 =end text
