@@ -613,7 +613,6 @@ module KBaseExpression {
 
     /*
         Simple Grouping of Samples that belong to the same replicate group.  ExpressionReplicateGroup typed object.
-
         @searchable ws_subset id expression_sample_ids
     */
     typedef structure {
@@ -621,4 +620,116 @@ module KBaseExpression {
         expression_sample_ids expression_sample_ids;
     } ExpressionReplicateGroup;
 
+    /*
+       Specification for the RNASeqFastq Metadata
+    */
+
+    /*
+       reference genome id for mapping the RNA-Seq fastq file
+    */
+
+    typedef string genome_id;
+    /*
+     Object for the RNASeq Metadata
+     @optional platform source tissue condition po_id eo_id
+    */
+    typedef structure {
+        string paired;
+        string platform;
+        string sample_id;
+        string title;
+        string source;
+        string source_id;
+        string ext_source_date;
+        string domain;
+        genome_id ref_genome;
+        list<string> tissue;
+        list<string> condition;
+        list<string> po_id;
+        list<string> eo_id;
+     }RNASeqSampleMetaData;
+
+     /*
+       Complete List of RNASeq MetaData
+     */
+     typedef list<RNASeqSampleMetaData> RNASeqSamplesMetaData;
+ 
+    /*
+       A reference to RNASeq fastq  object on shock         
+    */
+ 
+    typedef string shock_url;
+    /*   
+       A reference to RNASeq fastq  object on shock       
+    */
+
+  typedef string shock_id;
+  
+ 
+  /*   
+       A reference to RNASeq fastq  object
+  */
+  typedef structure{
+      shock_id shock_id;
+      shock_url shock_url;
+  }shock_ref;
+ 
+  /*
+      RNASeq fastq  object
+  */
+
+  typedef structure {
+      string name;
+      string type;
+      string created;
+      shock_ref  shock_ref;
+      RNASeqSampleMetaData metadata;  
+  }RNASeqSample;
+
+   /*
+       list of RNASeqSamples
+   */
+
+  typedef list<RNASeqSample> RNASeqSamplesSet;
+  /*
+     Object for the RNASeq Alignment bam file
+  */
+  typedef structure {
+      string  name;
+      string  paired;
+      string created;
+      shock_ref shock_ref;
+      RNASeqSampleMetaData metadata; 
+  }RNASeqSampleAlignment;
+
+/*
+       list of RNASeqSampleAlignment
+*/
+
+  typedef list<RNASeqSampleAlignment> RNASeqSampleAlignmentSet;
+
+/*
+       RNASeqDifferentialExpression file structure
+*/
+   typedef structure {
+       string name;
+       shock_ref shock_ref;
+   }RNASeqDifferentialExpressionFile;
+
+/*
+       list of RNASeqDifferentialExpression files 
+*/
+
+   typedef list<RNASeqDifferentialExpressionFile> RNASeqDifferentialExpressionSet;
+
+/*
+     Object for the RNASeq Differential Expression
+*/
+
+  typedef structure {
+       string  name;
+       string  title;
+       string created;
+       RNASeqDifferentialExpressionSet diff_expression;
+  }RNASeqDifferentialExpression;
 }; 
