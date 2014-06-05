@@ -1,4 +1,4 @@
-package Bio::KBase::KBaseExpression::FunctionsForGEO;
+package Bio::KBase::KBaseExpression::FunctionsForGEORatio;
 use strict;
 use Statistics::Descriptive;
 #use Bio::KBase::Exceptions;
@@ -25,6 +25,7 @@ use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 use IO::File; 
 use LWP::Simple; 
 use Bio::DB::Taxonomy;
+use Bio::DB::EUtilities;
 use Bio::KBase;
 use Bio::KBase::CDMI::CDMIClient; 
 use Bio::KBase::IdMap::Client; 
@@ -125,6 +126,29 @@ sub new
     {
 	$self->_init_instance();
     }
+    $self->{version} = "Version 1.0";
+    #NEW DB CONNECTION
+    $self->{dbh} = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, 
+				$self->{dbUser}, 
+				$self->{dbPwd}, 
+				{ RaiseError => 1, ShowErrorStatement => 1 } 
+	);
+
+    $self->{get_dbh} = sub {
+	unless ($self->{dbh}->ping) {
+	    $self->{dbh} = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, 
+					$self->{dbUser}, 
+					$self->{dbPwd},                                                                        
+					{ RaiseError => 1, ShowErrorStatement => 1 }                                  
+		);            
+	}
+	return $self->{dbh};
+    };
+
+
+
+
+
     return $self;
 }
 
@@ -374,33 +398,43 @@ sub parse_gse_platform_portion
 		}
 	    }
 	}
-#print "\nDUMPER OF TAX ID HASH : ".Dumper(\%tax_ids_hash)."\n";
-	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
-			       { RaiseError => 1, ShowErrorStatement => 1 }
-	    ); 
+print "\nDUMPER OF TAX ID HASH : ".Dumper(\%tax_ids_hash)."\n";
+#	my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
+#			       { RaiseError => 1, ShowErrorStatement => 1 }
+#	    ); 
 
 	my $has_passing_tax_id = 0;
 #print "\nIN PARSE GSE PLATFORM BEFORE QUERY\n";
 	foreach my $temp_tax_id (keys(%tax_ids_hash))
 	{
 	    my %genome_ids_hash;
-#print "\nPLATFORM TAX ID : $temp_tax_id\n";
-	    my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
+print "\nPLATFORM TAX ID : $temp_tax_id\n";
+#URL WAS NOT WORKING PROPERLY
+#	    my $ncbi_db = Bio::DB::Taxonomy->new(-source=>"entrez");
 	    #IF GSM uses current GPL
 	    #Check for the GSMs Tax ID vs NCBI and get Scientific name.  Then look up genome by that scientific name.
-	    my $ncbi_taxon = $ncbi_db->get_taxon(-taxonid=>$temp_tax_id);
-	    my @ncbi_scientific_names = @{$ncbi_taxon->{'_names_hash'}->{'scientific'}};
+#	    my $ncbi_taxon = $ncbi_db->get_taxon(-taxonid=>$temp_tax_id);
+#	    my @ncbi_scientific_names = @{$ncbi_taxon->{'_names_hash'}->{'scientific'}};
+	    my $factory = Bio::DB::EUtilities->new(-eutil => 'esummary',
+                                       -email => 'mymail@foo.bar',
+                                       -db    => 'taxonomy',
+                                       -id    => $temp_tax_id );
+	    my @ncbi_scientific_names = $factory->next_DocSum->get_contents_by_name('ScientificName');
+
 #	    my $get_genome_ids_q = "select id from Genome where scientific_name in (".
 #		join(",", ("?") x @ncbi_scientific_names) . ") ";
 	    my $get_genome_ids_q = "select distinct g.id from Genome g left outer join ".
 		                   "IsTaxonomyOf it on it.to_link = g.id left outer join ".
                                    "TaxonomicGrouping tg on tg.id = it.from_link ".
-                                   "where tg.scientific_name in (".
-				   join(",", ("?") x @ncbi_scientific_names) . ") ".
+                                   "where (tg.scientific_name in (".
+				   join(",", ("?") x @ncbi_scientific_names) . ") and it.confidence >= 2)".
 	                           "or g.scientific_name in (".
 				   join(",", ("?") x @ncbi_scientific_names) . ") ";
-	    my $get_genome_ids_qh = $dbh->prepare($get_genome_ids_q) or die "Unable to prepare get_genome_ids_q : $get_genome_ids_q ".
-		$dbh->errstr();
+#	    my $get_genome_ids_qh = $dbh->prepare($get_genome_ids_q) or die "Unable to prepare get_genome_ids_q : $get_genome_ids_q ".
+#		$dbh->errstr();
+	    my $get_genome_ids_qh = $self->{get_dbh}->()->prepare($get_genome_ids_q)
+                or die "could not prepare $get_genome_ids_q, $DBI::errstr";
+
 	    $get_genome_ids_qh->execute(@ncbi_scientific_names,@ncbi_scientific_names) or die "Unable to execute get_genome_ids_q : $get_genome_ids_q " .
 		$get_genome_ids_qh->errstr();
 	    while (my ($genome_id) = $get_genome_ids_qh->fetchrow_array())
@@ -421,10 +455,11 @@ print "\nMatching GENOME $genome_id \n";
 #print "\nGenomes - 1:\n".Dumper(\%genome_ids_hash);
             #CHECK TO SEE IF PROBE MAPPING FILE EXISTS HERE:
             my $gpl_file = $platform_genome_mappings_directory."/".$gplID; 
+print "\nTHE CHECK GPL FILE $gpl_file\n";
             if (-e $gpl_file)
             {
                 #Open GPL file get mapping method results (lets you know what genomes you need to grab data for, and do not have to attempt to map of genomes in the list)
-#print "\nFILE EXISTS ALREADY\n";
+print "\nGPL FILE $gpl_file EXISTS ALREADY\n";
 		open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
 		my @gpl_file_lines = (<GPL>); 
 		close(GPL); 
@@ -436,9 +471,12 @@ print "\nMatching GENOME $genome_id \n";
                 }
             }
 
+print "\nFIRST TIME - Genomes HASH:\n".Dumper(\%genome_ids_hash);
+
             my $need_to_try_new_mappings = 0;
             foreach my $genome_id (keys(%genome_ids_hash))
             { 
+print "IN LOOP - GENOME ID : $genome_id \n";
                 if ($genome_ids_hash{$genome_id} == 0)
                 {
                     if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS")
@@ -449,8 +487,10 @@ print "\nMatching GENOME $genome_id \n";
 			 $genome_number =~ s/kb\|//;
                          my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
                          #check file exists if it does, die as it should be;
+print "\nTEST FOR GPL GENOME FILE ::".$gpl_genome_file."::\n";
                          if (-e $gpl_genome_file)
                          {
+print "\nGPL GENOME $gpl_genome_file FILE EXISTS ALREADY\n";
                              #slurp up file and make probe_id-<feature_id mappings
                              open (GPL_GENOME,$gpl_genome_file) or die "Unable to open the gpl genome file : $gpl_genome_file.\n\n"; 
 		             my @gpl_genome_file_lines = (<GPL_GENOME>); 
@@ -482,7 +522,7 @@ print "\nMatching GENOME $genome_id \n";
     	        my @platform_map_lines = @lines[$platform_table_begin..(scalar(@lines)-2)];
 	    
 	        my $probe_sequence_hash_ref;
-		my $probe_sequence_warning - '';;
+		my $probe_sequence_warning = '';
 		($probe_sequence_hash_ref, $probe_sequence_warning) = make_platform_sequence_hash(\@platform_map_lines);
 	        my %probe_sequence_hash = %{$probe_sequence_hash_ref};
 print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash))."\n";
@@ -494,8 +534,10 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 		#IF THE
 		my $get_genomes_max_size_q = "select max(dna_size) from Genome where id in (". 
                 join(",", ("?") x scalar(keys(%genome_ids_hash))) . ") "; 
-		my $get_genomes_max_size_qh = $dbh->prepare($get_genomes_max_size_q) or die 
-		    "Unable to prepare get_genomes_max_size_q : $get_genomes_max_size_q ". $dbh->errstr(); 
+#		my $get_genomes_max_size_qh = $dbh->prepare($get_genomes_max_size_q) or die 
+#		    "Unable to prepare get_genomes_max_size_q : $get_genomes_max_size_q ". $dbh->errstr(); 
+		my $get_genomes_max_size_qh = $self->{get_dbh}->()->prepare($get_genomes_max_size_q)
+		    or die "could not prepare $get_genomes_max_size_q, $DBI::errstr";
 		$get_genomes_max_size_qh->execute(keys(%genome_ids_hash)) or die "Unable to execute get_genomes_max_size_q : $get_genomes_max_size_q " . 
 		    $get_genomes_max_size_qh->errstr(); 
 		my ($max_genome_size) = $get_genomes_max_size_qh->fetchrow_array();
@@ -540,10 +582,10 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 		    #Run blat
 		    #create mapping platform_id -> feature_id
 		    #remove files
-#print "\nGenomes:\n".Dumper(\%genome_ids_hash);
+print "\nSECOND TIME - Genomes HASH:\n".Dumper(\%genome_ids_hash);
 		    foreach my $genome_id (keys(%genome_ids_hash))
 		    {
-#print "\nLoop $genome_id $genome_ids_hash{$genome_id}\n";
+print "\nLoop $genome_id $genome_ids_hash{$genome_id}\n";
                         if($genome_ids_hash{$genome_id} == 1)
 		        {
                             #create Blat DB File
@@ -565,7 +607,8 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 print "\nGENOME $genome_id : $fid_count\n";
 		            close(BLAT_DB_FILE); 
 		            # Run Blat
-		            my $blat_results_file = "/kb/dev_container/modules/expression/blat_files/".
+#		            my $blat_results_file = "/kb/dev_container/modules/expression/blat_files/".
+			    my $blat_results_file = $blat_files_directory."/".
 			        $gplID."_".$file_genome_id."_blat_results.psl";
 		            my $cmd = "/usr/local/bin/blat -t=dna -q=dna -tileSize=6 -repMatch=1000000 -minIdentity=95 -fine ".
 			              "-minMatch=0 -out=psl -minScore=$min_probe_length ".
@@ -576,7 +619,8 @@ print "\nGENOME $genome_id : $fid_count\n";
 		            die "blat failed" unless -e $blat_results_file; 
 		            push(@blat_files_to_clean_up_after, $blat_results_file);
 		            #Parse Blat File and create mapping from Platform ID to Feature ID
-		            my %probe_to_feature_hash =  parse_blat_results($blat_results_file,$genome_id,$dbh);  
+#		            my %probe_to_feature_hash =  parse_blat_results($blat_results_file,$genome_id,$dbh);  
+		            my %probe_to_feature_hash =  parse_blat_results($blat_results_file,$genome_id,$self);  
 		            $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id} = \%probe_to_feature_hash; 
 
 		            #if number of probe sequences mapped to feature ids is greater than (.3 * total number of probe sequences) it passes.
@@ -600,7 +644,7 @@ print "\nGENOME $genome_id : $fid_count\n";
 		    foreach my $clean_up_file (@blat_files_to_clean_up_after) 
 		    { 
 		        my $rm_cmd = "rm ".$clean_up_file; 
-		        system($rm_cmd) == 0 || print "Cannot perform $rm_cmd \n"; 
+#		        system($rm_cmd) == 0 || print "Cannot perform $rm_cmd \n"; 
 		    } 
 	        }#end of if sequence exists (Blat mapping)
 	        else
@@ -1254,7 +1298,8 @@ sub parse_blat_results
 {
     my $blat_results_file = shift;
     my $genome_id = shift;
-    my $dbh = shift;
+#    my $dbh = shift;
+    my $self = shift;
     open (BLAT,$blat_results_file) or die "Unable to open the blat file : $blat_results_file.\n\n";
     my @blat_lines = (<BLAT>);
     close(BLAT);
@@ -1276,9 +1321,12 @@ sub parse_blat_results
                                      inner join Encompasses m2l on c2m.from_link = m2l.to_link
                                      where substring_index(f.id, '.', 2) = ?
                                      and f.feature_type = 'CDS'^;
-    my $get_cds_hiearchy_info_qh = $dbh->prepare($get_cds_hiearchy_info_q) or die "Unable to prepare get_cds_hiearchy_info_q : ".$get_cds_hiearchy_info_q." : ".$dbh->errstr();
+#    my $get_cds_hiearchy_info_qh = $dbh->prepare($get_cds_hiearchy_info_q) or die "Unable to prepare get_cds_hiearchy_info_q : ".$get_cds_hiearchy_info_q." : ".$dbh->errstr();
+
+    my $get_cds_hiearchy_info_qh = $self->{get_dbh}->()->prepare($get_cds_hiearchy_info_q)
+	or die "could not prepare $get_cds_hiearchy_info_q, $DBI::errstr";    
     $get_cds_hiearchy_info_qh->execute($genome_id) or die "Unable to execute get_cds_hiearchy_info_q : ".$get_cds_hiearchy_info_q." : ".$get_cds_hiearchy_info_qh->errstr();
-    
+
     while (my ($temp_locus,$temp_cds, $temp_length) = $get_cds_hiearchy_info_qh->fetchrow_array()) 
     {
 	$cds_to_locus_hash{$temp_cds}=$temp_locus;
@@ -1447,6 +1495,7 @@ sub make_platform_sequence_hash
 	}
 	my $max_index = undef;
 	my $max_value = 0;
+	my @column_indexes_past_threshold;
 	foreach my $col_index (keys(%sequence_hash_counter))
 	{
 	    if ($sequence_hash_counter{$col_index} > $max_value)
@@ -1454,10 +1503,18 @@ sub make_platform_sequence_hash
 		$max_value = $sequence_hash_counter{$col_index};
 		$max_index = $col_index;
 	    }
+	    if ($sequence_hash_counter{$col_index} > ($percent_threshold * scalar(@lines)))
+	    {
+		push(@column_indexes_past_threshold,$col_index);
+	    }
 	}
-	if ($max_value < ($percent_threshold * scalar(@lines)))
+	if (scalar(@column_indexes_past_threshold) == 0)
 	{
 	    $warning = "A column did not exist in the platform that passed thresholds for being a sequence column";
+	}
+	elsif (scalar(@column_indexes_past_threshold) > 1)
+	{
+	    $warning = "Mulitple columns passed thresholds for being a sequence column. This is ambiguous, platform mapping to be attempted by aliases.";
 	}
 	else
 	{
@@ -1543,7 +1600,9 @@ sub parse_gse_sample_portion
     my $gsm_submission_date = undef;
     my $gsm_tax_id = undef;
     my $gsm_sample_organism = undef;
+    my $gsm_sample_organism_ch2 = undef;
     my @gsm_sample_characteristics = ();
+    my @gsm_sample_characteristics_ch2 = ();
     my @gsm_protocols_array = ();
     my $gsm_value_type = undef;
     my $gsm_original_log2_median = undef;
@@ -1595,8 +1654,18 @@ sub parse_gse_sample_portion
             my @temp_arr = split(/\s*=\s*/,$line);
             push(@gsm_sample_characteristics,trim($temp_arr[1])); 
         }
+        if ($line =~ m/^\!Sample_characteristics_ch2 = /)
+        { 
+            my @temp_arr = split(/\s*=\s*/,$line);
+            push(@gsm_sample_characteristics_ch2,trim($temp_arr[1])); 
+        }
         if (($line =~ m/^\!Sample_treatment_protocol_ch1 = /) ||
 	    ($line =~ m/^\!Sample_growth_protocol_ch1 = /))
+	{
+	    push(@gsm_protocols_array,trim($line));
+	}
+        if (($line =~ m/^\!Sample_treatment_protocol_ch2 = /) ||
+	    ($line =~ m/^\!Sample_growth_protocol_ch2 = /))
 	{
 	    push(@gsm_protocols_array,trim($line));
 	}
@@ -1604,6 +1673,11 @@ sub parse_gse_sample_portion
 	{
 	    my @temp_arr = split(/\s*=\s*/,$line);
             $gsm_sample_organism = trim($temp_arr[1]);
+	}
+	if ($line =~ m/^\!Sample_organism_ch2 = /)
+	{
+	    my @temp_arr = split(/\s*=\s*/,$line);
+            $gsm_sample_organism_ch2 = trim($temp_arr[1]);
 	}
         if ($line =~ m/^\!Sample_contact_email = /) 
         { 
@@ -1718,18 +1792,39 @@ sub parse_gse_sample_portion
 	} 
     } 
     #print "\nMOLECULE HASH : \n".Dumper(\%gsm_molecule_hash)."\n";
+    my $numerical_interpretation = "Log2 level intensities";
     if (scalar(keys(%gsm_molecule_hash)) == 2)
     {
         if (defined($gsm_molecule_hash{"!Sample_molecule_ch2"}))
         {
-	    if ($gsm_molecule_hash{"!Sample_molecule_ch2"} ne "Genomic DNA")
+	    $gsm_molecule .= "/" . $gsm_molecule_hash{"!Sample_molecule_ch2"};
+#print "\nCHANNEL 2 MOLECULE : ". $gsm_molecule_hash{"!Sample_molecule_ch2"} . "\n";
+	    if (lc($gsm_molecule_hash{"!Sample_molecule_ch2"}) ne "genomic dna")
 	    {
-		push(@{$gsm_hash{$gsm_id}->{"errors"}},
-		     "This is a 2 channel array with the 2nd array not being Genomic DNA.  This suggests log ratio and not log level values.");
+		if ((lc($gsm_molecule_hash{"!Sample_molecule_ch2"})) ne (lc($gsm_molecule_hash{"!Sample_molecule_ch1"})))
+		{
+		    push(@{$gsm_hash{$gsm_id}->{"errors"}},
+			 "This is a 2 channel array.  The 2nd channel is not Genomic DNA and not the same molecule type as channel 1(not a ratio)");
+		}
+		else
+		{
+		    $numerical_interpretation = "Log2 level ratios";
+		    unshift(@gsm_sample_characteristics,"Ch1_Characteristics");
+		    push(@gsm_sample_characteristics,"Ch2_Characteristics");
+		    push(@gsm_sample_characteristics,@gsm_sample_characteristics_ch2);
+		}
 	    }
 	    else
 	    {
-		$gsm_molecule .= "/" . $gsm_molecule_hash{"!Sample_molecule_ch2"};
+		$numerical_interpretation = "Log2 level ratios genomic DNA control";
+		unshift(@gsm_sample_characteristics,"Ch1_Characteristics");
+		push(@gsm_sample_characteristics,"Ch2_Characteristics");
+		push(@gsm_sample_characteristics,@gsm_sample_characteristics_ch2);
+	    }
+	    if (defined($gsm_sample_organism_ch2)  && ($gsm_sample_organism ne $gsm_sample_organism_ch2))
+	    {
+		push(@{$gsm_hash{$gsm_id}->{"warnings"}},
+		     "The organism in channel 1 $gsm_sample_organism does not equal the organism in channel 2 $gsm_sample_organism_ch2 ."); 
 	    }
         }
         else 
@@ -1744,12 +1839,12 @@ sub parse_gse_sample_portion
     { 
         push(@{$gsm_hash{$gsm_id}->{"errors"}},"The sample has no tax id.  Will not be able to get feature ids for this.");
     } 
+    $gsm_hash{$gsm_id}->{"numerical_interpretation"}=$numerical_interpretation; 
     $gsm_hash{$gsm_id}->{"gsmTaxID"}=$gsm_tax_id; 
     $gsm_hash{$gsm_id}->{"gsmSampleOrganism"}=$gsm_sample_organism;
     $gsm_hash{$gsm_id}->{"gsmSampleCharacteristics"}=\@gsm_sample_characteristics;
     my $gsm_protocol = join(' :: ',sort(@gsm_protocols_array));
     $gsm_hash{$gsm_id}->{"gsmProtocol"}=$gsm_protocol;
-
 
     #Get Contact person info 
     unless(defined($gsm_contact_email)) 
@@ -1857,23 +1952,26 @@ sub parse_gse_sample_portion
 	    return \%gsm_hash;
 	}
         my ($gsm_data_hash_ref,$gsm_value_type,$temp_gsm_value_errors_ref) = 
-	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,\@sample_data_lines);
+	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,$gsm_hash{$gsm_id}->{"numerical_interpretation"},\@sample_data_lines);
 
-        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
-                               { RaiseError => 1, ShowErrorStatement => 1 }
-            ); 
+#        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
+#                               { RaiseError => 1, ShowErrorStatement => 1 }
+#            ); 
 	my $were_representatives_used_q = qq^select count(*)
 	                                     from Feature f inner join Encompasses c2m on f.id = c2m.to_link
                                              inner join Encompasses m2l on c2m.from_link = m2l.to_link
                                              where substring_index(f.id, '.', 2) = ? 
                                              and f.feature_type = 'CDS'^;
 #print "\n\nQUERY : \n".$were_representatives_used_q ."\nGenomes:".join("  ",@genomes_with_data)."\n\n";
-	my $were_representatives_used_qh = $dbh->prepare($were_representatives_used_q) or die "Unable to prepare were_representatives_used : ".$were_representatives_used_q . ":".$dbh->errstr();
+#	my $were_representatives_used_qh = $dbh->prepare($were_representatives_used_q) or die "Unable to prepare were_representatives_used : ".
+#	    $were_representatives_used_q . ":".$dbh->errstr();
+        my $were_representatives_used_qh = $self->{get_dbh}->()->prepare($were_representatives_used_q)
+                or die "could not prepare $were_representatives_used_q, $DBI::errstr";
 
 	my %genomes_with_data = %{$gsm_data_hash_ref};
         foreach my $temp_genome_id (keys(%{$gsm_data_hash_ref}))
         {
-	    my $processing_comments = "Imported using KBase GEO Importer. ";
+	    my $processing_comments = "Imported using KBase GEO Importer ". $self->{version} .".";
 	    if (defined($genomes_with_data{$temp_genome_id}))
 	    {
 		$were_representatives_used_qh->execute($temp_genome_id)or die "Unable to execute were_representatives_used : ".$were_representatives_used_q . ":".$were_representatives_used_qh->errstr();
@@ -1922,10 +2020,10 @@ sub parse_sample_data
 {
     my $gsm_id = shift;
     my $genome_probe_feature_hash_ref = shift;
+    my $numerical_interpretation = shift;
     my $lines_ref = shift;
 
     my %genome_probe_feature_hash = %{$genome_probe_feature_hash_ref}; #key {$genome_id->{probe id from platform => feature_id}
-
     my @lines = @{$lines_ref};  #Lines of data section plus value information as well other potential column headers
     my $gsm_mapping_hash_key = $gsm_id; 
 
@@ -2082,7 +2180,7 @@ sub parse_sample_data
 	}
 
 	#DO sanity checks on the high and low to see if the ranges are reasonable
-	my ($pass_max_range,$pass_min_range) = data_value_sanity_checks($gsm_treatment,$max_seen_value,$min_seen_value);
+	my ($pass_max_range,$pass_min_range) = data_value_sanity_checks($gsm_treatment,$numerical_interpretation,$max_seen_value,$min_seen_value);
 	if ($pass_max_range == 0)
 	{
 	    push(@data_value_errors,"The data value range for $gsm_id in genome $genome_id is too large to be reasonable");
@@ -2170,60 +2268,120 @@ sub data_value_sanity_checks
 {
     # Loose Sanity check for data values (max compared to min)
     # Range (Max to Min) of values within a GSM seem off - 
+    # IF Log2 level intensities then use the following
     # Log 2 (Difference from Max and Min should be between 1.8 and 23)
     # Log 10 (Difference from Max and Min should be between 0.542 and 6.924)
     # ln (natural log) (Difference from Max and Min should be between 1.248 and 15.942)
-    # Intensity (max/min) should be greater than 3.482 
+    # Intensity (max/min) should be greater than 3.482
+    #
+    # IF Log2 level ratios (with or without DNA control) then use the following
+    # Log 2 (Difference from Max and Min should be between 1.8 and 30)
+    # Log 10 (Difference from Max and Min should be between 0.542 and 6.924)
+    # ln (natural log) (Difference from Max and Min should be between 1.248 and 15.942)
+    # Intensity (max/min) should be greater than 3.482
+ 
     
     my $value_treatment = shift;
+    my $numerical_interpretation = shift;
     my $max_value = shift;
     my $min_value = shift;
     my $pass_max_range = 1;
     my $pass_min_range = 1;
 
-    if($value_treatment eq "intensity")
+
+    if ($numerical_interpretation eq "Log2 level intensities")
     {
-	#Max Sanity is automatically ok for intensity as if background is subtracted out it may have a huge multiple.                
-	if ($min_value == 0)
+	if($value_treatment eq "intensity")
 	{
-	    $min_value = .001;
+	    #Max Sanity is automatically ok for intensity as if background is subtracted out it may have a huge multiple.                
+	    if ($min_value == 0)
+	    {
+		$min_value = .001;
+	    }
+	    if (($max_value/$min_value) < 3.482 )
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    }
+	    #Max Sanity is automatically ok for intensity as if background is subtracted out it may have a huge multiple.
 	}
-        if (($max_value/$min_value) < 3.482 )
-        {#means the range is too small
-	    $pass_min_range = 0; 
-        }
-        #Max Sanity is automatically ok for intensity as if background is subtracted out it may have a huge multiple.
+	elsif($value_treatment eq "log2"){
+	    if (($max_value - $min_value) > 23)
+	    {#means the range is too large
+		
+		$pass_max_range = 0; 
+	    }
+	    elsif (($max_value - $min_value) < 1.8)
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    }
+	}
+	elsif($value_treatment eq "log10"){
+	    if (($max_value - $min_value) > 6.924)
+	    {#means the range is too large
+		$pass_max_range = 0; 
+	    }
+	    elsif (($max_value - $min_value) < 0.542)
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    }
+	}
+	elsif($value_treatment eq "ln"){
+	    if (($max_value - $min_value) > 15.942)
+	    {#means the range is too large
+		$pass_max_range = 0; 
+	    }
+	    elsif (($max_value - $min_value) < 1.248)
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    } 
+	}
     }
-    elsif($value_treatment eq "log2"){
-	if (($max_value - $min_value) > 23)
-        {#means the range is too large
-        
-	    $pass_max_range = 0; 
-        }
-        elsif (($max_value - $min_value) < 1.8)
-        {#means the range is too small
-	    $pass_min_range = 0; 
-        }
-    }
-    elsif($value_treatment eq "log10"){
-	if (($max_value - $min_value) > 6.924)
-        {#means the range is too large
-	    $pass_max_range = 0; 
-        }
-        elsif (($max_value - $min_value) < 0.542)
-        {#means the range is too small
-	    $pass_min_range = 0; 
-        }
-    }
-    elsif($value_treatment eq "ln"){
-	if (($max_value - $min_value) > 15.942)
-        {#means the range is too large
-	    $pass_max_range = 0; 
-        }
-        elsif (($max_value - $min_value) < 1.248)
-        {#means the range is too small
-	    $pass_min_range = 0; 
-        } 
+    else
+    {
+	if($value_treatment eq "intensity")
+	{
+	    #Max Sanity is automatically ok for intensity as if background is subtracted out it may have a huge multiple.                
+	    if ($min_value == 0)
+	    {
+		$min_value = .001;
+	    }
+	    if (($max_value/$min_value) < 3.482 )
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    }
+	    #Max Sanity is automatically ok for intensity as if background is subtracted out it may have a huge multiple.
+	}
+	elsif($value_treatment eq "log2"){
+	    if (($max_value - $min_value) > 30)
+	    {#means the range is too large
+		
+		$pass_max_range = 0; 
+	    }
+	    elsif (($max_value - $min_value) < 1.8)
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    }
+	}
+	elsif($value_treatment eq "log10"){
+	    if (($max_value - $min_value) > 9.031)
+	    {#means the range is too large
+		$pass_max_range = 0; 
+	    }
+	    elsif (($max_value - $min_value) < 0.542)
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    }
+	}
+	elsif($value_treatment eq "ln"){
+	    if (($max_value - $min_value) > 20.7944)
+	    {#means the range is too large
+		$pass_max_range = 0; 
+	    }
+	    elsif (($max_value - $min_value) < 1.248)
+	    {#means the range is too small
+		$pass_min_range = 0; 
+	    } 
+	}
     }
     return ($pass_max_range,$pass_min_range);
 }#End data_value_sanity_checks

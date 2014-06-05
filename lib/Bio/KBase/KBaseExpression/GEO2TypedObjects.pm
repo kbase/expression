@@ -1,4 +1,4 @@
-package Bio::KBase::KBaseExpression::GEO2TypedObjects;
+package Bio::KBase::KBaseExpression::GEO2TypedObjectsRatio;
 use strict;
 use Statistics::Descriptive;
 #use Bio::KBase::Exceptions;
@@ -71,9 +71,9 @@ sub new
         } 
         else 
         { 
-            $self->{dbName} = 'kbase_sapling_v3_dev';
+            $self->{dbName} = 'kbase_sapling_v3';
             $self->{dbUser} = 'kbase_sapselect'; 
-            $self->{dbhost} = 'db4.chicago.kbase.us';
+            $self->{dbhost} = 'db3.chicago.kbase.us';
             $self->{dbPwd} = 'oiwn22&dmwWEe'; 
 #            $self->{dbName} = 'expression'; 
 #            $self->{dbUser} = 'expressionselect'; 
@@ -87,9 +87,9 @@ sub new
     } 
     else 
     { 
-	$self->{dbName} = 'kbase_sapling_v3_dev';
+	$self->{dbName} = 'kbase_sapling_v3';
 	$self->{dbUser} = 'kbase_sapselect'; 
-	$self->{dbhost} = 'db4.chicago.kbase.us';
+	$self->{dbhost} = 'db3.chicago.kbase.us';
 	$self->{dbPwd} = 'oiwn22&dmwWEe'; 
 #         $self->{dbName} = 'expression'; 
 #         $self->{dbUser} = 'expressionselect';
@@ -277,8 +277,8 @@ sub geo2TypedObjects
 			my $get_genome_ids_q = "select distinct g.id from Genome g left outer join ". 
                                    "IsTaxonomyOf it on it.to_link = g.id left outer join ". 
                                    "TaxonomicGrouping tg on tg.id = it.from_link ".
-                                   "where tg.scientific_name in (".
-                                   join(",", ("?") x @ncbi_scientific_names) . ") ".
+                                   "where (tg.scientific_name in (".
+                                   join(",", ("?") x @ncbi_scientific_names) . ") and it.confidence >= 2) ".
                                    "or g.scientific_name in (". 
                                    join(",", ("?") x @ncbi_scientific_names) . ") ";
 
@@ -400,7 +400,13 @@ sub geo2TypedObjects
             {
 		#grab shared sample object data
                 my $gsm_type = "microarray";
-		my $gsm_numerical_interpretation = "Log2 level intensities";
+#		my $gsm_numerical_interpretation = "Log2 level intensities";
+		my $gsm_numerical_interpretation;
+		if(exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'}) && 
+		   ($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'} ne "")) 
+		{
+		    $gsm_numerical_interpretation = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'};
+		}
 		my $gsm_description = "";
 		if(exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'}) &&
 		   ($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'} ne ""))
@@ -430,6 +436,15 @@ sub geo2TypedObjects
 		    $gsm_protocol = {"name"=>$gsm_protocol_name,
 				    "description"=>$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmProtocol'}};
 		}
+
+		#Characteristics
+		my $gsm_characteristics = "";
+		my @gsm_characteristics_list = @{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmSampleCharacteristics'}};
+		if (scalar(@gsm_characteristics_list) > 0)
+		{
+		    $gsm_characteristics = join(":: ",@gsm_characteristics_list);
+		}
+
                 #Persons
                 my @persons;
                 foreach my $person_email (keys(%{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'contactPeople'}}))
@@ -507,6 +522,10 @@ sub geo2TypedObjects
 			    push(@new_sample_id_array,$temp_kbase_id); 
 			}
 			$passing_gsm_count++;
+		    }
+		    elsif (scalar(@{$gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmData'}->{$temp_genome_id}->{'errors'}}) > 0)
+		    {
+			#DO NOTHING as the GSM and genome combination has an error.  No sample gets made.
 		    }
 		    else
 		    {
@@ -614,6 +633,11 @@ sub geo2TypedObjects
 			{
 			    $sample_object_ref->{"processing_comments"}=$gsm_processing_comments;
 			}
+			if ($gsm_characteristics)
+			{
+			    $sample_object_ref->{"characteristics"}=$gsm_characteristics;
+			}
+
 			#Write out object
 			#CREATE JSON OBJECT FILE          
 			my $temp_sample_file_name = $sample_kb_id; 
