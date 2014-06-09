@@ -776,9 +776,9 @@ sub parse_platform_synonyms
 		    my @line_elements = split(/\t/,$line); 
 		    foreach my $line_element (@line_elements)
 		    {
-			if (defined($synonyms_lookup{trim($line_element)}))
+			if (defined($synonyms_lookup{lc(trim($line_element))}))
 			{
-			    my $num_feature_elements = scalar(keys(%{$synonyms_lookup{trim($line_element)}}));
+			    my $num_feature_elements = scalar(keys(%{$synonyms_lookup{lc(trim($line_element))}}));
 			    if ($num_feature_elements == 1)
 			    {
 				$column_single_synonym_count_hash{$element_counter}++;
@@ -824,13 +824,13 @@ sub parse_platform_synonyms
 			foreach my $line (@lines)
 			{
 			    my @line_elements = split(/\t/,$line); 
-			    if (defined($synonyms_lookup{trim($line_elements[$max_col_index])}))
+			    if (defined($synonyms_lookup{lc(trim($line_elements[$max_col_index]))}))
 			    {
-				my %feature_id_hash = %{$synonyms_lookup{trim($line_elements[$max_col_index])}};
+				my %feature_id_hash = %{$synonyms_lookup{lc(trim($line_elements[$max_col_index]))}};
 				my %source_hash;  #key is source of alias, need to do this to properly count aliases that were mapped to the wrong level.
 				foreach my $feature_id (keys(%feature_id_hash))
 				{
-				    my @external_dbs = keys(%{$synonyms_lookup{trim($line_elements[$max_col_index])}->{$feature_id}});
+				    my @external_dbs = keys(%{$synonyms_lookup{lc(trim($line_elements[$max_col_index]))}->{$feature_id}});
 				    foreach my $external_db (@external_dbs)
 				    {
 					$source_hash{$external_db}=1;
@@ -864,9 +864,9 @@ sub parse_platform_synonyms
 			{
 			    #map id_col to features
 			    my @line_elements = split(/\t/,$line); 
-			    if (defined($synonyms_lookup{trim($line_elements[$max_col_index])}))
+			    if (defined($synonyms_lookup{lc(trim($line_elements[$max_col_index]))}))
                             { 
-				my %feature_id_hash = %{$synonyms_lookup{trim($line_elements[$max_col_index])}}; 
+				my %feature_id_hash = %{$synonyms_lookup{lc(trim($line_elements[$max_col_index]))}}; 
 				if (scalar(keys(%feature_id_hash)) == 1)
 				{
 				    my ($feature_id) = keys(%feature_id_hash);
@@ -878,7 +878,7 @@ sub parse_platform_synonyms
 				    my $max_source_count = 0;
 				    foreach my $feature_id (keys(%feature_id_hash)) 
 				    {
-					my @external_dbs = keys(%{$synonyms_lookup{trim($line_elements[$max_col_index])}->{$feature_id}}); 
+					my @external_dbs = keys(%{$synonyms_lookup{lc(trim($line_elements[$max_col_index]))}->{$feature_id}}); 
 					foreach my $external_db (@external_dbs) 
 					{
 					    if ($external_db == $max_external_db)
@@ -911,7 +911,7 @@ sub parse_platform_synonyms
 				    {
 					foreach my $feature_id (keys(%feature_id_hash)) 
 					{
-					    my @external_dbs = keys(%{$synonyms_lookup{trim($line_elements[$max_col_index])}->{$feature_id}}); 
+					    my @external_dbs = keys(%{$synonyms_lookup{lc(trim($line_elements[$max_col_index]))}->{$feature_id}}); 
 					    foreach my $external_db (@external_dbs) 
 					    {
 						if ($external_db == $max_external_db)
@@ -1187,14 +1187,14 @@ sub create_genome_synonyms_lookup
  
 	foreach my $alias_hash_ref (@aliases_CDS) 
 	{ 
-	    my $alias = $alias_hash_ref->{'alias'}; 
+	    my $alias = lc($alias_hash_ref->{'alias'}); 
 	    my $source = $alias_hash_ref->{'source_db'}; 
 	    my $feature_id = $alias_hash_ref->{'kbase_id'}; 
 	    $alias_mappings_ref->{$alias}->{$feature_id}->{$source} = 1; 
 	} 
 	foreach my $alias_hash_ref (@aliases_mRNA) 
 	{ 
-	    my $alias = $alias_hash_ref->{'alias'}; 
+	    my $alias = lc($alias_hash_ref->{'alias'}); 
 	    my $source = $alias_hash_ref->{'source_db'}; 
 	    my $feature_id = $mRNA_to_cds_hash{$alias_hash_ref->{'kbase_id'}}; 
 	    if ($feature_id ne '')
@@ -1204,7 +1204,7 @@ sub create_genome_synonyms_lookup
 	} 
 	foreach my $alias_hash_ref (@aliases_locus) 
 	{ 
-	    my $alias = $alias_hash_ref->{'alias'}; 
+	    my $alias = lc($alias_hash_ref->{'alias'}); 
 	    my $source = $alias_hash_ref->{'source_db'}; 
 	    my $feature_id = $locus_to_cds_hash{$alias_hash_ref->{'kbase_id'}}; 
 	    if ($feature_id ne '')
@@ -1214,7 +1214,6 @@ sub create_genome_synonyms_lookup
 	}
 	$genome_lookups_return_hash{$genome_id}=$alias_mappings_ref;
     }
-
     return \%genome_lookups_return_hash;
 }
 
