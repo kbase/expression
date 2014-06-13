@@ -590,7 +590,7 @@ sub geo2TypedObjects
                         # and "averaged_from_samples" are not set by this (those are custom fields that require users to set that data)
 			$dataQualityLevel = $dataQualityLevel + 0;#To coerce back to an integer
 			my $sample_object_ref = {"id" =>$sample_kb_id,
-						 "source_id" => $gsm_id,
+						 "source_id" => $sample_id_key . "___" . $gsm_id,
 						 "type"=>$gsm_type,
 						 "numerical_interpretation"=>$gsm_numerical_interpretation,
 						 "title"=>$gsm_title,
