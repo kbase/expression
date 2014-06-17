@@ -16,8 +16,9 @@ my $usage = "This command requires a db_user and db_pwd for inserting the ontolo
      && @ARGV == 0) || die $usage;
 die $usage if ((!defined $db_user) || (!defined $db_pwd) || (!defined $db_name));
 
-my %ontology_databases = ("Plant Ontology" => "http://palea.cgrb.oregonstate.edu/viewsvn/Poc/tags/live/plant_ontology.obo?view=co",
-			  "Plant Environmental Ontology" => "http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/phenotype/environment/environment_ontology.obo",
+my %ontology_databases = (
+			  "Plant Ontology" => "http://palea.cgrb.oregonstate.edu/viewsvn/Poc/trunk/ontology/OBO_format/plant_ontology.obo",
+			  "Plant Environmental Ontology" => "http://palea.cgrb.oregonstate.edu/viewsvn/Poc/trunk/ontology/collaborators_ontology/plant_environment/environment_ontology.obo",
 			  "Microbial Environmental Ontology" => "http://www.berkeleybop.org/ontologies/envo/subsets/envo-basic.obo");
 #OLD ENVO site  "http://envo.googlecode.com/svn/trunk/src/envo/envo-basic.obo");
 
