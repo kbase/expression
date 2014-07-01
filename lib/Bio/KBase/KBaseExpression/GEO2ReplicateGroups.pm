@@ -216,7 +216,31 @@ sub geo2ReplicateGroups
 #		my $kb_rep_group_id = $replicate_group_prefix .".".$id_server->allocate_id_range( $replicate_group_prefix, 1 ); 
 #next three lines for real ids (comment out above two lines)
                 my $replicate_group_prefix = "kb|repGroup";                                                                          
-                my $temp_id_hash_ref = $id_server->register_ids($replicate_group_prefix,"KB",[$replicate_group_key]);                            
+		my $temp_id_hash_ref; 
+		my $id_counter_try = 0; 
+		while (! defined $temp_id_hash_ref) 
+		{ 
+		    eval 
+		    { 
+			$temp_id_hash_ref = $id_server->register_ids($replicate_group_prefix,"KB",[$replicate_group_key]);
+		    }; 
+		    if ($@) 
+		    { 
+			my $msg = $@; 
+			if ($id_counter_try < 20 && $msg =~ /500\s+Internal\s+Server\s+Error/i) 
+			{ 
+			    print "Retrying ID server call.\n"; 
+			    $id_counter_try++; 
+			    sleep 1; 
+			} 
+			else 
+			{ 
+			    print "ID server error ($id_counter_try retries): $msg\n"; 
+			    print "ID server call: $replicate_group_prefix, KB , $replicate_group_key  \n ";
+			    die "ID server failed."; 
+			} 
+		    } 
+		} 
                 my $kb_rep_group_id = $temp_id_hash_ref->{$replicate_group_key}; 
  
 		#make replicate group data structure

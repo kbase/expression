@@ -339,7 +339,30 @@ sub geo2TypedObjects
 #			my $kb_gpl_id = $platform_prefix .".".$id_server->allocate_id_range( $platform_prefix, 1 );
 #Next three lines for real
 			my $platform_prefix = "kb|platform";
-			my $temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
+			my $temp_id_hash_ref;
+			my $id_counter_try = 0;
+			while (! defined $temp_id_hash_ref)
+			{
+			    eval {
+				$temp_id_hash_ref = $id_server->register_ids($platform_prefix,"GEO",[$gpl_id]); 
+			    };
+			    if ($@)
+			    {
+				my $msg = $@;
+				if ($id_counter_try < 20 && $msg =~ /500\s+Internal\s+Server\s+Error/i) 
+				{
+				    print "Retrying ID server call.\n";
+				    $id_counter_try++;
+				    sleep 1;
+				} 
+				else 
+				{
+				    print "ID server error ($id_counter_try retries): $msg\n";
+				    print "ID server call: $platform_prefix, GEO , $gpl_id \n";
+				    die "ID server failed.";
+				}
+			    }
+			}
 			my $kb_gpl_id = $temp_id_hash_ref->{$gpl_id};
                         $gpl_object_hash{$gpl_id}={"id" =>$kb_gpl_id,
 						   "source_id" => $gpl_id,
@@ -568,7 +591,31 @@ sub geo2TypedObjects
 #Next four lines for real                        
 			my $sample_prefix = "kb|sample";#
 			my $sample_id_key = "GEO::".$gsm_id."::".$temp_genome_id."::".$dataQualityLevel;
-                        my $temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
+			my $temp_id_hash_ref;
+			my $id_counter_try = 0;
+			while (! defined $temp_id_hash_ref)
+			{
+			    eval
+			    {
+				$temp_id_hash_ref = $id_server->register_ids($sample_prefix,"GEO",[$sample_id_key]);
+			    };
+			    if ($@) 
+			    {
+				my $msg = $@;
+				if ($id_counter_try < 20 && $msg =~ /500\s+Internal\s+Server\s+Error/i) 
+				{
+				    print "Retrying ID server call.\n";
+				    $id_counter_try++;
+				    sleep 1;
+				} 
+				else 
+				{
+				    print "ID server error ($id_counter_try retries): $msg\n";
+				    print "ID server call: $sample_prefix, GEO $sample_id_key  \n ";
+				    die "ID server failed.";
+				}
+			    }
+			}
                         my $sample_kb_id = $temp_id_hash_ref->{$sample_id_key};
 
 			#add sample_kb_id to gse_list
@@ -760,7 +807,31 @@ sub geo2TypedObjects
 #	    $series_id = $series_prefix .".".$id_server->allocate_id_range( $series_prefix, 1 );
 #Next three lines for real                        
 	    my $series_prefix = "kb|series";
-	    my $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
+	    my $temp_id_hash_ref;
+	    my $id_counter_try = 0;
+	    while (! defined $temp_id_hash_ref)
+	    { 
+		eval
+		{ 
+		    $temp_id_hash_ref = $id_server->register_ids($series_prefix,"GEO",[$gse_object_ref->{'gseID'}]);
+		}; 
+		if ($@) 
+		{
+		    my $msg = $@; 
+		    if ($id_counter_try < 20 && $msg =~ /500\s+Internal\s+Server\s+Error/i) 
+		    {
+			print "Retrying ID server call.\n"; 
+			$id_counter_try++;
+			sleep 1;
+		    } 
+		    else 
+		    {
+			print "ID server error ($id_counter_try retries): $msg\n";
+			print "ID server call: $series_prefix, GEO, ".$gse_object_ref->{'gseID'}."  \n "; 
+			die "ID server failed.";
+		    }
+		}
+	    }
 	    $series_id = $temp_id_hash_ref->{$gse_object_ref->{'gseID'}};
 
             #resolve result
