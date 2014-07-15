@@ -341,9 +341,13 @@ module KBaseExpression {
     {sample_id -> expressionSampleDataStructure}*/
     funcdef get_expression_samples_data(sample_ids sample_ids) returns (expression_data_samples_map expression_data_samples_map);
 
-    /* given a list of sample ids and feature ids it returns a LabelDataMapping {sampleID}->{featureId => value}}.  
-	If feature list is an empty array [], all features with measurment values will be returned. */
-    funcdef get_expression_data_by_samples_and_features(sample_ids sample_ids, feature_ids feature_ids) returns (label_data_mapping label_data_mapping);
+    /* given a list of sample ids and feature ids and the string of what type of numerical interpretation it returns a LabelDataMapping {sampleID}->{featureId => value}}. 
+        If sample id list is an empty array [], all samples with that feature measurment values will be returned.
+	If feature list is an empty array [], all features with measurment values will be returned. 
+        Both sample id list and feature list can not be empty, one of them must have a value.
+	Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'
+	*/
+    funcdef get_expression_data_by_samples_and_features(sample_ids sample_ids, feature_ids feature_ids, string numerical_interpretation) returns (label_data_mapping label_data_mapping);
 
     /* given a list of SeriesIDs returns mapping of SeriesID to expressionDataSamples : {series_id -> {sample_id -> expressionSampleDataStructure}}*/
     funcdef get_expression_samples_data_by_series_ids(series_ids series_ids) returns (series_expression_data_samples_mapping series_expression_data_samples_mapping);

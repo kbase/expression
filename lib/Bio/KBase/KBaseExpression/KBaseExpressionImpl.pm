@@ -518,7 +518,7 @@ sub get_expression_samples_data
 
 =head2 get_expression_data_by_samples_and_features
 
-  $label_data_mapping = $obj->get_expression_data_by_samples_and_features($sample_ids, $feature_ids)
+  $label_data_mapping = $obj->get_expression_data_by_samples_and_features($sample_ids, $feature_ids, $numerical_interpretation)
 
 =over 4
 
@@ -529,6 +529,7 @@ sub get_expression_samples_data
 <pre>
 $sample_ids is a KBaseExpression.sample_ids
 $feature_ids is a KBaseExpression.feature_ids
+$numerical_interpretation is a string
 $label_data_mapping is a KBaseExpression.label_data_mapping
 sample_ids is a reference to a list where each element is a KBaseExpression.sample_id
 sample_id is a string
@@ -546,6 +547,7 @@ measurement is a float
 
 $sample_ids is a KBaseExpression.sample_ids
 $feature_ids is a KBaseExpression.feature_ids
+$numerical_interpretation is a string
 $label_data_mapping is a KBaseExpression.label_data_mapping
 sample_ids is a reference to a list where each element is a KBaseExpression.sample_id
 sample_id is a string
@@ -562,8 +564,11 @@ measurement is a float
 
 =item Description
 
-given a list of sample ids and feature ids it returns a LabelDataMapping {sampleID}->{featureId => value}}.  
-If feature list is an empty array [], all features with measurment values will be returned.
+given a list of sample ids and feature ids and the string of what type of numerical interpretation it returns a LabelDataMapping {sampleID}->{featureId => value}}. 
+If sample id list is an empty array [], all samples with that feature measurment values will be returned.
+If feature list is an empty array [], all features with measurment values will be returned. 
+Both sample id list and feature list can not be empty, one of them must have a value.
+Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'
 
 =back
 
@@ -572,11 +577,12 @@ If feature list is an empty array [], all features with measurment values will b
 sub get_expression_data_by_samples_and_features
 {
     my $self = shift;
-    my($sample_ids, $feature_ids) = @_;
+    my($sample_ids, $feature_ids, $numerical_interpretation) = @_;
 
     my @_bad_arguments;
     (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
     (ref($feature_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"feature_ids\" (value was \"$feature_ids\")");
+    (!ref($numerical_interpretation)) or push(@_bad_arguments, "Invalid type for argument \"numerical_interpretation\" (value was \"$numerical_interpretation\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_expression_data_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -587,26 +593,36 @@ sub get_expression_data_by_samples_and_features
     my($label_data_mapping);
     #BEGIN get_expression_data_by_samples_and_features
     $label_data_mapping = {};
-    if (0 == @{$sample_ids}) 
+    if ((0 == @{$sample_ids}) && (0 == @{$feature_ids})) 
     { 
-	my $msg = "get_expression_data_by_samples_and_features requires a list of valid sample ids.  Note that feature ids can be empty.  ".
-	    "If features are empty all features for the sample will be returned";
+	my $msg = "get_expression_data_by_samples_and_features requires a list of valid sample ids or sample ids.  Note that feature ids or sample ids can be empty, but not both.  ".
+	    "If features are empty all features for the sample will be returned.  If samples are empty all samples that match the numerical interpreation and feature ids will be returned.";
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
 							       method_name => 'get_expression_data_by_samples_and_features'); 
     } 
- 
+    if (($numerical_interpretation ne 'FPKM') && ($numerical_interpretation ne 'Log2 level intensities') && 
+	($numerical_interpretation ne 'Log2 level ratios') && ($numerical_interpretation ne 'Log2 level ratios genomic DNA control'))
+    {
+        my $msg = "The numerical_interpretation must be equal to one of the following values 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'.";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+							     method_name => 'get_expression_data_by_samples_and_features'); 
+    }
+
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd},
 			   { RaiseError => 1, ShowErrorStatement => 1 } 
     ); 
 
-    my $get_feature_log2level_q = qq^select sam.id, fea.id, mea.value   
+    my $get_feature_log2level_q = qq^select sam.id, sam.title, fea.id, mea.value   
                                      from Sample sam           
                                      inner join SampleMeasurements sms on sam.id = sms.from_link      
                                      inner join Measurement mea on sms.to_link = mea.id       
                                      inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link      
                                      inner join Feature fea on fmb.from_link = fea.id       
-                                     where sam.id in (^.
-				     join(",", ("?") x @{$sample_ids}). ") ";
+                                     where sam.numerical_interpretation = ? ^;
+    if (scalar(@{$sample_ids}) > 0)
+    {
+	$get_feature_log2level_q .= qq^ and sam.id in (^. join(",", ("?") x @{$sample_ids}). ") ";
+    }
     if (scalar(@{$feature_ids}) > 0)
     {
 	$get_feature_log2level_q .= qq^ and fea.id in (^. join(",", ("?") x @{$feature_ids}). ") ";
@@ -614,11 +630,12 @@ sub get_expression_data_by_samples_and_features
 
     my $get_feature_log2level_qh = $dbh->prepare($get_feature_log2level_q) or die "Unable to prepare get_feature_log2level_q : ".
         $get_feature_log2level_q . " : " .$dbh->errstr();
-    $get_feature_log2level_qh->execute(@{$sample_ids},@{$feature_ids})  or die "Unable to execute get_feature_log2level_q : ".
+    $get_feature_log2level_qh->execute($numerical_interpretation, @{$sample_ids}, @{$feature_ids})  or die "Unable to execute get_feature_log2level_q : ".
         $get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr();
-    while(my ($sample_id,$feature_id,$log2level) = $get_feature_log2level_qh->fetchrow_array())
+    while(my ($sample_id, $title, $feature_id,$log2level) = $get_feature_log2level_qh->fetchrow_array())
     { 
-        $label_data_mapping->{$sample_id}->{$feature_id}=$log2level;
+	my $sample_key = $sample_id . "___" . $title;
+        $label_data_mapping->{$sample_key}->{$feature_id}=$log2level;
     } 
 
     #END get_expression_data_by_samples_and_features

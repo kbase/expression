@@ -48,7 +48,7 @@ ok(defined($client),"instantiating KBaseExpression client");
 my $func_calls = { 
                 get_expression_samples_data=>[['kb|sample.3775','kb|sample.3776']], 
 		get_expression_data_by_samples_and_features=>[['kb|sample.3775','kb|sample.3776','kb|sample.3777','kb|sample.3778'], 
-                                       ['kb|g.3899.CDS.35409','kb|g.3899.CDS.35410','kb|g.3899.CDS.35411','kb|g.3899.CDS.35402']], 
+                                       ['kb|g.3899.CDS.35409','kb|g.3899.CDS.35410','kb|g.3899.CDS.35411','kb|g.3899.CDS.35402'],'Log2 level intensities'], 
                 get_expression_samples_data_by_series_ids=>[['kb|series.283','kb|series.284']], 
 		get_expression_sample_ids_by_series_ids=>[['kb|series.283','kb|series.284']], 
 #                get_expression_samples_data_by_experimental_unit_ids=>[['kb|expu.3167770','kb|expu.3167762']],

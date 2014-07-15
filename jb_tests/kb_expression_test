@@ -1,3 +1,6 @@
+
+
+
 use strict;
 use Data::Dumper;
 use Bio::KBase::KBaseExpression::KBaseExpressionClient;
@@ -31,17 +34,17 @@ print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
 #$result = $client->get_expression_samples_data(['kb|sample.3713']);
 #$result = $client->get_expression_samples_data(['kb|sample.3745']);
-$result = $client->get_expression_samples_data(['kb|sample.3775']);
+#$result = $client->get_expression_samples_data(['kb|sample.3775']);
 #$result = $client->get_expression_samples_data(['kb|sample.38','kb|sample.39']);
 #$result = $client->get_expression_samples_data(['kb|sample.50','kb|sample.51']);
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
-#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'],
-#					['kb|g.20848.CDS.1800','kb|g.20848.CDS.1687','kb|g.20848.CDS.180','kb|g.20848.CDS.1085']);
-#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.2','kb|sample.3','kb|sample.7','kb|sample.10'], []); 
-#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.8'], []); 
-#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.52','kb|sample.53'], []); 
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], [], 'Log2 level intensities'); 
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], ['kb|g.3899.CDS.56284','kb|g.3899.CDS.47443'], 'Log2 level intensities'); 
+#$result = $client->get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284','kb|g.3899.CDS.47443'], 'Log2 level intensities'); 
+#$result = $client->get_expression_data_by_samples_and_features([], [], 'Log2 level intensities'); 
+$result = $client->get_expression_data_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], [], 'Bad entry'); 
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\
@@ -106,7 +109,7 @@ print "get_expression_samples_data_by_ontology_ids()\n";
 #$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y'); 
 #$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y'); 
 #$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y'); 
-#$result = $client->get_expression_samples_data_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
+#$result = $client->get_expression_samples_data_by_ontology_ids(['EO:0007174','PO:0000014','PO:0009025'],'and','kb|g.3899','microarray','Y');
 #print Dumper($result) . "\n----------------------------\n"; 
 
 #get_expression_sample_ids_by_ontology_ids
@@ -114,7 +117,8 @@ print "get_expression_sample_ids_by_ontology_ids()\n";
 #$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086'],'or','kb|g.20848','microarray','Y');
 #$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086'],'and','kb|g.20848','microarray','Y');
 #$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'and','kb|g.20848','microarray','Y');
-#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y'); 
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['ENVO:02000086','PO:0030086','PO:0030085'],'or','kb|g.20848','microarray','Y');
+#$result = $client->get_expression_sample_ids_by_ontology_ids(['EO:0007174','PO:0000014','PO:0009025'],'and','kb|g.3899','microarray','Y'); 
 #print Dumper($result) . "\n----------------------------\n";
 
 
