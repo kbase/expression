@@ -1,4 +1,4 @@
-package KBaseExpressionImpl;
+package Bio::KBase::KBaseExpression::KBaseExpressionImpl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
@@ -92,9 +92,9 @@ sub new
 #            $self->{dbName} = 'expression'; 
 #            $self->{dbUser} = 'expressionselect'; 
 #            $self->{dbhost} = 'db1.chicago.kbase.us'; 
-            $self->{dbName} = 'kbase_sapling_v3'; 
+            $self->{dbName} = 'kbase_sapling_v4'; 
             $self->{dbUser} = 'kbase_sapselect'; 
-            $self->{dbhost} = 'db3.chicago.kbase.us'; 
+            $self->{dbhost} = 'db4.chicago.kbase.us'; 
             $self->{dbPwd} = 'oiwn22&dmwWEe'; 
 
 #warn "IN CONFIG ELSE\n"; 
@@ -111,9 +111,9 @@ sub new
 #         $self->{dbName} = 'expression'; 
 #         $self->{dbUser} = 'expressionselect';
 #         $self->{dbhost} = 'db1.chicago.kbase.us'; 
-	$self->{dbName} = 'kbase_sapling_v3'; 
+	$self->{dbName} = 'kbase_sapling_v4'; 
 	$self->{dbUser} = 'kbase_sapselect'; 
-	$self->{dbhost} = 'db3.chicago.kbase.us';
+	$self->{dbhost} = 'db4.chicago.kbase.us';
 	$self->{dbPwd} = 'oiwn22&dmwWEe';  
 #print "IN ELSE\n"; 
     } 
@@ -308,7 +308,7 @@ sub get_expression_samples_data
 							       method_name => 'get_expression_samples_data');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($expression_data_samples_map);
     #BEGIN get_expression_samples_data
     $expression_data_samples_map = {};
@@ -583,7 +583,7 @@ sub get_expression_data_by_samples_and_features
 							       method_name => 'get_expression_data_by_samples_and_features');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($label_data_mapping);
     #BEGIN get_expression_data_by_samples_and_features
     $label_data_mapping = {};
@@ -808,7 +808,7 @@ sub get_expression_samples_data_by_series_ids
 							       method_name => 'get_expression_samples_data_by_series_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($series_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_series_ids
     $series_expression_data_samples_mapping = {};
@@ -929,7 +929,7 @@ sub get_expression_sample_ids_by_series_ids
 							       method_name => 'get_expression_sample_ids_by_series_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_series_ids
     if (0 == @{$series_ids}) 
@@ -1151,7 +1151,7 @@ sub get_expression_samples_data_by_experimental_unit_ids
 							       method_name => 'get_expression_samples_data_by_experimental_unit_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($experimental_unit_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_experimental_unit_ids
     $experimental_unit_expression_data_samples_mapping = {};
@@ -1274,7 +1274,7 @@ sub get_expression_sample_ids_by_experimental_unit_ids
 							       method_name => 'get_expression_sample_ids_by_experimental_unit_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_experimental_unit_ids
     $sample_ids = [];
@@ -1495,7 +1495,7 @@ sub get_expression_samples_data_by_experiment_meta_ids
 							       method_name => 'get_expression_samples_data_by_experiment_meta_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($experiment_meta_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_experiment_meta_ids
     $experiment_meta_expression_data_samples_mapping = {}; 
@@ -1614,7 +1614,7 @@ sub get_expression_sample_ids_by_experiment_meta_ids
 							       method_name => 'get_expression_sample_ids_by_experiment_meta_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_experiment_meta_ids
     $sample_ids = [];
@@ -1840,7 +1840,7 @@ sub get_expression_samples_data_by_strain_ids
 							       method_name => 'get_expression_samples_data_by_strain_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($strain_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_strain_ids
     $strain_expression_data_samples_mapping = {};
@@ -1983,7 +1983,7 @@ sub get_expression_sample_ids_by_strain_ids
 							       method_name => 'get_expression_sample_ids_by_strain_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_strain_ids
     $sample_ids = [];
@@ -2236,7 +2236,7 @@ sub get_expression_samples_data_by_genome_ids
 							       method_name => 'get_expression_samples_data_by_genome_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($genome_expression_data_samples_mapping);
     #BEGIN get_expression_samples_data_by_genome_ids
     $genome_expression_data_samples_mapping = {};
@@ -2394,7 +2394,7 @@ sub get_expression_sample_ids_by_genome_ids
 							       method_name => 'get_expression_sample_ids_by_genome_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_genome_ids
     $sample_ids = [];
@@ -2658,7 +2658,7 @@ sub get_expression_samples_data_by_ontology_ids
 							       method_name => 'get_expression_samples_data_by_ontology_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($ontology_expression_data_sample_mapping);
     #BEGIN get_expression_samples_data_by_ontology_ids
     $ontology_expression_data_sample_mapping = {}; 
@@ -2880,7 +2880,7 @@ sub get_expression_sample_ids_by_ontology_ids
 							       method_name => 'get_expression_sample_ids_by_ontology_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_ontology_ids
     $sample_ids = [];
@@ -3075,7 +3075,7 @@ sub get_expression_data_by_feature_ids
 							       method_name => 'get_expression_data_by_feature_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($feature_sample_measurement_mapping);
     #BEGIN get_expression_data_by_feature_ids
     $feature_sample_measurement_mapping = {};
@@ -3224,7 +3224,7 @@ sub compare_samples
 							       method_name => 'compare_samples');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_comparison_mapping);
     #BEGIN compare_samples
     $sample_comparison_mapping = {};
@@ -3403,7 +3403,7 @@ sub compare_samples_vs_default_controls
 							       method_name => 'compare_samples_vs_default_controls');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_comparison_mapping);
     #BEGIN compare_samples_vs_default_controls
     $sample_comparison_mapping = {};
@@ -3549,7 +3549,7 @@ sub compare_samples_vs_the_average
 							       method_name => 'compare_samples_vs_the_average');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_comparison_mapping);
     #BEGIN compare_samples_vs_the_average
     if((scalar(@{$numerator_sample_ids}) == 0) || (scalar(@{$denominator_sample_ids}) == 0))
@@ -3691,7 +3691,7 @@ sub get_on_off_calls
 							       method_name => 'get_on_off_calls');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($on_off_mappings);
     #BEGIN get_on_off_calls
     if (scalar(keys(%{$sample_comparison_mapping})) == 0)
@@ -3837,7 +3837,7 @@ sub get_top_changers
 							       method_name => 'get_top_changers');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($top_changers_mappings);
     #BEGIN get_top_changers
     if (scalar(keys(%{$sample_comparison_mapping})) == 0) 
@@ -3966,7 +3966,7 @@ sub get_expression_samples_titles
 							       method_name => 'get_expression_samples_titles');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($samples_titles_map);
     #BEGIN get_expression_samples_titles
     $samples_titles_map = {}; 
@@ -4058,7 +4058,7 @@ sub get_expression_samples_descriptions
 							       method_name => 'get_expression_samples_descriptions');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($samples_descriptions_map);
     #BEGIN get_expression_samples_descriptions
     $samples_descriptions_map = {}; 
@@ -4150,7 +4150,7 @@ sub get_expression_samples_molecules
 							       method_name => 'get_expression_samples_molecules');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($samples_molecules_map);
     #BEGIN get_expression_samples_molecules
     $samples_molecules_map = {}; 
@@ -4242,7 +4242,7 @@ sub get_expression_samples_types
 							       method_name => 'get_expression_samples_types');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($samples_types_map);
     #BEGIN get_expression_samples_types
     $samples_types_map = {}; 
@@ -4334,7 +4334,7 @@ sub get_expression_samples_external_source_ids
 							       method_name => 'get_expression_samples_external_source_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($samples_external_source_id_map);
     #BEGIN get_expression_samples_external_source_ids
     $samples_external_source_id_map = {}; 
@@ -4426,7 +4426,7 @@ sub get_expression_samples_original_log2_medians
 							       method_name => 'get_expression_samples_original_log2_medians');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($samples_float_map);
     #BEGIN get_expression_samples_original_log2_medians
     $samples_float_map = {}; 
@@ -4519,7 +4519,7 @@ sub get_expression_series_titles
 							       method_name => 'get_expression_series_titles');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_titles
     $series_string_map = {}; 
@@ -4611,7 +4611,7 @@ sub get_expression_series_summaries
 							       method_name => 'get_expression_series_summaries');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_summaries
     $series_string_map = {}; 
@@ -4703,7 +4703,7 @@ sub get_expression_series_designs
 							       method_name => 'get_expression_series_designs');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_designs
     $series_string_map = {}; 
@@ -4795,7 +4795,7 @@ sub get_expression_series_external_source_ids
 							       method_name => 'get_expression_series_external_source_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($series_string_map);
     #BEGIN get_expression_series_external_source_ids
     $series_string_map = {}; 
@@ -4889,7 +4889,7 @@ sub get_expression_sample_ids_by_sample_external_source_ids
 							       method_name => 'get_expression_sample_ids_by_sample_external_source_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_sample_external_source_ids
     $sample_ids = []; 
@@ -4984,7 +4984,7 @@ sub get_expression_sample_ids_by_platform_external_source_ids
 							       method_name => 'get_expression_sample_ids_by_platform_external_source_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($sample_ids);
     #BEGIN get_expression_sample_ids_by_platform_external_source_ids
     $sample_ids = []; 
@@ -5080,7 +5080,7 @@ sub get_expression_series_ids_by_series_external_source_ids
 							       method_name => 'get_expression_series_ids_by_series_external_source_ids');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($series_ids);
     #BEGIN get_expression_series_ids_by_series_external_source_ids
     $series_ids = []; 
@@ -5307,7 +5307,7 @@ sub get_GEO_GSE
 							       method_name => 'get_GEO_GSE');
     }
 
-    my $ctx = $KBaseExpressionServer::CallContext;
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
     my($gseObject);
     #BEGIN get_GEO_GSE
     $gseObject ={};
