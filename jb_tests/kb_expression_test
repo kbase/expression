@@ -1,6 +1,3 @@
-
-
-
 use strict;
 use Data::Dumper;
 use Bio::KBase::KBaseExpression::KBaseExpressionClient;
@@ -11,6 +8,10 @@ use Bio::KBase::KBaseExpression::KBaseExpressionClient;
 
 #FOR STARMAN
 my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7075");
+
+#FOR TESTING THE DEPLOYED SERVICE
+#my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://kbase.us/services/expression/");
+
 #FOR PLACKUP NOTE WILL HAVE RUN PLACKUP IN ANOTHER WINDOW 
 #(In other window do next 4 lines) and then uncomment 5th line and comment out the above line
 #Log into your instance
