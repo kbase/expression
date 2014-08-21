@@ -486,10 +486,18 @@ module KBaseExpression {
     typedef list<ExpressionOntologyTerm> expression_ontology_terms; 
 
     /*
+       id for the genome
+
+       @id ws KBaseGenomes.Genome
+    */   
+    typedef string kbase_genome_id;  
+
+
+    /*
         Data structure for Strain  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED IN THE FUTURE IN WORKSPACE COMMON)
     */
     typedef structure {
-        genome_id genome_id; 
+        kbase_genome_id genome_id; 
         string reference_strain;
         string wild_type;
         string description;
@@ -508,7 +516,7 @@ module KBaseExpression {
     typedef structure { 
         string id; 
         string source_id;
-        genome_id genome_id;
+        kbase_genome_id genome_id;
         Strain strain; 
         string technology; 
         string title; 
@@ -518,8 +526,6 @@ module KBaseExpression {
        id for the expression platform
 
        @id ws KBaseExpression.ExpressionPlatform
-
-       "ws" may go to "to" in the future
     */
     typedef string expression_platform_id;
 
@@ -535,8 +541,6 @@ module KBaseExpression {
        id for the expression sample
 
        @id ws KBaseExpression.ExpressionSample
-
-       "ws" may go to "to" in the future
     */
     typedef string expression_sample_id;
 
@@ -546,10 +550,9 @@ module KBaseExpression {
     /* list of expression series ids that the sample belongs to : note this can not be a ws_reference because ws does not support bidirectional references */
     typedef list<string> expression_series_ids;
 
-    /* map between genome ids and a list of samples from that genome in this sample */
-    typedef mapping<genome_id genome_id, expression_sample_ids> genome_expression_sample_ids_map; 
+    /* map between genome ids and a list of samples from that genome in this series */
+    typedef mapping<kbase_genome_id genome_id, expression_sample_ids> genome_expression_sample_ids_map; 
     
-
     /* list of Persons */ 
     typedef list<Person> persons;
 
@@ -557,11 +560,12 @@ module KBaseExpression {
        Data structure for the workspace expression sample.  The Expression Sample typed object.
        
        protocol, persons and strain should need to eventually have common ws objects.  I will make expression ones for now.
+       RMA_normalized (1 = true, non 1 = false)
        
        we may need a link to experimentMetaID later.
 
        @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample characteristics
-       @optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids 
+       @optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids RMA_normalized
        
        @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source characteristics keys_of(expression_levels) 
        @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
@@ -580,7 +584,7 @@ module KBaseExpression {
         float original_median;
 	string external_source_date;
         data_expression_levels_for_sample expression_levels; 
-	genome_id genome_id; 
+        kbase_genome_id genome_id; 
         expression_ontology_terms expression_ontology_terms;
         expression_platform_id platform_id; 
         expression_sample_id default_control_sample; 
@@ -594,6 +598,7 @@ module KBaseExpression {
         string processing_comments;
         expression_series_ids expression_series_ids;
         string characteristics;
+        int RMA_normalized;
     } ExpressionSample;
 
     /*
