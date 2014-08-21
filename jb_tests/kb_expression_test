@@ -5,7 +5,6 @@ use Bio::KBase::KBaseExpression::KBaseExpressionClient;
 #use Bio::KBase::KBaseExpression::KBaseExpressionImpl;
 #use Bio::KBase::KBaseExpression::FunctionsForGEO; 
 
-
 #FOR STARMAN
 my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7075");
 
