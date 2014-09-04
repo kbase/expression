@@ -556,6 +556,48 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 	        if (!defined($probe_sequence_warning))
 	        {
 		    #Look for Running Blat Jobs File
+		    my $running_blat_jobs_file = $blat_files_directory."/running_jobs"; 
+		    my $genome_number = $genome_id; 
+		    $genome_number =~ s/kb\|//; 
+		    my $job_gpl_genome = $gplID."_".$genome_number
+		    if (-e $running_blat_jobs)
+                    {
+			#check in running jobs for the gpl_genome combo of interest
+			open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n";
+			my @rbj_file_lines = (<RBJ>); 
+			close(RBJ);
+			$job_found = 0;
+			foreach my $rbj_line (@rbj_file_lines)
+			{
+			    my @rbj_elements = split(/\t/,$rbj_line);
+			    my $rbj_job = $rbj_elements[0];
+			    if ($rbj_job eq $job_gpl_genome)
+			    {
+				$job_found = 1;
+			    }
+			}
+			if ($job_found == 1)
+			{
+			    #NEED to do polling of running jobs, completed jobs, and GPL file.
+			    #If polling take more than 1 day error out
+			    #Get results from GPL File
+                            #update genomes_id_hash setting known results to zero.
+			}
+			else
+			{
+			    #new blat job, make entry into running blat jobs.
+
+
+			}
+		    }
+		    else
+		    {
+			#make file and make entry into it.
+
+		    }
+
+
+
 		    #IF Does Not exist, make the file
 		    #LOOK in file see if the Platform and Genome combination is running
 		    #If Not make entry into the file and start the blat process
