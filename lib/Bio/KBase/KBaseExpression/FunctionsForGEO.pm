@@ -555,6 +555,13 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 #$probe_sequence_warning = "Temporary message to force platform id mapping by synonym";
 	        if (!defined($probe_sequence_warning))
 	        {
+		    #Look for Running Blat Jobs File
+		    #IF Does Not exist, make the file
+		    #LOOK in file see if the Platform and Genome combination is running
+		    #If Not make entry into the file and start the blat process
+		    #If does exist start polling to see if the mapping/platform files exist.(see logic above)
+		    #If polling goes beyond 8 hours error out.
+
 		    #print "\nIN BLAT TRY\n";
 		    #It has a sequence column, prepare a blat_db file and build query file
 		    my $min_probe_length = 500;  #artificially high intial value will get set
@@ -1950,7 +1957,7 @@ sub parse_gse_sample_portion
 	    push(@{$gsm_hash{$gsm_id}->{"errors"}},"No Platform to Feature Map was able to be generated");
 	    return \%gsm_hash;
 	}
-        my ($gsm_data_hash_ref,$gsm_value_type,$temp_gsm_value_errors_ref) = 
+        my ($gsm_data_hash_ref,$gsm_value_type,$rma_normalized_boolean,$temp_gsm_value_errors_ref) = 
 	    parse_sample_data($gsm_id,$genome_probe_feature_hash_ref,$gsm_hash{$gsm_id}->{"numerical_interpretation"},\@sample_data_lines);
 
 #        my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost}, $self->{dbUser}, $self->{dbPwd}, 
@@ -2000,7 +2007,8 @@ sub parse_gse_sample_portion
 	    $gsm_data_hash_ref->{$temp_genome_id}->{"processing_comments"}=$processing_comments;
         }
 	$gsm_hash{$gsm_id}->{"gsmData"}=$gsm_data_hash_ref;
-	$gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type;	
+	$gsm_hash{$gsm_id}->{"gsmValueType"}=$gsm_value_type;
+	$gsm_hash{$gsm_id}->{"rmaNormalized"}=$rma_normalized_boolean;
         push(@{$gsm_hash{$gsm_id}->{"errors"}},@{$temp_gsm_value_errors_ref});
         #print "GSM HASH : ".Dumper(\%gsm_hash);
     } 
@@ -2049,9 +2057,20 @@ sub parse_sample_data
 	#ADD determining of confidence type pValue/Zscore.
     }
 
+    my $rma_normalized_boolean = 0;
     if (defined($gsm_value_type))
     {
-	if (($gsm_value_type =~ m/ log/i)||($gsm_value_type =~ m/^log/i)){
+	if (($gsm_value_type =~ m/[ ]?RMA[\. ]?/) || 
+               ($gsm_value_type =~ m/[ ]?Robust Multichip Average[\. ]?/) || 
+               ($gsm_value_type =~ m/[ ]?robust multichip average[\. ]?/) 
+            ) 
+        { 
+            #May need to include MAS 5 as well.  NOPE MAS 5 can be either in normal or log2 space. 
+            $gsm_value_multiplier = 1; 
+            $gsm_treatment="log2";
+	    $rma_normalized_boolean = 0;
+	}
+	elsif (($gsm_value_type =~ m/ log/i)||($gsm_value_type =~ m/^log/i)){
 	    if (($gsm_value_type =~ m/ log[ _]?10/i) || ($gsm_value_type =~ m/^log[ _]?10/i)){
 		$gsm_value_multiplier = 3.3219;
 		$gsm_treatment="log10";
@@ -2067,12 +2086,8 @@ sub parse_sample_data
 	elsif (($gsm_value_type =~ m/^ln /i) || ($gsm_value_type =~ m/ ln /i)){
 	    $gsm_value_multiplier = 1.4427;
 	    $gsm_treatment="ln";
-	}elsif (($gsm_value_type =~ m/[ ]?RMA[\. ]?/) || ($gsm_value_type =~ m/[ ]?Robust Multichip Average[\. ]?/))
-	{
-	    #May need to include MAS 5 as well.
-	    $gsm_value_multiplier = 1;
-	    $gsm_treatment="log2";
-	}else {#need to take log2 of the value
+	}
+	else {#need to take log2 of the value
 	    $gsm_value_multiplier = 'log2';
 	    $gsm_treatment="intensity";
 	}
@@ -2259,7 +2274,7 @@ sub parse_sample_data
     {
         push(@errors,"None of the Genomes had data that passed the data sanity checks."); 
     }
-    return (\%gsm_data_hash,$gsm_value_type,\@errors);
+    return (\%gsm_data_hash,$gsm_value_type,$rma_normalized_boolean,\@errors);
 }
 #End parse_sample_data
 
