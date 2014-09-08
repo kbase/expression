@@ -611,9 +611,13 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 					$internal_job_found = 1; 
 				    } 
 				} 
-				if ($internal_job_found == 0)
+				if (($internal_job_found == 0) && ($completed_jobs == 0))
 				{
+				    
 				    #means the job should be completed.  Check to see if it is.  Error out if it is not.
+				    #give it another minute to insure it gets here
+				    sleep($timing_interval); 
+				    $total_time = $total_time + $timing_interval; 
 				    if (-e $completed_blat_jobs) 
 				    { 
 					#check in completed jobs for the gpl_genome combo of interest        				    
@@ -633,15 +637,20 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 					if ($completed_job_found == 0)
 					{
 					    #Job Should have been here, error out
+					    die "The Blat job ".$job_gpl_genome. " should have been in the completed blat jobs file : ".
+						$completed_blat_jobs_file . ". It was not.";
 					}
 				    }
 				    else
 				    {
 					#file Should have been here, error out
+					die "The Blat job ".$job_gpl_genome. " should have been in the completed blat jobs file : ".
+					    $completed_blat_jobs_file . ". THE COMPLETED JOBS FILE DOES NOT EXIST.";
 				    }
 				}
-				if ($completed_job_found == 1)
+				elsif ($completed_job_found == 1)
 				{
+
 				    #Check for GPL file
 				    #Get results from GPL File
 				    #update genomes_id_hash setting known results to zero.				    
@@ -665,7 +674,7 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 
 		    }
 
-
+#ALSO NEED TO UPDATE WHEN JOB COMPLETES.
 
 		    #IF Does Not exist, make the file
 		    #LOOK in file see if the Platform and Genome combination is running
