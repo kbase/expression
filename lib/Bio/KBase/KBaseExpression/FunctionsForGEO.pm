@@ -557,6 +557,7 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 	        {
 		    #Look for Running Blat Jobs File
 		    my $running_blat_jobs_file = $blat_files_directory."/running_jobs"; 
+		    my $completed_blat_jobs_file = $blat_files_directory."/completed_jobs"; 
 		    my $genome_number = $genome_id; 
 		    $genome_number =~ s/kb\|//; 
 		    my $job_gpl_genome = $gplID."_".$genome_number
@@ -580,8 +581,76 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 			{
 			    #NEED to do polling of running jobs, completed jobs, and GPL file.
 			    #If polling take more than 1 day error out
-			    #Get results from GPL File
-                            #update genomes_id_hash setting known results to zero.
+			    my $max_threshold = 86400; #Set to 1 day (in seconds)
+			    my $total_time = 0;
+			    my $timing_interval = 60;
+
+			    my $internal_job_found = 1;
+			    my $completed_job_found = 0;
+			    my $gpl_results_file_found = 0;
+
+			    while (($internal_job_found == 1) || ($completed_job_found == 0) || ($gpl_results_file_found == 0))
+			    {
+				sleep($timing_interval);
+				$total_time = $total_time + $timing_interval;
+				if ($total_time > $max_threshold)
+				{
+				    #job is taking too long. Exit out with error message
+
+				}
+				$internal_job_found = 0;
+				open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n"; 
+				my @rbj_file_lines = (<RBJ>); 
+				close(RBJ); 
+				foreach my $rbj_line (@rbj_file_lines) 
+				{ 
+				    my @rbj_elements = split(/\t/,$rbj_line); 
+				    my $rbj_job = $rbj_elements[0]; 
+				    if ($rbj_job eq $job_gpl_genome) 
+				    { 
+					$internal_job_found = 1; 
+				    } 
+				} 
+				if ($internal_job_found == 0)
+				{
+				    #means the job should be completed.  Check to see if it is.  Error out if it is not.
+				    if (-e $completed_blat_jobs) 
+				    { 
+					#check in completed jobs for the gpl_genome combo of interest        				    
+					$completed_job_found = 0; 
+					open (CBJ,$completed_blat_jobs_file) or die "Unable to open the Completed Blat Jobs file : $completed_blat_jobs_file.\n\n";
+					my @cbj_file_lines = (<CBJ>); 
+					close(CBJ); 
+					foreach my $cbj_line (@cbj_file_lines) 
+					{ 
+					    my @cbj_elements = split(/\t/,$cbj_line); 
+					    my $cbj_job = $cbj_elements[0]; 
+					    if ($cbj_job eq $job_gpl_genome) 
+					    { 
+						$completed_job_found = 1; 
+					    } 
+					} 
+					if ($completed_job_found == 0)
+					{
+					    #Job Should have been here, error out
+					}
+				    }
+				    else
+				    {
+					#file Should have been here, error out
+				    }
+				}
+				if ($completed_job_found == 1)
+				{
+				    #Check for GPL file
+				    #Get results from GPL File
+				    #update genomes_id_hash setting known results to zero.				    
+
+
+
+
+				}
+			    }
 			}
 			else
 			{
