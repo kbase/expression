@@ -474,8 +474,13 @@ print "\nGPL FILE $gpl_file EXISTS ALREADY\n";
 print "\nFIRST TIME - Genomes HASH:\n".Dumper(\%genome_ids_hash);
 
             my $need_to_try_new_mappings = 0;
-            foreach my $genome_id (keys(%genome_ids_hash))
-            { 
+#            foreach my $genome_id (keys(%genome_ids_hash))
+#            { 
+	    my @temp_genome_ids = sort(keys(%genome_ids_hash));
+	    for (my $genome_counter = 0; $genome_counter < scalar(@temp_genome_ids) ; $genome_counter++)
+	    {
+		my $genome_id = $temp_genome_ids[$genome_counter];
+
 print "IN LOOP - GENOME ID : $genome_id \n";
                 if ($genome_ids_hash{$genome_id} == 0)
                 {
@@ -650,22 +655,69 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 				}
 				elsif ($completed_job_found == 1)
 				{
-
 				    #Check for GPL file
-				    #Get results from GPL File
-				    #update genomes_id_hash setting known results to zero.				    
-
-
-
-
+				    if (-e $gpl_file) 
+				    { 
+					#Open GPL file get mapping method results (lets you know what genomes you need to grab data for, 
+					#and do not have to attempt to map of genomes in the list)
+					print "\nGPL FILE $gpl_file EXISTS ALREADY\n"; 
+					open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
+					my @gpl_file_lines = (<GPL>); 
+					close(GPL); 
+					foreach my $gpl_file_line (@gpl_file_lines) 
+					{ 
+					    my ($temp_genome_id,$temp_mapping_method) = split('\t',trim($gpl_file_line)); 
+					    $genome_ids_hash{$temp_genome_id} = 0; 
+					    $platform_hash{$gplID}->{"genomesMappingMethod"}->{$temp_genome_id}=$temp_mapping_method; 
+					} 
+				    } 
+				    
+				    $genome_counter = $genome_counter - 1;
+				    
+#				    #Get results from GPL File
+#				    foreach my $genome_id (keys(%genome_ids_hash)) 
+#				    { 
+#					print "IN LOOP - GENOME ID : $genome_id \n"; 
+#					if ($genome_ids_hash{$genome_id} == 0) 
+#					{ 
+#					    if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS") 
+#					    { 
+#                                                #print "GENOME FILE : $genome_id\n";
+#						$has_passing_tax_id = 1; 
+#						my $genome_number = $genome_id; 
+#						$genome_number =~ s/kb\|//; 
+#						my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
+#						#check file exists if it does, die as it should be;                                                                                        
+#print "\nTEST POLL FOR GPL GENOME FILE ::".$gpl_genome_file."::\n"; 
+#						if (-e $gpl_genome_file) 
+#						{ 
+#print "\nGPL POLL GENOME $gpl_genome_file FILE EXISTS ALREADY\n"; 
+#                                                    #slurp up file and make probe_id-<feature_id mappings       
+#						    open (GPL_GENOME,$gpl_genome_file) or die "Unable to open the gpl genome file : $gpl_genome_file.\n\n"; 
+#						    my @gpl_genome_file_lines = (<GPL_GENOME>); 
+#						    close(GPL_GENOME); 
+#						    my %temp_hash; 
+#                                                    foreach my $gpl_genome_file_line (@gpl_genome_file_lines) 
+#						    { 
+#							my ($temp_probe_id,$temp_feature_id) = split('\t',trim($gpl_genome_file_line)); 
+#							$temp_hash{$temp_probe_id} = $temp_feature_id; 
+#						    } 
+#                                                   $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id}=\%temp_hash; 
+#						} 
+#						else 
+#						{ 
+#						    die "\nERROR : The gpl_genome_file $gpl_genome_file should exist and it does not\n"; 
+#						} 
+#					    } 
+#						    #update genomes_id_hash setting known results to zero.				    
 				}
 			    }
 			}
 			else
 			{
 			    #new blat job, make entry into running blat jobs.
-
-
+			    
+			    
 			}
 		    }
 		    else
