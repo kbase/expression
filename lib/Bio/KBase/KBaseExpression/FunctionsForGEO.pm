@@ -31,6 +31,7 @@ use Bio::KBase::CDMI::CDMIClient;
 use Bio::KBase::IdMap::Client; 
 use JSON::RPC::Client; 
 use JSON;
+use Fcntl ':flock'; # Import LOCK_* constants ;
 
 #require Exporter;
 
@@ -460,7 +461,8 @@ print "\nTHE CHECK GPL FILE $gpl_file\n";
             {
                 #Open GPL file get mapping method results (lets you know what genomes you need to grab data for, and do not have to attempt to map of genomes in the list)
 print "\nGPL FILE $gpl_file EXISTS ALREADY\n";
-		open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
+		open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n";
+                flock(GPL, LOCK_EX) or die "Could not lock '$gpl_file' - $!"; 
 		my @gpl_file_lines = (<GPL>); 
 		close(GPL); 
                 foreach my $gpl_file_line (@gpl_file_lines)
@@ -474,13 +476,8 @@ print "\nGPL FILE $gpl_file EXISTS ALREADY\n";
 print "\nFIRST TIME - Genomes HASH:\n".Dumper(\%genome_ids_hash);
 
             my $need_to_try_new_mappings = 0;
-#            foreach my $genome_id (keys(%genome_ids_hash))
-#            { 
-	    my @temp_genome_ids = sort(keys(%genome_ids_hash));
-	    for (my $genome_counter = 0; $genome_counter < scalar(@temp_genome_ids) ; $genome_counter++)
-	    {
-		my $genome_id = $temp_genome_ids[$genome_counter];
-
+            foreach my $genome_id (keys(%genome_ids_hash))
+            { 
 print "IN LOOP - GENOME ID : $genome_id \n";
                 if ($genome_ids_hash{$genome_id} == 0)
                 {
@@ -498,6 +495,7 @@ print "\nTEST FOR GPL GENOME FILE ::".$gpl_genome_file."::\n";
 print "\nGPL GENOME $gpl_genome_file FILE EXISTS ALREADY\n";
                              #slurp up file and make probe_id-<feature_id mappings
                              open (GPL_GENOME,$gpl_genome_file) or die "Unable to open the gpl genome file : $gpl_genome_file.\n\n"; 
+                             flock(GPL, LOCK_EX) or die "Could not lock '$gpl_file' - $!"; 
 		             my @gpl_genome_file_lines = (<GPL_GENOME>); 
 		             close(GPL_GENOME);  
                              my %temp_hash;
@@ -560,180 +558,6 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 #$probe_sequence_warning = "Temporary message to force platform id mapping by synonym";
 	        if (!defined($probe_sequence_warning))
 	        {
-		    #Look for Running Blat Jobs File
-		    my $running_blat_jobs_file = $blat_files_directory."/running_jobs"; 
-		    my $completed_blat_jobs_file = $blat_files_directory."/completed_jobs"; 
-		    my $genome_number = $genome_id; 
-		    $genome_number =~ s/kb\|//; 
-		    my $job_gpl_genome = $gplID."_".$genome_number
-		    if (-e $running_blat_jobs)
-                    {
-			#check in running jobs for the gpl_genome combo of interest
-			open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n";
-			my @rbj_file_lines = (<RBJ>); 
-			close(RBJ);
-			$job_found = 0;
-			foreach my $rbj_line (@rbj_file_lines)
-			{
-			    my @rbj_elements = split(/\t/,$rbj_line);
-			    my $rbj_job = $rbj_elements[0];
-			    if ($rbj_job eq $job_gpl_genome)
-			    {
-				$job_found = 1;
-			    }
-			}
-			if ($job_found == 1)
-			{
-			    #NEED to do polling of running jobs, completed jobs, and GPL file.
-			    #If polling take more than 1 day error out
-			    my $max_threshold = 86400; #Set to 1 day (in seconds)
-			    my $total_time = 0;
-			    my $timing_interval = 60;
-
-			    my $internal_job_found = 1;
-			    my $completed_job_found = 0;
-			    my $gpl_results_file_found = 0;
-
-			    while (($internal_job_found == 1) || ($completed_job_found == 0) || ($gpl_results_file_found == 0))
-			    {
-				sleep($timing_interval);
-				$total_time = $total_time + $timing_interval;
-				if ($total_time > $max_threshold)
-				{
-				    #job is taking too long. Exit out with error message
-
-				}
-				$internal_job_found = 0;
-				open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n"; 
-				my @rbj_file_lines = (<RBJ>); 
-				close(RBJ); 
-				foreach my $rbj_line (@rbj_file_lines) 
-				{ 
-				    my @rbj_elements = split(/\t/,$rbj_line); 
-				    my $rbj_job = $rbj_elements[0]; 
-				    if ($rbj_job eq $job_gpl_genome) 
-				    { 
-					$internal_job_found = 1; 
-				    } 
-				} 
-				if (($internal_job_found == 0) && ($completed_jobs == 0))
-				{
-				    
-				    #means the job should be completed.  Check to see if it is.  Error out if it is not.
-				    #give it another minute to insure it gets here
-				    sleep($timing_interval); 
-				    $total_time = $total_time + $timing_interval; 
-				    if (-e $completed_blat_jobs) 
-				    { 
-					#check in completed jobs for the gpl_genome combo of interest        				    
-					$completed_job_found = 0; 
-					open (CBJ,$completed_blat_jobs_file) or die "Unable to open the Completed Blat Jobs file : $completed_blat_jobs_file.\n\n";
-					my @cbj_file_lines = (<CBJ>); 
-					close(CBJ); 
-					foreach my $cbj_line (@cbj_file_lines) 
-					{ 
-					    my @cbj_elements = split(/\t/,$cbj_line); 
-					    my $cbj_job = $cbj_elements[0]; 
-					    if ($cbj_job eq $job_gpl_genome) 
-					    { 
-						$completed_job_found = 1; 
-					    } 
-					} 
-					if ($completed_job_found == 0)
-					{
-					    #Job Should have been here, error out
-					    die "The Blat job ".$job_gpl_genome. " should have been in the completed blat jobs file : ".
-						$completed_blat_jobs_file . ". It was not.";
-					}
-				    }
-				    else
-				    {
-					#file Should have been here, error out
-					die "The Blat job ".$job_gpl_genome. " should have been in the completed blat jobs file : ".
-					    $completed_blat_jobs_file . ". THE COMPLETED JOBS FILE DOES NOT EXIST.";
-				    }
-				}
-				elsif ($completed_job_found == 1)
-				{
-				    #Check for GPL file
-				    if (-e $gpl_file) 
-				    { 
-					#Open GPL file get mapping method results (lets you know what genomes you need to grab data for, 
-					#and do not have to attempt to map of genomes in the list)
-					print "\nGPL FILE $gpl_file EXISTS ALREADY\n"; 
-					open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n"; 
-					my @gpl_file_lines = (<GPL>); 
-					close(GPL); 
-					foreach my $gpl_file_line (@gpl_file_lines) 
-					{ 
-					    my ($temp_genome_id,$temp_mapping_method) = split('\t',trim($gpl_file_line)); 
-					    $genome_ids_hash{$temp_genome_id} = 0; 
-					    $platform_hash{$gplID}->{"genomesMappingMethod"}->{$temp_genome_id}=$temp_mapping_method; 
-					} 
-				    } 
-				    
-				    $genome_counter = $genome_counter - 1;
-				    
-#				    #Get results from GPL File
-#				    foreach my $genome_id (keys(%genome_ids_hash)) 
-#				    { 
-#					print "IN LOOP - GENOME ID : $genome_id \n"; 
-#					if ($genome_ids_hash{$genome_id} == 0) 
-#					{ 
-#					    if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS") 
-#					    { 
-#                                                #print "GENOME FILE : $genome_id\n";
-#						$has_passing_tax_id = 1; 
-#						my $genome_number = $genome_id; 
-#						$genome_number =~ s/kb\|//; 
-#						my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number; 
-#						#check file exists if it does, die as it should be;                                                                                        
-#print "\nTEST POLL FOR GPL GENOME FILE ::".$gpl_genome_file."::\n"; 
-#						if (-e $gpl_genome_file) 
-#						{ 
-#print "\nGPL POLL GENOME $gpl_genome_file FILE EXISTS ALREADY\n"; 
-#                                                    #slurp up file and make probe_id-<feature_id mappings       
-#						    open (GPL_GENOME,$gpl_genome_file) or die "Unable to open the gpl genome file : $gpl_genome_file.\n\n"; 
-#						    my @gpl_genome_file_lines = (<GPL_GENOME>); 
-#						    close(GPL_GENOME); 
-#						    my %temp_hash; 
-#                                                    foreach my $gpl_genome_file_line (@gpl_genome_file_lines) 
-#						    { 
-#							my ($temp_probe_id,$temp_feature_id) = split('\t',trim($gpl_genome_file_line)); 
-#							$temp_hash{$temp_probe_id} = $temp_feature_id; 
-#						    } 
-#                                                   $platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id}=\%temp_hash; 
-#						} 
-#						else 
-#						{ 
-#						    die "\nERROR : The gpl_genome_file $gpl_genome_file should exist and it does not\n"; 
-#						} 
-#					    } 
-#						    #update genomes_id_hash setting known results to zero.				    
-				}
-			    }
-			}
-			else
-			{
-			    #new blat job, make entry into running blat jobs.
-			    
-			    
-			}
-		    }
-		    else
-		    {
-			#make file and make entry into it.
-
-		    }
-
-#ALSO NEED TO UPDATE WHEN JOB COMPLETES.
-
-		    #IF Does Not exist, make the file
-		    #LOOK in file see if the Platform and Genome combination is running
-		    #If Not make entry into the file and start the blat process
-		    #If does exist start polling to see if the mapping/platform files exist.(see logic above)
-		    #If polling goes beyond 8 hours error out.
-
 		    #print "\nIN BLAT TRY\n";
 		    #It has a sequence column, prepare a blat_db file and build query file
 		    my $min_probe_length = 500;  #artificially high intial value will get set
@@ -741,6 +565,7 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 		    my $blat_platform_query_file = $blat_files_directory."/".$gplID."_blat_query_file";
 		    push(@blat_files_to_clean_up_after, $blat_platform_query_file);
 		    open (BLAT_QUERY_FILE, ">".$blat_platform_query_file) or die "Unable to make $blat_platform_query_file \n";
+		    flock(BLAT_QUERY_FILE, LOCK_EX) or die "Could not lock '$blat_platform_query_file' - $!"; 
 		    foreach my $probe_id (keys(%probe_sequence_hash))
 		    {
 		        my $probe_sequence = $probe_sequence_hash{$probe_id};
@@ -762,17 +587,202 @@ print "\nTOTAL NUMBER OF PROBE SEQUENCES : ".scalar(keys(%probe_sequence_hash)).
 		    #create mapping platform_id -> feature_id
 		    #remove files
 print "\nSECOND TIME - Genomes HASH:\n".Dumper(\%genome_ids_hash);
-		    foreach my $genome_id (keys(%genome_ids_hash))
+#		    foreach my $genome_id (keys(%genome_ids_hash))
+#		    {
+		    my @temp_genome_ids = sort(keys(%genome_ids_hash));
+		    for (my $genome_counter = 0; $genome_counter < scalar(@temp_genome_ids); $genome_counter++)
 		    {
+			my $genome_id = $temp_genome_ids[$genome_counter];
 print "\nLoop $genome_id $genome_ids_hash{$genome_id}\n";
                         if($genome_ids_hash{$genome_id} == 1)
-		        {
+		        {   
+			    #Look for Running Blat Jobs File 
+			    my $running_blat_jobs_file = $blat_files_directory."/running_jobs";
+			    my $completed_blat_jobs_file = $blat_files_directory."/completed_jobs";
+			    my $genome_number = $genome_id; 
+			    $genome_number =~ s/kb\|//; 
+			    my $job_gpl_genome = $gplID."_".$genome_number; 
+			    if (-e $running_blat_jobs) 
+			    { 
+				#check in running jobs for the gpl_genome combo of interest  
+				open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n";
+				flock(RBJ, LOCK_EX) or die "Could not lock '$running_blat_jobs_file' - $!"; 
+				my @rbj_file_lines = (<RBJ>); 
+				close(RBJ); 
+				$job_found = 0; 
+				foreach my $rbj_line (@rbj_file_lines)
+				{ 
+				    my @rbj_elements = split(/\t/,$rbj_line); 
+				    my $rbj_job = $rbj_elements[0];
+				    if ($rbj_job eq $job_gpl_genome) 
+				    { 
+					$job_found = 1;
+				    } 
+				} 
+				if ($job_found == 1)
+				{ 
+				    print "\nMonitoring started for $job_gpl_genome : ".localtime()."\n"; 
+				    #NEED to do polling of running jobs, completed jobs, and GPL file.
+				    #If polling take more than 1 day error out           
+				    my $max_threshold = 86400; #Set to 1 day (in seconds)  
+				    my $total_time = 0; 
+				    my $timing_interval = 60; 
+ 
+				    my $internal_job_found = 1;
+				    my $completed_job_found = 0;
+				    my $gpl_results_file_found = 0;
+				    
+				    while (($internal_job_found == 1) || ($completed_job_found == 0) || ($gpl_results_file_found == 0))
+				    {
+					sleep($timing_interval); 
+					$total_time = $total_time + $timing_interval; 
+					if ($total_time > $max_threshold)
+					{ 
+					    #job is taking too long. Exit out with error message                                       
+					    
+					} 
+					$internal_job_found = 0; 
+					open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n";
+					flock(RBJ, LOCK_EX) or die "Could not lock '$running_blat_jobs_file' - $!"; 
+					my @rbj_file_lines = (<RBJ>);
+					close(RBJ); 
+					foreach my $rbj_line (@rbj_file_lines)
+					{ 
+					    my @rbj_elements = split(/\t/,$rbj_line); 
+					    my $rbj_job = $rbj_elements[0]; 
+					    if ($rbj_job eq $job_gpl_genome) 
+					    { 
+						$internal_job_found = 1; 
+					    } 
+					} 
+					if (($internal_job_found == 0) && ($completed_jobs == 0)) 
+					{ 
+					    #means the job should be completed.  Check to see if it is.  Error out if it is not.                                     
+					    #give it another minute to insure it gets here                                                                           
+					    sleep($timing_interval);
+					    $total_time = $total_time + $timing_interval;
+					    if (-e $completed_blat_jobs) 
+					    {
+						#check in completed jobs for the gpl_genome combo of interest                                                        
+						$completed_job_found = 0;
+						open (CBJ,$completed_blat_jobs_file) 
+						    or die "Unable to open the Completed Blat Jobs file : $completed_blat_jobs_file.\n\n";
+						flock(CBJ, LOCK_EX) or die "Could not lock '$completed_blat_jobs_file' - $!"; 
+						my @cbj_file_lines = (<CBJ>);
+						close(CBJ);
+						foreach my $cbj_line (@cbj_file_lines) 
+						{ 
+						    my @cbj_elements = split(/\t/,$cbj_line);
+						    my $cbj_job = $cbj_elements[0]; 
+						    if ($cbj_job eq $job_gpl_genome) 
+						    { 
+							$completed_job_found = 1;
+						    } 
+						} 
+						if ($completed_job_found == 0)
+						{
+						    #Job Should have been here, error out                                                                            
+						    die "The Blat job ".$job_gpl_genome. " should have been in the completed blat jobs file : ". 
+							$completed_blat_jobs_file . ". It was not.";
+						}
+					    } 
+					    else 
+					    {
+						#file Should have been here, error out                                                                               
+						die "The Blat job ".$job_gpl_genome. " should have been in the completed blat jobs file : ".
+						    $completed_blat_jobs_file . ". THE COMPLETED JOBS FILE DOES NOT EXIST.";
+					    }
+					} 
+					elsif ($completed_job_found == 1)
+					{
+					    #Check for GPL file                                                                                                      
+					    if (-e $gpl_file)
+					    { 
+						#Open GPL file get mapping method results (lets you know what genomes you need to grab data for,                     
+						#and do not have to attempt to map of genomes in the list)                                                           
+						print "\nGPL FILE $gpl_file EXISTS ALREADY\n"; 
+						open (GPL,$gpl_file) or die "Unable to open the gpl file : $gpl_file.\n\n";
+						flock(GPL, LOCK_EX) or die "Could not lock '$gpl_file' - $!"; 
+						my @gpl_file_lines = (<GPL>);
+						close(GPL);
+						foreach my $gpl_file_line (@gpl_file_lines)
+						{ 
+						    my ($temp_genome_id,$temp_mapping_method) = split('\t',trim($gpl_file_line));
+						    $genome_ids_hash{$temp_genome_id} = 0;
+						    $platform_hash{$gplID}->{"genomesMappingMethod"}->{$temp_genome_id}=$temp_mapping_method;
+						}
+                                                #POPULATE THE MAPPINGS
+						foreach my $genome_id (keys(%genome_ids_hash))
+						{
+						    #print "IN LOOP - GENOME ID : $genome_id \n";
+						    if ($genome_ids_hash{$genome_id} == 0)
+						    {  
+							if ($platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id} ne "UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS") 
+							{         
+							    #print "GENOME FILE : $genome_id\n";
+							    $has_passing_tax_id = 1;
+							    my $genome_number = $genome_id;
+							    $genome_number =~ s/kb\|//;  
+							    my $gpl_genome_file = $platform_genome_mappings_directory."/".$gplID."_".$genome_number;
+							    #check file exists if it does, die as it should be;  
+                                                            #print "\nTEST POLL FOR GPL GENOME FILE ::".$gpl_genome_file."::\n"; 
+							    if (-e $gpl_genome_file)
+							    {
+								print "\nGPL POLL GENOME $gpl_genome_file FILE EXISTS ALREADY\n";  
+								#slurp up file and make probe_id-<feature_id mappings
+								open (GPL_GENOME,$gpl_genome_file) or die "Unable to open the gpl genome file : $gpl_genome_file.\n\n"; 
+								flock(GPL_GENOME, LOCK_EX) or die "Could not lock '$gpl_genome_file' - $!";  
+								my @gpl_genome_file_lines = (<GPL_GENOME>); 
+								close(GPL_GENOME);                                                                                       
+								my %temp_hash; 
+								foreach my $gpl_genome_file_line (@gpl_genome_file_lines)                                               
+								{  
+								    my ($temp_probe_id,$temp_feature_id) = split('\t',trim($gpl_genome_file_line));
+								    $temp_hash{$temp_probe_id} = $temp_feature_id;
+								}
+								$platform_tax_probe_feature_hash{$gplID}->{$temp_tax_id}->{$genome_id}=\%temp_hash;
+								$has_passing_tax_id = 1; 
+							    } 
+							    else 
+							    {
+								die "\nERROR : The gpl_genome_file $gpl_genome_file should exist and it does not\n";  
+							    }
+							}                                                                                
+						    }
+						}
+						$gpl_results_file_found = 1;
+					    } 
+					    $genome_counter = $genome_counter - 1;
+#					    last;
+					}#elsif ($completed_job_found == 1) 
+				    } #End of while (($internal_job_found == 1) || ($completed_job_found == 0) || ($gpl_results_file_found == 0))
+				}#End of if ($job_found == 1) 
+				elsif($genome_ids_hash{$genome_id} == 1) 
+				{ 
+				    #new blat job, make entry into running blat jobs.                                                                                
+				    open (RBJ,">>".$running_blat_jobs_file) or die "Unable to open Running Blat Jobs file to append to : $running_blat_jobs_file.\n\n";
+				    flock(RBJ, LOCK_EX) or die "Could not lock '$running_blat_jobs_file' - $!"; 
+				    print RBJ $job_gpl_genome . "\t".localtime()."\n";
+				    close(RBJ); 
+				} 
+			    }#End of if (-e $running_blat_jobs)
+			    elsif($genome_ids_hash{$genome_id} == 1)  
+			    { 
+				#make file and make entry into it.                                                                                                   
+				open (RBJ,">>".$running_blat_jobs_file) or die "Unable to make new Running Blat Jobs file to write to : $running_blat_jobs_file.\n\n";
+				flock(RBJ, LOCK_EX) or die "Could not lock '$running_blat_jobs_file' - $!"; 
+				print RBJ $job_gpl_genome . "\t".localtime()."\n";
+				close(RBJ);
+			    } 
+#ALSO NEED TO UPDATE WHEN JOB COMPLETES. (Remove from current job, add to complete job).
+
                             #create Blat DB File
 		            my $file_genome_id = $genome_id;
 		            $file_genome_id =~ s/kb\|//; 
 		            my $blat_genome_db_file = $blat_files_directory."/".$file_genome_id."_blat_db_file";
 		            push(@blat_files_to_clean_up_after, $blat_genome_db_file);
 		            open (BLAT_DB_FILE, ">".$blat_genome_db_file) or die "Unable to make $blat_genome_db_file \n";
+			    flock(BLAT_DB_FILE, LOCK_EX) or die "Could not lock '$blat_genome_db_file' - $!"; 
 		            my $fid_count = 0;
 		            my $kb = Bio::KBase->new();
 		            my $cdmi_client = $kb->central_store;
@@ -884,6 +894,7 @@ print "\nGENOME $genome_id : $fid_count\n";
 	}
         my $gpl_out_file = $platform_genome_mappings_directory."/".$gplID; 
         open(GPL_OUT_FILE, ">".$gpl_out_file) or die "Unable to make $gpl_out_file \n";
+	flock(GPL_OUT_FILE, LOCK_EX) or die "Could not lock '$gpl_out__file' - $!"; 
         foreach my $mapping_genome_id (keys(%{$platform_hash{$gplID}->{"genomesMappingMethod"}}))
         {
             print GPL_OUT_FILE $mapping_genome_id . "\t" . $platform_hash{$gplID}->{"genomesMappingMethod"}->{$mapping_genome_id} . "\n";
@@ -1479,6 +1490,7 @@ sub parse_blat_results
 #    my $dbh = shift;
     my $self = shift;
     open (BLAT,$blat_results_file) or die "Unable to open the blat file : $blat_results_file.\n\n";
+    flock(BLAT, LOCK_EX) or die "Could not lock '$blat_results_file' - $!"; 
     my @blat_lines = (<BLAT>);
     close(BLAT);
     chomp(@blat_lines);
@@ -2898,6 +2910,7 @@ sub make_GSE_object_file
     my $gse_object = get_GEO_GSE_data($self,$gse_input_id,$metaDataOnly,$blat_files_directory,$platform_genome_mappings_directory,$gse_gz_directory); 
     my $file_name = $gse_object_directory."/".$gse_input_id;
     open(FILE, ">".$file_name) or die "Unable to make to $file_name \n"; 
+    flock(FILE, LOCK_EX) or die "Could not lock '$file_name' - $!"; 
     print FILE to_json($gse_object); 
     close(FILE); 
     return 1;
@@ -2908,6 +2921,7 @@ sub get_gse_records_from_gds_list
     my $self = shift;
     my $gds_file = shift;
     open (GDS,$gds_file) or die "Unable to open the gds file : $gds_file.\n\n"; 
+    flock(GDS, LOCK_EX) or die "Could not lock '$gds_file' - $!"; 
     my @gds_list_lines = <GDS>;
  
     my @gse_records;
@@ -2934,6 +2948,7 @@ sub get_gse_records_from_gse_list
     my $self = shift;
     my $gds_file = shift;
     open (GDS,$gds_file) or die "Unable to open the gds file : $gds_file.\n\n"; 
+    flock(GDS, LOCK_EX) or die "Could not lock '$gds_file' - $!"; 
     my @gds_list_lines = <GDS>;
  
     my @gse_records;
@@ -2967,6 +2982,7 @@ sub make_gpl_genome_file
     my %probe_feature_hash = %{$probe_feature_hash_ref};
     
     open(FILE, ">".$gpl_genome_file) or die "Unable to make $gpl_genome_file \n"; 
+    flock(FILE, LOCK_EX) or die "Could not lock '$gpl_genome_file' - $!"; 
     
     foreach my $probe_id (keys(%probe_feature_hash))
     {
