@@ -774,7 +774,6 @@ print "\nLoop $genome_id $genome_ids_hash{$genome_id}\n";
 				print RBJ $job_gpl_genome . "\t".localtime()."\n";
 				close(RBJ);
 			    } 
-#ALSO NEED TO UPDATE WHEN JOB COMPLETES. (Remove from current job, add to complete job).
 
                             #create Blat DB File
 		            my $file_genome_id = $genome_id;
@@ -828,7 +827,41 @@ print "\nGENOME $genome_id : $fid_count\n";
                                 $platform_hash{$gplID}->{"genomesMappingMethod"}->{$genome_id}="UNABLE TO MAP PROBES BY SEQUENCE OR EXTERNAL IDS";  
                             }
 		            #MAY want to add self so can connect to DB to resolve alternative splicings
-		        }#if genome needs to be done.
+
+			    #NEED TO REMOVE ACTIVE BLAT JOB from running list and make entry in complete list.
+                            #ALSO NEED TO UPDATE WHEN JOB COMPLETES. (Remove from current job, add to complete job).
+			    open (RBJ,$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n";
+			    flock(RBJ, LOCK_EX) or die "Could not lock '$running_blat_jobs_file' - $!";
+			    my @rbj_file_lines = (<RBJ>);			    
+			    my $new_rbj_file_text = '';
+			    my $rbj_of_interest;
+			    foreach my $rbj_line (@rbj_file_lines) 
+			    { 
+				my @rbj_elements = split(/\t/,$rbj_line); 
+				my $rbj_job = $rbj_elements[0]; 
+				if ($rbj_job eq $job_gpl_genome)
+				{ 
+				    $rbj_of_interest = $rbj_line;
+				} 
+				else
+				{
+				    $new_rbj_file_text .= $rbj_line;
+				}
+			    } 
+			    close(RBJ);
+			    open (RBJ, ">".$running_blat_jobs_file) or die "Unable to open the Running Blat Jobs file : $running_blat_jobs_file.\n\n";
+			    flock(RBJ, LOCK_EX) or die "Could not lock '$running_blat_jobs_file' - $!";
+			    print RBJ $new_rbj_file_text;
+			    close(RBJ);
+			    my @cbj_elements = split(/\t/,$rbj_of_interest); 
+			    my $cbj_job = trim($cbj_elements[0]); 
+			    my $cbj_start_time = trim($cbj_elements[1]); 
+			    open (CBJ, ">>".$completed_blat_jobs_file) 
+				or die "Unable to open the Completed Blat Jobs file for appending : $completed_blat_jobs_file.\n\n"; 
+			    flock(CBJ, LOCK_EX) or die "Could not lock '$completed_blat_jobs_file' - $!";
+			    print CBJ $cbj_job . "\t" . $cbj_start_time . "\t". localtime() . "\n";
+			    close(CBJ); 
+		        }#if($genome_ids_hash{$genome_id} == 1)          ---if genome needs to be done.
                     }#foreach genome   
 		    foreach my $clean_up_file (@blat_files_to_clean_up_after) 
 		    { 
