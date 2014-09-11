@@ -1,4 +1,4 @@
-package Bio::KBase::KBaseExpression::FunctionsForGEORatio;
+package Bio::KBase::KBaseExpression::FunctionsForGEO;
 use strict;
 use Statistics::Descriptive;
 #use Bio::KBase::Exceptions;
