@@ -504,6 +504,42 @@ module KBaseExpression {
         string name;
     } Strain; 
 
+    /* 
+       Represents data for a single data table, convention is biological features on y-axis and samples etc. on x
+       string id - identifier for data table
+       string name - name or title to display in a plot etc.
+       list<string> row_ids - kb ids for the objects
+       list<string> row_labels - label text to display
+       list<string> row_groups - group labels for row
+       list<string> row_groups_ids - kb ids for group objects
+       list<string> column_ids - kb ids for the objects
+       list<string> column_labels - label text to display
+       list<string> column_groups - group labels for columns
+       list<string> column_groups_ids - kb ids for group objects
+       list<list<float>> data - a list of rows of floats, non-numeric values represented as 'null'
+       @optional id
+       @optional name
+       @optional row_ids
+       @optional row_groups
+       @optional row_groups_ids
+       @optional column_ids
+       @optional column_groups
+       @optional column_groups_ids
+   */
+   typedef structure{
+        string id;
+        string name;
+        list<string> row_ids;
+        list<string> row_labels;
+        list<string> row_groups;
+        list<string> row_groups_ids;
+        list<string> column_ids;
+        list<string> column_labels;
+        list<string> column_groups;
+        list<string> column_groups_ids;
+        list<list<float>> data;
+    } FloatDataTable;
+
     /*
         Data structure for the workspace expression platform.  The ExpressionPlatform typed object.
         source_id defaults to id if not set, but typically referes to a GPL if the data is from GEO.
