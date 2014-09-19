@@ -764,7 +764,6 @@ module KBaseExpression {
 /*
        list of RNASeqDifferentialExpression files 
 */
-
    typedef list<RNASeqDifferentialExpressionFile> RNASeqDifferentialExpressionSet;
 
 /*
@@ -777,4 +776,16 @@ module KBaseExpression {
        string created;
        RNASeqDifferentialExpressionSet diff_expression;
   }RNASeqDifferentialExpression;
+
+
+/*FUNCTIONS AGAIN, INCLUDES FLOAT DATA TABLE*/ 
+ 
+   /* given a list of sample ids and feature ids and the string of what type of numerical interpretation 
+        it returns a FloatDataTable. 
+        If sample id list is an empty array [], all samples with that feature measurment values will be returned. 
+        If feature list is an empty array [], all features with measurment values will be returned. 
+        Both sample id list and feature list can not be empty, one of them must have a value. 
+        Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control' 
+   */ 
+   funcdef get_expression_float_data_table_by_samples_and_features(sample_ids sample_ids, feature_ids feature_ids, string numerical_interpretation) returns (FloatDataTable float_data_table); 
 }; 

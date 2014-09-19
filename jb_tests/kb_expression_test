@@ -34,9 +34,8 @@ print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
 #$result = $client->get_expression_samples_data(['kb|sample.3713']);
 #$result = $client->get_expression_samples_data(['kb|sample.3745']);
-#$result = $client->get_expression_samples_data(['kb|sample.3775']);
+$result = $client->get_expression_samples_data(['kb|sample.3775']);
 #$result = $client->get_expression_samples_data(['kb|sample.38','kb|sample.39']);
-#$result = $client->get_expression_samples_data(['kb|sample.50','kb|sample.51']);
 #print Dumper($result) . "\n----------------------------\n";
 
 print "get_expression_data_by_sample_and_features()\n";
@@ -44,7 +43,11 @@ print "get_expression_data_by_sample_and_features()\n";
 #$result = $client->get_expression_data_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], ['kb|g.3899.CDS.56284','kb|g.3899.CDS.47443'], 'Log2 level intensities'); 
 #$result = $client->get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284','kb|g.3899.CDS.47443'], 'Log2 level intensities'); 
 #$result = $client->get_expression_data_by_samples_and_features([], [], 'Log2 level intensities'); 
-$result = $client->get_expression_data_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], [], 'Bad entry'); 
+#$result = $client->get_expression_data_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], [], 'Bad entry'); 
+#print Dumper($result) . "\n----------------------------\n";
+
+print "get_expression_float_data_table_by_samples_and_features()\n";
+#$result = $client->get_expression_float_data_table_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], [], 'Log2 level intensities'); 
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\

@@ -5346,6 +5346,195 @@ sub get_GEO_GSE
 
 
 
+=head2 get_expression_float_data_table_by_samples_and_features
+
+  $float_data_table = $obj->get_expression_float_data_table_by_samples_and_features($sample_ids, $feature_ids, $numerical_interpretation)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$sample_ids is a KBaseExpression.sample_ids
+$feature_ids is a KBaseExpression.feature_ids
+$numerical_interpretation is a string
+$float_data_table is a KBaseExpression.FloatDataTable
+sample_ids is a reference to a list where each element is a KBaseExpression.sample_id
+sample_id is a string
+feature_ids is a reference to a list where each element is a KBaseExpression.feature_id
+feature_id is a string
+FloatDataTable is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	row_ids has a value which is a reference to a list where each element is a string
+	row_labels has a value which is a reference to a list where each element is a string
+	row_groups has a value which is a reference to a list where each element is a string
+	row_groups_ids has a value which is a reference to a list where each element is a string
+	column_ids has a value which is a reference to a list where each element is a string
+	column_labels has a value which is a reference to a list where each element is a string
+	column_groups has a value which is a reference to a list where each element is a string
+	column_groups_ids has a value which is a reference to a list where each element is a string
+	data has a value which is a reference to a list where each element is a reference to a list where each element is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$sample_ids is a KBaseExpression.sample_ids
+$feature_ids is a KBaseExpression.feature_ids
+$numerical_interpretation is a string
+$float_data_table is a KBaseExpression.FloatDataTable
+sample_ids is a reference to a list where each element is a KBaseExpression.sample_id
+sample_id is a string
+feature_ids is a reference to a list where each element is a KBaseExpression.feature_id
+feature_id is a string
+FloatDataTable is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	row_ids has a value which is a reference to a list where each element is a string
+	row_labels has a value which is a reference to a list where each element is a string
+	row_groups has a value which is a reference to a list where each element is a string
+	row_groups_ids has a value which is a reference to a list where each element is a string
+	column_ids has a value which is a reference to a list where each element is a string
+	column_labels has a value which is a reference to a list where each element is a string
+	column_groups has a value which is a reference to a list where each element is a string
+	column_groups_ids has a value which is a reference to a list where each element is a string
+	data has a value which is a reference to a list where each element is a reference to a list where each element is a float
+
+
+=end text
+
+
+
+=item Description
+
+given a list of sample ids and feature ids and the string of what type of numerical interpretation 
+it returns a FloatDataTable. 
+If sample id list is an empty array [], all samples with that feature measurment values will be returned. 
+If feature list is an empty array [], all features with measurment values will be returned. 
+Both sample id list and feature list can not be empty, one of them must have a value. 
+Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'
+
+=back
+
+=cut
+
+sub get_expression_float_data_table_by_samples_and_features
+{
+    my $self = shift;
+    my($sample_ids, $feature_ids, $numerical_interpretation) = @_;
+
+    my @_bad_arguments;
+    (ref($sample_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"sample_ids\" (value was \"$sample_ids\")");
+    (ref($feature_ids) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"feature_ids\" (value was \"$feature_ids\")");
+    (!ref($numerical_interpretation)) or push(@_bad_arguments, "Invalid type for argument \"numerical_interpretation\" (value was \"$numerical_interpretation\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_float_data_table_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_float_data_table_by_samples_and_features');
+    }
+
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
+    my($float_data_table);
+    #BEGIN get_expression_float_data_table_by_samples_and_features
+    $float_data_table = {}; 
+    if ((0 == @{$sample_ids}) && (0 == @{$feature_ids})) 
+    { 
+        my $msg = "get_expression_float_data_table_by_samples_and_features requires a list of valid sample ids or sample ids.  ".
+	    "Note that feature ids or sample ids can be empty, but not both.  ". 
+            "If features are empty all features for the sample will be returned.  ".
+	    "If samples are empty all samples that match the numerical interpreation and feature ids will be returned."; 
+      Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+							     method_name => 'get_expression_data_by_samples_and_features'); 
+    } 
+    if (($numerical_interpretation ne 'FPKM') && ($numerical_interpretation ne 'Log2 level intensities') && 
+        ($numerical_interpretation ne 'Log2 level ratios') && ($numerical_interpretation ne 'Log2 level ratios genomic DNA control')) 
+    { 
+        my $msg = "The numerical_interpretation must be equal to one of the following values 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'."; 
+      Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_data_by_samples_and_features'); 
+    } 
+ 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd}, 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+	); 
+ 
+    my $get_feature_log2level_q = qq^select sam.id, sam.title, fea.id, mea.value
+                                     from Sample sam                           
+                                     inner join SampleMeasurements sms on sam.id = sms.from_link
+                                     inner join Measurement mea on sms.to_link = mea.id 
+                                     inner join FeatureMeasuredBy fmb on mea.id = fmb.to_link 
+                                     inner join Feature fea on fmb.from_link = fea.id 
+                                     where sam.numerical_interpretation = ? ^; 
+    if (scalar(@{$sample_ids}) > 0) 
+    { 
+        $get_feature_log2level_q .= qq^ and sam.id in (^. join(",", ("?") x @{$sample_ids}). ") "; 
+	    } 
+	if (scalar(@{$feature_ids}) > 0) 
+	{ 
+	    $get_feature_log2level_q .= qq^ and fea.id in (^. join(",", ("?") x @{$feature_ids}). ") "; 
+		} 
+ 
+    my $get_feature_log2level_qh = $dbh->prepare($get_feature_log2level_q) or die "Unable to prepare get_feature_log2level_q : ". 
+        $get_feature_log2level_q . " : " .$dbh->errstr(); 
+	    $get_feature_log2level_qh->execute($numerical_interpretation, @{$sample_ids}, @{$feature_ids})  or die "Unable to execute get_feature_log2level_q : ". 
+		$get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr(); 
+    my %feature_sample_value_hash;#feature_id->sample_id->value
+    my %sample_id_title_hash;#Sample_id -> sample_title
+    while(my ($sample_id, $title, $feature_id,$value) = $get_feature_log2level_qh->fetchrow_array()) 
+    { 
+#        my $sample_key = $sample_id . "___" . $title; 
+#        $label_data_mapping->{$sample_key}->{$feature_id}=$log2level; 
+	$feature_sample_value_hash{$feature_id}->{$sample_id}=$value;
+	$sample_id_title_hash{$sample_id}=$title;
+    } 
+    my @results_feature_ids = sort(keys(%feature_sample_value_hash));
+    $float_data_table{"row_ids"}=\@results_feature_ids;
+    $float_data_table{"row_labels"}=\@results_feature_ids;
+    my @results_sample_ids = sort(keys(%sample_id_title_hash));
+    $float_data_table{"column_ids"}=\@results_sample_ids;
+    my @results_sample_titles;
+    foreach my $result_sample_id (@results_sample_ids)
+    {
+	push(@results_sample_titles,$sample_id_title_hash{$result_sample_id});
+    }
+    $float_data_table{"column_labels"}=\@results_sample_titles;
+    my @data_array;
+    foreach my $result_feature_id (@results_feature_ids)
+    {
+	my @row_array;
+	foreach  my $result_sample_id (@results_sample_ids)
+	{
+	    if (exists($feature_sample_value_hash{$feature_id}->{$sample_id}))
+	    {
+		push(@row_array, $feature_sample_value_hash{$feature_id}->{$sample_id});
+	    }
+	    else
+	    {
+		push(@row_array, undef);
+	    }
+	}
+	push(@data_array,\@row_array);
+    }
+    $float_data_table{"data"}=\@data_array;
+    #END get_expression_float_data_table_by_samples_and_features
+    my @_bad_returns;
+    (ref($float_data_table) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"float_data_table\" (value was \"$float_data_table\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_float_data_table_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_float_data_table_by_samples_and_features');
+    }
+    return($float_data_table);
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
@@ -7891,6 +8080,39 @@ a reference to a list where each element is a KBaseExpression.ExpressionOntology
 
 
 
+=head2 kbase_genome_id
+
+=over 4
+
+
+
+=item Description
+
+id for the genome
+
+@id ws KBaseGenomes.Genome
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 Strain
 
 =over 4
@@ -7908,7 +8130,7 @@ Data structure for Strain  (TEMPORARY WORKSPACE TYPED OBJECT SHOULD BE HANDLED I
 
 <pre>
 a reference to a hash where the following keys are defined:
-genome_id has a value which is a KBaseExpression.genome_id
+genome_id has a value which is a KBaseExpression.kbase_genome_id
 reference_strain has a value which is a string
 wild_type has a value which is a string
 description has a value which is a string
@@ -7921,11 +8143,85 @@ name has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-genome_id has a value which is a KBaseExpression.genome_id
+genome_id has a value which is a KBaseExpression.kbase_genome_id
 reference_strain has a value which is a string
 wild_type has a value which is a string
 description has a value which is a string
 name has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 FloatDataTable
+
+=over 4
+
+
+
+=item Description
+
+Represents data for a single data table, convention is biological features on y-axis and samples etc. on x
+string id - identifier for data table
+string name - name or title to display in a plot etc.
+list<string> row_ids - kb ids for the objects
+list<string> row_labels - label text to display
+list<string> row_groups - group labels for row
+list<string> row_groups_ids - kb ids for group objects
+list<string> column_ids - kb ids for the objects
+list<string> column_labels - label text to display
+list<string> column_groups - group labels for columns
+list<string> column_groups_ids - kb ids for group objects
+list<list<float>> data - a list of rows of floats, non-numeric values represented as 'null'
+@optional id
+@optional name
+@optional row_ids
+@optional row_groups
+@optional row_groups_ids
+@optional column_ids
+@optional column_groups
+@optional column_groups_ids
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+row_ids has a value which is a reference to a list where each element is a string
+row_labels has a value which is a reference to a list where each element is a string
+row_groups has a value which is a reference to a list where each element is a string
+row_groups_ids has a value which is a reference to a list where each element is a string
+column_ids has a value which is a reference to a list where each element is a string
+column_labels has a value which is a reference to a list where each element is a string
+column_groups has a value which is a reference to a list where each element is a string
+column_groups_ids has a value which is a reference to a list where each element is a string
+data has a value which is a reference to a list where each element is a reference to a list where each element is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is a string
+name has a value which is a string
+row_ids has a value which is a reference to a list where each element is a string
+row_labels has a value which is a reference to a list where each element is a string
+row_groups has a value which is a reference to a list where each element is a string
+row_groups_ids has a value which is a reference to a list where each element is a string
+column_ids has a value which is a reference to a list where each element is a string
+column_labels has a value which is a reference to a list where each element is a string
+column_groups has a value which is a reference to a list where each element is a string
+column_groups_ids has a value which is a reference to a list where each element is a string
+data has a value which is a reference to a list where each element is a reference to a list where each element is a float
 
 
 =end text
@@ -7959,7 +8255,7 @@ source_id defaults to id if not set, but typically referes to a GPL if the data 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 source_id has a value which is a string
-genome_id has a value which is a KBaseExpression.genome_id
+genome_id has a value which is a KBaseExpression.kbase_genome_id
 strain has a value which is a KBaseExpression.Strain
 technology has a value which is a string
 title has a value which is a string
@@ -7973,7 +8269,7 @@ title has a value which is a string
 a reference to a hash where the following keys are defined:
 id has a value which is a string
 source_id has a value which is a string
-genome_id has a value which is a KBaseExpression.genome_id
+genome_id has a value which is a KBaseExpression.kbase_genome_id
 strain has a value which is a KBaseExpression.Strain
 technology has a value which is a string
 title has a value which is a string
@@ -7996,8 +8292,6 @@ title has a value which is a string
 id for the expression platform
 
 @id ws KBaseExpression.ExpressionPlatform
-
-"ws" may go to "to" in the future
 
 
 =item Definition
@@ -8068,8 +8362,6 @@ description has a value which is a string
 id for the expression sample
 
 @id ws KBaseExpression.ExpressionSample
-
-"ws" may go to "to" in the future
 
 
 =item Definition
@@ -8162,7 +8454,7 @@ a reference to a list where each element is a string
 
 =item Description
 
-map between genome ids and a list of samples from that genome in this sample
+map between genome ids and a list of samples from that genome in this series
 
 
 =item Definition
@@ -8170,14 +8462,14 @@ map between genome ids and a list of samples from that genome in this sample
 =begin html
 
 <pre>
-a reference to a hash where the key is a KBaseExpression.genome_id and the value is a KBaseExpression.expression_sample_ids
+a reference to a hash where the key is a KBaseExpression.kbase_genome_id and the value is a KBaseExpression.expression_sample_ids
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a KBaseExpression.genome_id and the value is a KBaseExpression.expression_sample_ids
+a reference to a hash where the key is a KBaseExpression.kbase_genome_id and the value is a KBaseExpression.expression_sample_ids
 
 =end text
 
@@ -8227,11 +8519,12 @@ a reference to a list where each element is a KBaseExpression.Person
 Data structure for the workspace expression sample.  The Expression Sample typed object.
 
 protocol, persons and strain should need to eventually have common ws objects.  I will make expression ones for now.
+RMA_normalized (1 = true, non 1 = false)
 
 we may need a link to experimentMetaID later.
 
 @optional description title data_quality_level original_median expression_ontology_terms platform_id default_control_sample characteristics
-@optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids 
+@optional averaged_from_samples protocol strain persons molecule data_source shock_url processing_comments expression_series_ids RMA_normalized
 
 @searchable ws_subset id source_id type data_quality_level genome_id platform_id description title data_source characteristics keys_of(expression_levels) 
 @searchable ws_subset persons.[*].email persons.[*].last_name persons.[*].institution  
@@ -8256,7 +8549,7 @@ data_quality_level has a value which is an int
 original_median has a value which is a float
 external_source_date has a value which is a string
 expression_levels has a value which is a KBaseExpression.data_expression_levels_for_sample
-genome_id has a value which is a KBaseExpression.genome_id
+genome_id has a value which is a KBaseExpression.kbase_genome_id
 expression_ontology_terms has a value which is a KBaseExpression.expression_ontology_terms
 platform_id has a value which is a KBaseExpression.expression_platform_id
 default_control_sample has a value which is a KBaseExpression.expression_sample_id
@@ -8270,6 +8563,7 @@ shock_url has a value which is a string
 processing_comments has a value which is a string
 expression_series_ids has a value which is a KBaseExpression.expression_series_ids
 characteristics has a value which is a string
+RMA_normalized has a value which is an int
 
 </pre>
 
@@ -8288,7 +8582,7 @@ data_quality_level has a value which is an int
 original_median has a value which is a float
 external_source_date has a value which is a string
 expression_levels has a value which is a KBaseExpression.data_expression_levels_for_sample
-genome_id has a value which is a KBaseExpression.genome_id
+genome_id has a value which is a KBaseExpression.kbase_genome_id
 expression_ontology_terms has a value which is a KBaseExpression.expression_ontology_terms
 platform_id has a value which is a KBaseExpression.expression_platform_id
 default_control_sample has a value which is a KBaseExpression.expression_sample_id
@@ -8302,6 +8596,7 @@ shock_url has a value which is a string
 processing_comments has a value which is a string
 expression_series_ids has a value which is a KBaseExpression.expression_series_ids
 characteristics has a value which is a string
+RMA_normalized has a value which is an int
 
 
 =end text
