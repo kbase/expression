@@ -788,4 +788,16 @@ module KBaseExpression {
         Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control' 
    */ 
    funcdef get_expression_float_data_table_by_samples_and_features(sample_ids sample_ids, feature_ids feature_ids, string numerical_interpretation) returns (FloatDataTable float_data_table); 
+
+   /* given a list of genome_id and the string of what type of numerical interpretation 
+        it returns a FloatDataTable. 
+        Gives all samples and features for expression data that match the numerical interpretation
+        Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control' 
+   */ 
+   funcdef get_expression_float_data_table_by_genome(string genome_id, string numerical_interpretation) returns (FloatDataTable float_data_table); 
+
+
+
+ 
 }; 
+

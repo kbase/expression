@@ -5449,14 +5449,14 @@ sub get_expression_float_data_table_by_samples_and_features
             "If features are empty all features for the sample will be returned.  ".
 	    "If samples are empty all samples that match the numerical interpreation and feature ids will be returned."; 
       Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
-							     method_name => 'get_expression_data_by_samples_and_features'); 
+							     method_name => 'get_expression_float_data_table_by_samples_and_features'); 
     } 
     if (($numerical_interpretation ne 'FPKM') && ($numerical_interpretation ne 'Log2 level intensities') && 
         ($numerical_interpretation ne 'Log2 level ratios') && ($numerical_interpretation ne 'Log2 level ratios genomic DNA control')) 
     { 
         my $msg = "The numerical_interpretation must be equal to one of the following values 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'."; 
       Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
-                                                             method_name => 'get_expression_data_by_samples_and_features'); 
+                                                             method_name => 'get_expression_float_data_table_by_samples_and_features'); 
     } 
  
     my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd}, 
@@ -5537,6 +5537,148 @@ sub get_expression_float_data_table_by_samples_and_features
 	my $msg = "Invalid returns passed to get_expression_float_data_table_by_samples_and_features:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_expression_float_data_table_by_samples_and_features');
+    }
+    return($float_data_table);
+}
+
+
+
+
+=head2 get_expression_float_data_table_by_genome
+
+  $float_data_table = $obj->get_expression_float_data_table_by_genome($genome_id, $numerical_interpretation)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genome_id is a string
+$numerical_interpretation is a string
+$float_data_table is a KBaseExpression.FloatDataTable
+FloatDataTable is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	row_ids has a value which is a reference to a list where each element is a string
+	row_labels has a value which is a reference to a list where each element is a string
+	row_groups has a value which is a reference to a list where each element is a string
+	row_groups_ids has a value which is a reference to a list where each element is a string
+	column_ids has a value which is a reference to a list where each element is a string
+	column_labels has a value which is a reference to a list where each element is a string
+	column_groups has a value which is a reference to a list where each element is a string
+	column_groups_ids has a value which is a reference to a list where each element is a string
+	data has a value which is a reference to a list where each element is a reference to a list where each element is a float
+
+</pre>
+
+=end html
+
+=begin text
+
+$genome_id is a string
+$numerical_interpretation is a string
+$float_data_table is a KBaseExpression.FloatDataTable
+FloatDataTable is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	row_ids has a value which is a reference to a list where each element is a string
+	row_labels has a value which is a reference to a list where each element is a string
+	row_groups has a value which is a reference to a list where each element is a string
+	row_groups_ids has a value which is a reference to a list where each element is a string
+	column_ids has a value which is a reference to a list where each element is a string
+	column_labels has a value which is a reference to a list where each element is a string
+	column_groups has a value which is a reference to a list where each element is a string
+	column_groups_ids has a value which is a reference to a list where each element is a string
+	data has a value which is a reference to a list where each element is a reference to a list where each element is a float
+
+
+=end text
+
+
+
+=item Description
+
+given a list of genome_id and the string of what type of numerical interpretation 
+it returns a FloatDataTable. 
+Gives all samples and features for expression data that match the numerical interpretation
+Numerical_interpretation options : 'FPKM', 'Log2 level intensities', 'Log2 level ratios' or 'Log2 level ratios genomic DNA control'
+
+=back
+
+=cut
+
+sub get_expression_float_data_table_by_genome
+{
+    my $self = shift;
+    my($genome_id, $numerical_interpretation) = @_;
+
+    my @_bad_arguments;
+    (!ref($genome_id)) or push(@_bad_arguments, "Invalid type for argument \"genome_id\" (value was \"$genome_id\")");
+    (!ref($numerical_interpretation)) or push(@_bad_arguments, "Invalid type for argument \"numerical_interpretation\" (value was \"$numerical_interpretation\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_expression_float_data_table_by_genome:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_float_data_table_by_genome');
+    }
+
+    my $ctx = $Bio::KBase::KBaseExpression::Service::CallContext;
+    my($float_data_table);
+    #BEGIN get_expression_float_data_table_by_genome
+    my $sample_ids = []; 
+    if ((trim($genome_id) eq '') || (!defined($genome_id))) 
+    { 
+        my $msg = "requires a valid genome id. "; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_float_table_by_genome'); 
+    } 
+
+    if (($numerical_interpretation ne 'FPKM') && ($numerical_interpretation ne 'Log2 level intensities') && 
+        ($numerical_interpretation ne 'Log2 level ratios') && ($numerical_interpretation ne 'Log2 level ratios genomic DNA control'))
+    { 
+        my $msg = "The numerical_interpretation must be equal to one of the following values 'FPKM', 'Log2 level intensities', ".
+	    "'Log2 level ratios' or 'Log2 level ratios genomic DNA control'."; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                                             method_name => 'get_expression_float_table_by_genome'); 
+    } 
+    my $dbh = DBI->connect('DBI:mysql:'.$self->{dbName}.':'.$self->{dbhost},$self->{dbUser},$self->{dbPwd}, 
+                           { RaiseError => 1, ShowErrorStatement => 1 } 
+        ); 
+    my $get_sample_ids_by_genome_id_q = 
+        qq^select distinct sam.id  
+           from Sample sam   
+           inner join StrainWithSample sws on sam.id = sws.to_link 
+           inner join Strain str on sws.from_link = str.id  
+           inner join GenomeParentOf gpo on str.id = gpo.to_link   
+           inner join Genome gen on gpo.from_link = gen.id    
+           where gen.id = ? and
+           sam.numerical_interpretation = ?^;
+
+    my $get_sample_ids_by_genome_id_qh = $dbh->prepare($get_sample_ids_by_genome_id_q) or die 
+        "Unable to prepare get_sample_ids_by_genome_id_q : ". 
+        $get_sample_ids_by_genome_id_q . " : " . dbh->errstr() . "\n\n"; 
+    $get_sample_ids_by_genome_id_qh->execute($genome_id,$numerical_interpretation) or die "Unable to execute get_sample_ids_by_genome_id_q : ". 
+        $get_sample_ids_by_genome_id_q . " : " . $get_sample_ids_by_genome_id_qh->errstr() . "\n\n"; 
+    while (my ($sample_id) = $get_sample_ids_by_genome_id_qh->fetchrow_array()) 
+    { 
+        push(@$sample_ids,$sample_id); 
+    } 
+    if (scalar(@{$sample_ids}) == 0)
+    {
+	my $msg = "No sample ids for that genome id $genome_id with the numerical interpretation of : $numerical_interpretation"; 
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg, 
+                                                             method_name => 'get_expression_float_table_by_genome'); 
+    }
+    $float_data_table = $self->get_expression_float_data_table_by_samples_and_features($sample_ids, [], $numerical_interpretation); 
+    $float_data_table->{"name"}= $genome_id . " " . $float_data_table->{"name"};
+    #END get_expression_float_data_table_by_genome
+    my @_bad_returns;
+    (ref($float_data_table) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"float_data_table\" (value was \"$float_data_table\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_expression_float_data_table_by_genome:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_expression_float_data_table_by_genome');
     }
     return($float_data_table);
 }
