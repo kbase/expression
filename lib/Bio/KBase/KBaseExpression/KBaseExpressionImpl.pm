@@ -94,7 +94,7 @@ sub new
 #            $self->{dbhost} = 'db1.chicago.kbase.us'; 
             $self->{dbName} = 'kbase_sapling_v4'; 
             $self->{dbUser} = 'kbase_sapselect'; 
-            $self->{dbhost} = 'db4.chicago.kbase.us'; 
+            $self->{dbhost} = 'db3.chicago.kbase.us'; 
             $self->{dbPwd} = 'oiwn22&dmwWEe'; 
 
 #warn "IN CONFIG ELSE\n"; 
@@ -113,7 +113,7 @@ sub new
 #         $self->{dbhost} = 'db1.chicago.kbase.us'; 
 	$self->{dbName} = 'kbase_sapling_v4'; 
 	$self->{dbUser} = 'kbase_sapselect'; 
-	$self->{dbhost} = 'db4.chicago.kbase.us';
+	$self->{dbhost} = 'db3.chicago.kbase.us';
 	$self->{dbPwd} = 'oiwn22&dmwWEe';  
 #print "IN ELSE\n"; 
     } 
@@ -1194,8 +1194,8 @@ sub get_expression_samples_data_by_experimental_unit_ids
                                                               $get_sample_ids_by_experimental_unit_ids_q . " : " . dbh->errstr() . "\n\n"; 
     $get_sample_ids_by_experimental_unit_ids_qh->execute(@{$experimental_unit_ids}) or die "Unable to execute get_sample_ids_by_experimental_unit_ids_q : ". 
         $get_sample_ids_by_experimental_unit_ids_q . " : " . $get_sample_ids_by_experimental_unit_ids_qh->errstr() . "\n\n"; 
-    my %experimental_unit_sample_list_hash; # {experimentalUnitID}->[Sample_IDS]                                                                                                                                                                                                               
-    my %sample_ids_hash; #hash to get unique sample_id_hash                                                                                                                                                                                                                                    
+    my %experimental_unit_sample_list_hash; # {experimentalUnitID}->[Sample_IDS]       
+    my %sample_ids_hash; #hash to get unique sample_id_hash     
     while (my ($experimental_unit_id, $sample_id) = $get_sample_ids_by_experimental_unit_ids_qh->fetchrow_array()) 
     { 
         $sample_ids_hash{$sample_id} = 1; 
@@ -5481,10 +5481,11 @@ sub get_expression_float_data_table_by_samples_and_features
  
     my $get_feature_log2level_qh = $dbh->prepare($get_feature_log2level_q) or die "Unable to prepare get_feature_log2level_q : ". 
         $get_feature_log2level_q . " : " .$dbh->errstr(); 
-	    $get_feature_log2level_qh->execute($numerical_interpretation, @{$sample_ids}, @{$feature_ids})  or die "Unable to execute get_feature_log2level_q : ". 
+	    $get_feature_log2level_qh->execute($numerical_interpretation, @{$sample_ids}, @{$feature_ids})  
+		or die "Unable to execute get_feature_log2level_q : ". 
 		$get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr(); 
-    my %feature_sample_value_hash;#feature_id->sample_id->value
-    my %sample_id_title_hash;#Sample_id -> sample_title
+    my %feature_sample_value_hash; #feature_id->sample_id->value
+    my %sample_id_title_hash; #Sample_id -> sample_title
     while(my ($sample_id, $title, $feature_id,$value) = $get_feature_log2level_qh->fetchrow_array()) 
     { 
 #        my $sample_key = $sample_id . "___" . $title; 
@@ -5493,25 +5494,21 @@ sub get_expression_float_data_table_by_samples_and_features
 	$sample_id_title_hash{$sample_id}=$title;
     } 
     my @results_feature_ids = sort(keys(%feature_sample_value_hash));
-    $float_data_table{"row_ids"}=\@results_feature_ids;
-    $float_data_table{"row_labels"}=\@results_feature_ids;
     my @results_sample_ids = sort(keys(%sample_id_title_hash));
-    $float_data_table{"column_ids"}=\@results_sample_ids;
     my @results_sample_titles;
     foreach my $result_sample_id (@results_sample_ids)
     {
 	push(@results_sample_titles,$sample_id_title_hash{$result_sample_id});
     }
-    $float_data_table{"column_labels"}=\@results_sample_titles;
     my @data_array;
     foreach my $result_feature_id (@results_feature_ids)
     {
 	my @row_array;
 	foreach  my $result_sample_id (@results_sample_ids)
 	{
-	    if (exists($feature_sample_value_hash{$feature_id}->{$sample_id}))
+	    if (exists($feature_sample_value_hash{$result_feature_id}->{$result_sample_id}))
 	    {
-		push(@row_array, $feature_sample_value_hash{$feature_id}->{$sample_id});
+		push(@row_array, $feature_sample_value_hash{$result_feature_id}->{$result_sample_id});
 	    }
 	    else
 	    {
@@ -5520,7 +5517,19 @@ sub get_expression_float_data_table_by_samples_and_features
 	}
 	push(@data_array,\@row_array);
     }
-    $float_data_table{"data"}=\@data_array;
+    my $name = "Expression Data : ".
+	$numerical_interpretation.
+	" for ".
+	scalar(@results_sample_ids). 
+	" samples and across ". 
+	scalar(@results_feature_ids).
+	" features"; 
+    $float_data_table = {"name" => $name, 
+			 "row_ids"=>\@results_feature_ids, 
+			 "row_labels"=>\@results_feature_ids, 
+			 "column_ids"=>\@results_sample_ids,
+			 "column_labels"=>\@results_sample_titles,
+			 "data"=>\@data_array};			 
     #END get_expression_float_data_table_by_samples_and_features
     my @_bad_returns;
     (ref($float_data_table) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"float_data_table\" (value was \"$float_data_table\")");
