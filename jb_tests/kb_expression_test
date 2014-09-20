@@ -6,7 +6,7 @@ use Bio::KBase::KBaseExpression::KBaseExpressionClient;
 #use Bio::KBase::KBaseExpression::FunctionsForGEO; 
 
 #FOR STARMAN
-my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7075");
+#my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:7075");
 
 #FOR TESTING THE DEPLOYED SERVICE
 #my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://kbase.us/services/expression/");
@@ -17,7 +17,7 @@ my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://loc
 #sudo su
 #source /kb/deployment/user-env.sh
 #plackup --listen :9999 /kb/dev_container/modules/expression/lib/KBaseExpression.psgi 
-#my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:9999"); 
+my $client = Bio::KBase::KBaseExpression::KBaseExpressionClient->new("http://localhost:9999"); 
 
 
 #For testing the IMP directly
@@ -34,7 +34,7 @@ print "get_expression_samples_data()\n";
 #$result = $client->get_expression_samples_data(['kb|sample.95']);
 #$result = $client->get_expression_samples_data(['kb|sample.3713']);
 #$result = $client->get_expression_samples_data(['kb|sample.3745']);
-$result = $client->get_expression_samples_data(['kb|sample.3775']);
+#$result = $client->get_expression_samples_data(['kb|sample.3775']);
 #$result = $client->get_expression_samples_data(['kb|sample.38','kb|sample.39']);
 #print Dumper($result) . "\n----------------------------\n";
 
@@ -48,6 +48,10 @@ print "get_expression_data_by_sample_and_features()\n";
 
 print "get_expression_float_data_table_by_samples_and_features()\n";
 #$result = $client->get_expression_float_data_table_by_samples_and_features(['kb|sample.3775','kb|sample.3776'], [], 'Log2 level intensities'); 
+#print Dumper($result) . "\n----------------------------\n";
+
+print "get_expression_float_data_table_by_genome()\n";
+$result = $client->get_expression_float_data_table_by_genome('kb|g.1870', 'Log2 level intensities'); 
 #print Dumper($result) . "\n----------------------------\n";
 
 #get_expression_samples_data_by_series_ids\
