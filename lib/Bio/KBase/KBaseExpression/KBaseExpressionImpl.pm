@@ -27,6 +27,7 @@ use Bio::DB::Taxonomy;
 use Bio::KBase;
 use Bio::KBase::CDMI::CDMIClient; 
 use Bio::KBase::KBaseExpression::FunctionsForGEO;
+use JSON;
 
 sub trim($)
 {
@@ -5463,7 +5464,7 @@ sub get_expression_float_data_table_by_samples_and_features
                            { RaiseError => 1, ShowErrorStatement => 1 } 
 	); 
  
-    my $get_feature_log2level_q = qq^select sam.id, sam.title, fea.id, mea.value
+    my $get_feature_log2level_q = qq^select sam.id, sam.title, sam.externalSourceId, fea.id, mea.value
                                      from Sample sam                           
                                      inner join SampleMeasurements sms on sam.id = sms.from_link
                                      inner join Measurement mea on sms.to_link = mea.id 
@@ -5486,12 +5487,18 @@ sub get_expression_float_data_table_by_samples_and_features
 		$get_feature_log2level_q . " : " .$get_feature_log2level_qh->errstr(); 
     my %feature_sample_value_hash; #feature_id->sample_id->value
     my %sample_id_title_hash; #Sample_id -> sample_title
-    while(my ($sample_id, $title, $feature_id,$value) = $get_feature_log2level_qh->fetchrow_array()) 
+    while(my ($sample_id, $title, $external_source_id, $feature_id,$value) = $get_feature_log2level_qh->fetchrow_array()) 
     { 
 #        my $sample_key = $sample_id . "___" . $title; 
 #        $label_data_mapping->{$sample_key}->{$feature_id}=$log2level; 
+	my $label = '';
+	if (defined($external_source_id)  && ($external_source_id ne ''))
+	{
+	    $label = $external_source_id . " : ";
+	}
+	$label = $label . $title;
 	$feature_sample_value_hash{$feature_id}->{$sample_id}=$value;
-	$sample_id_title_hash{$sample_id}=$title;
+	$sample_id_title_hash{$sample_id}=$label;
     } 
     my @results_feature_ids = sort(keys(%feature_sample_value_hash));
     my @results_sample_ids = sort(keys(%sample_id_title_hash));
@@ -5508,7 +5515,7 @@ sub get_expression_float_data_table_by_samples_and_features
 	{
 	    if (exists($feature_sample_value_hash{$result_feature_id}->{$result_sample_id}))
 	    {
-		push(@row_array, $feature_sample_value_hash{$result_feature_id}->{$result_sample_id});
+		push(@row_array, $feature_sample_value_hash{$result_feature_id}->{$result_sample_id} + 0);
 	    }
 	    else
 	    {
