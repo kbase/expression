@@ -2300,7 +2300,7 @@ sub parse_sample_data
             #May need to include MAS 5 as well.  NOPE MAS 5 can be either in normal or log2 space. 
             $gsm_value_multiplier = 1; 
             $gsm_treatment="log2";
-	    $rma_normalized_boolean = 0;
+	    $rma_normalized_boolean = 1;
 	}
 	elsif (($gsm_value_type =~ m/ log/i)||($gsm_value_type =~ m/^log/i)){
 	    if (($gsm_value_type =~ m/ log[ _]?10/i) || ($gsm_value_type =~ m/^log[ _]?10/i)){

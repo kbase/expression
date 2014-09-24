@@ -426,19 +426,33 @@ sub geo2TypedObjects
 #		my $gsm_numerical_interpretation = "Log2 level intensities";
 		my $gsm_numerical_interpretation;
 		if(exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'}) && 
-		   ($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'} ne "")) 
+		   (trim($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'}) ne "")) 
 		{
 		    $gsm_numerical_interpretation = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'numerical_interpretation'};
 		}
 		my $gsm_description = "";
 		if(exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'}) &&
-		   ($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'} ne ""))
+		   (trim($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'}) ne ""))
 		{
 		    $gsm_description = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmDescription'};
 		}
 		$gsm_description .= "::Value Description : ".$gse_object_ref->{'gseSamples'}->{$gsm_id}->{"gsmValueType"};
 		my $gsm_title = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmTitle'};
 		my $gsm_external_source_date = $gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmSubmissionDate'};
+
+		my $RMA_normalized = 0;
+		if  (exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'rmaNormalized'}) && 
+		     ($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'rmaNormalized'} ne "")) 
+		{
+		    if ($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'rmaNormalized'} eq "1")
+		    {
+			$RMA_normalized = 1;
+		    }
+		    else
+		    {
+			$RMA_normalized = 0;
+		    } 
+		}
 
 		my $gsm_molecule = "";
 		if (exists($gse_object_ref->{'gseSamples'}->{$gsm_id}->{'gsmMolecule'}) &&
@@ -653,6 +667,7 @@ sub geo2TypedObjects
 							    "description" => "$temp_genome_id wild_type reference strain",
 							    "name" => "$temp_genome_id wild_type reference strain"},
 						 "data_source"=>$gsm_data_source,
+						 "RMA_normalized"=>$RMA_normalized,
 			};
 
 			if (scalar(@expression_ontology_terms) > 0)
