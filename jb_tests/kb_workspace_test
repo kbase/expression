@@ -9,6 +9,7 @@ my $workspace_name = shift;
 #my $workspace_name = "networks_typed_objects_examples";
 my $typed_objects_dir = shift;
 #my $typed_objects_dir = "/mnt/typed_objects/";
+my $genomes_workspace_name = shift;
 
 my $ws_client = Bio::KBase::workspace::Client->new($ws_url);
 #my $ws_client = Bio::KBase::workspace::Client->new("http://140.221.84.209:7058");
@@ -57,7 +58,16 @@ foreach my $platform_file (@platform_files)
 	my ($json_result,@temp_array)= (<JSON_FILE>);
 	close(JSON_FILE);
 	my $perl_object = from_json($json_result);
-#will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
+	#will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
+        if($perl_object->{"genome_id"}) 
+        { 
+          $perl_object->{"genome_id"} = $genomes_workspace_name . "/".$perl_object->{"genome_id"}; 
+        } 
+        if($perl_object->{"strain"}->{"genome_id"}) 
+        { 
+	  $perl_object->{"strain"}->{"genome_id"} = $genomes_workspace_name . "/".$perl_object->{"strain"}->{"genome_id"};
+        } 
+
         my $save_object_params = {"workspace"=>$workspace_name, 
                                   "objects"=>[{"type"=>$typed_object, 
                                                "name"=>$perl_object->{'id'}, 
@@ -72,10 +82,19 @@ foreach my $sample_file (@sample_files)
 	my ($json_result,@temp_array)= (<JSON_FILE>);
 	close(JSON_FILE);
 	my $perl_object = from_json($json_result);
+	#will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
 	if($perl_object->{"platform_id"})
 	{
 		$perl_object->{"platform_id"} = $workspace_name . "/".$perl_object->{"platform_id"};
 	}
+        if($perl_object->{"genome_id"}) 
+        { 
+          $perl_object->{"genome_id"} = $genomes_workspace_name . "/".$perl_object->{"genome_id"};
+        } 
+        if($perl_object->{"strain"}->{"genome_id"})
+        { 
+          $perl_object->{"strain"}->{"genome_id"} = $genomes_workspace_name . "/".$perl_object->{"strain"}->{"genome_id"};
+        } 
         if($perl_object->{"expression_series_ids"}) 
         { 
                 my @series_ids = @{$perl_object->{"expression_series_ids"}};
@@ -86,7 +105,6 @@ foreach my $sample_file (@sample_files)
                 } 
                 $perl_object->{"expression_series_ids"}) = \@prepended_series_ids;
         }
-#will need to add workspace prepending once we are referring to a ws.genome_id (perhaps feature)
         my $save_object_params = {"workspace"=>$workspace_name, 
                                   "objects"=>[{"type"=>$typed_object, 
                                                "name"=>$perl_object->{'id'}, 
@@ -102,6 +120,7 @@ foreach my $series_file (@series_files)
 	close(JSON_FILE);
 	my $perl_object = from_json($json_result);
 	my %genome_expression_sample_ids_map = %{$perl_object->{"genome_expression_sample_ids_map"}};
+	my %new_genome_expression_sample_ids_map;
 	foreach my $genome_id (keys(%genome_expression_sample_ids_map))
 	{
 		my @sample_ids = @{$genome_expression_sample_ids_map{$genome_id}};
@@ -109,9 +128,10 @@ foreach my $series_file (@series_files)
         	{ 
                   $sample_ids[$i] = $workspace_name."/".$sample_ids[$i];
         	} 
-		$genome_expression_sample_ids_map{$genome_id}=\@sample_ids;
+		my $temp_genome_id = $genomes_workspace_name . "/".$genome_id;
+		$new_genome_expression_sample_ids_map{$genome_id}=\@sample_ids;
 	}
-	$perl_object->{"genome_expression_sample_ids_map"}=\%genome_expression_sample_ids_map;
+	$perl_object->{"genome_expression_sample_ids_map"}=\%new_genome_expression_sample_ids_map;
         my $save_object_params = {"workspace"=>$workspace_name, 
                                   "objects"=>[{"type"=>$typed_object, 
                                                "name"=>$perl_object->{'id'}, 
