@@ -1361,7 +1361,8 @@ sub create_genome_synonyms_lookup
     my $genome_hash_ref = shift; 
     my @genome_ids = keys(%{$genome_hash_ref}); 
 
-    my $id_map = Bio::KBase::IdMap::Client->new("http://140.221.85.96:7111"); 
+#    my $id_map = Bio::KBase::IdMap::Client->new("http://140.221.85.96:7111"); 
+    my $id_map = Bio::KBase::IdMap::Client->new("http://kbase.us/services/id_map"); 
  
     my $kb = Bio::KBase->new(); 
     my $cdmi_client = $kb->central_store; 
