@@ -103,7 +103,7 @@ foreach my $sample_file (@sample_files)
                 { 
                         push(@prepended_series_ids,$workspace_name ."/".$series_id);
                 } 
-                $perl_object->{"expression_series_ids"}) = \@prepended_series_ids;
+                $perl_object->{"expression_series_ids"} = \@prepended_series_ids;
         }
         my $save_object_params = {"workspace"=>$workspace_name, 
                                   "objects"=>[{"type"=>$typed_object, 
