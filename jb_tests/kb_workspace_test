@@ -129,7 +129,7 @@ foreach my $series_file (@series_files)
                   $sample_ids[$i] = $workspace_name."/".$sample_ids[$i];
         	} 
 		my $temp_genome_id = $genomes_workspace_name . "/".$genome_id;
-		$new_genome_expression_sample_ids_map{$genome_id}=\@sample_ids;
+		$new_genome_expression_sample_ids_map{$temp_genome_id}=\@sample_ids;
 	}
 	$perl_object->{"genome_expression_sample_ids_map"}=\%new_genome_expression_sample_ids_map;
         my $save_object_params = {"workspace"=>$workspace_name, 
