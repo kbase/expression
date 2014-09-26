@@ -1,0 +1,53 @@
+use strict; 
+use Bio::KBase::KBaseExpression::FunctionsForGEO; 
+use Bio::KBase::KBaseExpression::GEO2TypedObjects; 
+use Bio::KBase::KBaseExpression::GEO2ReplicateGroups; 
+ 
+use Data::Dumper; 
+$| = 1; 
+ 
+my $low_index = shift; 
+my $high_index = shift; 
+my $functionsForGEO = Bio::KBase::KBaseExpression::FunctionsForGEO->new(); 
+ 
+#open FILE, "/mnt/geo_lists/microbes_list" or die $!; 
+#my @gses = <FILE>; 
+#close (FILE); 
+#chomp(@gses); 
+#print "\nTOTAL GSEs : ".scalar(@gses)."\n"; 
+my $counter = 1; 
+ 
+#my @gses_subset = @gses[$low_index ..$high_index]; 
+my @gses = qw(GSE29187 GSE29303); 
+
+#foreach my $gse (@gses) 
+#{ 
+#print "\nCounter $counter "; 
+  #note the 3 file directories should be different and exist 
+#print "\nGSE :".$gse.": -- Before call : ".localtime."\n\n"; 
+#  $functionsForGEO->make_GSE_object_file($gse,0,"/kb/dev_container/modules/expression/test_files/blat_files","/kb/dev_container/modules/expression/test_files/platform_genome_mapping_files/","/kb/dev_container/modules/expression/test_files/gse_objects/",
+#						"/kb/dev_container/modules/expression/test_files/gse_files"); 
+#print "\nAfter call : ".localtime."\n\n"; 
+#  $counter++; 
+#} 
+ 
+my $counter = 1; 
+print "\nDoing Geo2TypedObjects loop\n"; 
+foreach my $gse (@gses) 
+{ 
+  print "\nCounter $counter -- GSE :".$gse." : ".localtime."\n\n"; 
+  my $file_name = "/kb/dev_container/modules/expression/test_files/gse_objects/".$gse; 
+  my $geo2TypedObject = Bio::KBase::KBaseExpression::GEO2TypedObjects->new(); 
+  if (-e $file_name) 
+  { 
+       my $test_hash_ref = $geo2TypedObject->geo2TypedObjects($file_name,"GEO","/kb/dev_container/modules/expression/test_files/geo_results/","/kb/dev_container/modules/expression/test_files/typed_objects/"); 
+       print "\nGEO2TypedObject: ".Dumper($test_hash_ref); 
+  } 
+  else 
+  { 
+        print "ERROR File $file_name does not exist\n"; 
+  } 
+$counter++; 
+} 
+ 
+system("perl /kb/dev_container/modules/expression/jb_tests/kb_workspace_test https://kbase.us/services/ws new_pipeline /kb/dev_container/modules/expression/test_files/typed_objects/ KBasePublicGenomesV4"); 
